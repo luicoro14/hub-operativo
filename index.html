@@ -2,324 +2,372 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matriz de Seguimiento Operativo - Executive Cloud v9.5</title>
-    <!-- SDKs Firebase -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Matriz de Seguimiento Operativo v11.0</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Angular v1.8 CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+
+    <!-- Firebase SDKs Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <!-- Librería para Generar Excel .xlsx Gerencial Nativo sin Servidor -->
+
+    <!-- Librería para Exportación a Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
         :root {
-            --bg-principal: #0b0e14;
-            --bg-card: #141a24;
-            --bg-input: #1a2332;
-            --accent-warm-orange: #ff6b35;
-            --accent-amber: #f7b801;
-            --accent-magenta: #e63946;
-            --accent-green: #00e676;
-            --accent-blue: #00f0ff;
-            --text-main: #f8f9fa;
-            --text-muted: #94a3b8;
-            --border-color: #27354a;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --accent-primary: #2563eb;
+            --text-dark: #0f172a;
+            --border-color: #e2e8f0;
         }
 
-        * { box-sizing: border-box; }
-
-        body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            margin: 0; padding: 15px; 
-            background: var(--bg-principal); color: var(--text-main); 
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* LOGIN ÁVILA WARM NEÓN RESPONSIVO */
-        .login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(11, 14, 20, 0.45) 0%, rgba(11, 14, 20, 0.95) 100%),
-                        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
-            display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 15px;
+        .card-fresca {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+            transition: all 0.2s ease;
         }
 
-        .login-box {
-            background: rgba(20, 26, 36, 0.88); backdrop-filter: blur(18px);
-            padding: 35px 25px; border-radius: 20px; border: 1px solid rgba(255, 107, 53, 0.4);
-            box-shadow: 0 0 35px rgba(255, 107, 53, 0.25); width: 100%; max-width: 400px; text-align: center;
+        .input-fresco {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 0.65rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #0f172a;
+            outline: none;
+            transition: all 0.2s;
         }
 
-        .login-box h3 {
-            color: var(--accent-warm-orange); margin: 0 0 6px 0; font-size: 21px; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 0 12px rgba(255, 107, 53, 0.6);
+        .input-fresco:focus {
+            border-color: #2563eb;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .login-box p { color: var(--text-muted); font-size: 11px; margin-bottom: 25px; text-transform: uppercase; }
-        .input-group { margin-bottom: 16px; }
-
-        .login-box input {
-            width: 100%; padding: 12px 15px; background: var(--bg-input); border: 1px solid var(--border-color);
-            border-radius: 10px; font-size: 13px; color: var(--text-main); outline: none; text-align: center;
+        .badge-estado {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 10px;
+            letter-spacing: 0.03em;
         }
 
-        .login-box input:focus { border-color: var(--accent-warm-orange); box-shadow: 0 0 12px rgba(255, 107, 53, 0.4); }
+        .badge-pendiente { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-proceso { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-completado { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
 
-        .login-btn {
-            background: linear-gradient(90deg, var(--accent-warm-orange), var(--accent-amber));
-            color: #000; width: 100%; padding: 13px; font-size: 14px; border-radius: 10px; border: none;
-            font-weight: bold; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
+        .nav-tab {
+            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            transition: all 0.2s;
         }
 
-        .login-error { color: var(--accent-magenta); font-size: 12px; margin-top: 15px; display: none; }
-
-        /* CONTENEDOR PRINCIPAL AUTÓNOMO */
-        .container { 
-            max-width: 1350px; margin: 0 auto; background: var(--bg-card); padding: 20px; 
-            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid var(--border-color); display: none;
-        }
-        
-        h2 { 
-            color: var(--accent-warm-orange); margin-top: 0; border-bottom: 2px solid var(--border-color); 
-            padding-bottom: 12px; text-transform: uppercase; font-size: 18px; display: flex;
-            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
-        }
-
-        .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-
-        .user-tag, .role-tag, .net-tag, .version-tag {
-            font-size: 11px; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: bold;
-        }
-        .user-tag { background: var(--bg-input); color: var(--accent-blue); }
-        .role-admin { background: rgba(255, 107, 53, 0.15); color: var(--accent-warm-orange); border-color: var(--accent-warm-orange); }
-        .role-user { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
-        .net-online { background: rgba(0, 230, 118, 0.15); color: var(--accent-green); border-color: var(--accent-green); }
-        .net-offline { background: rgba(230, 57, 70, 0.15); color: var(--accent-magenta); border-color: var(--accent-magenta); }
-        .version-tag { background: var(--bg-input); color: var(--accent-amber); border-color: var(--accent-amber); }
-
-        .btn-logout {
-            background: #1e293b; color: var(--accent-magenta); border: 1px solid var(--accent-magenta);
-            padding: 5px 10px; font-size: 11px; border-radius: 6px; cursor: pointer;
-        }
-
-        /* TARJETAS KPI RESPONSIVAS */
-        .kpi-container { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .kpi-card { 
-            flex: 1; min-width: 140px; background: var(--bg-principal); border-left: 4px solid var(--accent-warm-orange); 
-            padding: 12px; border-radius: 10px; border: 1px solid var(--border-color);
-        }
-        .kpi-card h4 { margin: 0 0 5px 0; font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-        .kpi-card .number { font-size: 18px; font-weight: bold; }
-
-        .charts-section { background: #0f1520; padding: 16px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-color); }
-        .charts-section h4 { margin: 0 0 12px 0; font-size: 12px; color: var(--accent-warm-orange); text-transform: uppercase; }
-        .chart-row { margin-bottom: 10px; }
-        .chart-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
-        .progress-bar-bg { background: var(--bg-input); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); }
-        .progress-bar-fill { height: 100%; width: 0%; transition: width 0.4s ease; }
-
-        /* FORMULARIO Y FILTROS */
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 10px; }
-        .form-grid-row2 { margin-bottom: 15px; }
-        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
-
-        input, select, textarea { 
-            padding: 10px; background: var(--bg-input); border: 1px solid var(--border-color); 
-            border-radius: 8px; font-size: 12px; color: var(--text-main); outline: none; width: 100%; font-family: inherit;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent-warm-orange); }
-        textarea { resize: vertical; min-height: 45px; }
-
-        .filter-section { background: #0f1520; padding: 12px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-color); }
-        .filter-section label { font-size: 11px; font-weight: bold; color: var(--accent-warm-orange); display: block; margin-bottom: 8px; }
-
-        /* BARRA DE BOTONES */
-        .btn-bar { display: flex; gap: 10px; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; }
-        button { padding: 10px 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; transition: all 0.2s; }
-        .btn-agregar { background: linear-gradient(90deg, var(--accent-warm-orange), var(--accent-amber)); color: #000; width: 100%; }
-        .btn-actualizar { background: var(--accent-amber); color: #000; width: 100%; display: none; }
-        .btn-exportar { background: #1e293b; color: var(--accent-green); border: 1px solid var(--accent-green); }
-        .btn-dash-excel { background: linear-gradient(90deg, #0284c7, #00e676); color: #000; font-weight: bold; border: 1px solid #00e676; display: none; }
-        .btn-archivar { background: #1e293b; color: var(--accent-amber); border: 1px solid var(--accent-amber); }
-        
-        .btn-accion { padding: 4px 8px; font-size: 10px; margin-right: 4px; border-radius: 4px; }
-        .btn-editar { background: #334155; color: var(--accent-blue); }
-        .btn-eliminar { background: #334155; color: var(--accent-magenta); }
-
-        /* TABLA GERENCIAL DE ALTA DENSIDAD */
-        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 850px; }
-        th, td { padding: 10px; border: 1px solid var(--border-color); text-align: left; font-size: 12px; }
-        th { background-color: var(--bg-principal); color: var(--accent-warm-orange); font-size: 11px; text-transform: uppercase; }
-        tr:nth-child(even) { background-color: #121824; }
-
-        tr.alerta-vencido { background-color: rgba(230, 57, 70, 0.15) !important; }
-        tr.alerta-proximo { background-color: rgba(247, 184, 1, 0.12) !important; }
-
-        .badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; text-align: center; display: inline-block; }
-        .badge-pendiente { background: rgba(230, 57, 70, 0.15); color: var(--accent-magenta); border: 1px solid var(--accent-magenta); }
-        .badge-proceso { background: rgba(247, 184, 1, 0.15); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
-        .badge-completado { background: rgba(0, 230, 118, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
-        
-        .creador-tag { font-size: 10px; color: var(--text-muted); font-style: italic; }
-        .alerta-texto { font-size: 10px; font-weight: bold; margin-left: 4px; }
-        .alerta-texto.rojo { color: var(--accent-magenta); }
-        .alerta-texto.amarillo { color: var(--accent-amber); }
-        .obs-cell { max-width: 180px; white-space: pre-wrap; word-break: break-word; font-size: 11px; color: #cbd5e1; }
-
-        @media (max-width: 768px) {
-            body { padding: 8px; }
-            .container { padding: 12px; }
-            button { width: 100%; }
-            .btn-bar { flex-direction: column; }
+        .nav-tab.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
     </style>
 </head>
-<body>
+<body ng-app="matrizApp" ng-controller="MatrizController">
 
-    <!-- Pantalla de Inicio / Autenticación -->
-    <div id="loginOverlay" class="login-overlay">
-        <div class="login-box">
-            <h3>Matriz de Seguimiento Operativo</h3>
-            <p>Acceso Ejecutivos & Operación Cloud</p>
-            <div class="input-group">
-                <input type="text" id="userInput" placeholder="Usuario" autocomplete="off">
+    <!-- 0. LOGIN DE ACCESO POR ROLES -->
+    <div id="loginOverlay" ng-show="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-500/30">
+                M
             </div>
-            <div class="input-group">
-                <input type="password" id="passInput" placeholder="Contraseña">
-            </div>
-            <button class="login-btn" onclick="autenticar()">Ingresar al Sistema</button>
-            <div id="loginError" class="login-error">⚠ Credenciales Inválidas</div>
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Matriz Operativa</h2>
+            <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-6">Control de Requerimientos & SLAs</p>
+
+            <form ng-submit="iniciarSesion()" class="space-y-4">
+                <div>
+                    <input type="text" ng-model="loginUser" placeholder="Usuario de acceso" required
+                           class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-800 outline-none focus:border-blue-600 focus:bg-white transition text-center font-medium">
+                </div>
+                <div>
+                    <input type="password" ng-model="loginPass" placeholder="Contraseña" required
+                           class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-800 outline-none focus:border-blue-600 focus:bg-white transition text-center font-medium">
+                </div>
+
+                <button type="submit" 
+                        class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm uppercase tracking-wider shadow-lg shadow-blue-500/25 active:scale-95 transition">
+                    Ingresar al Sistema
+                </button>
+            </form>
+
+            <p ng-show="loginError" class="text-xs text-red-500 font-bold mt-4">⚠ Usuario o contraseña incorrectos</p>
         </div>
     </div>
 
-    <!-- App Container -->
-    <div id="appContainer" class="container">
-        <h2>
-            <span>Matriz de Seguimiento Operativo <span class="version-tag">☁ Executive Cloud v9.5</span></span>
-            <div class="header-actions">
-                <span id="netTag" class="net-tag net-online">🟢 Conectado Nube</span>
-                <span id="roleTag" class="role-tag role-user">Perfil: Operador</span>
-                <span id="userTag" class="user-tag">Usuario: --</span>
-                <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
-            </div>
-        </h2>
+    <!-- APP PRINCIPAL -->
+    <div ng-show="sesionIniciada">
+        <!-- HEADER TOP CORPORATIVO -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center font-black text-white text-lg shadow-md">
+                        M
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">MATRIZ OPERATIVA</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Sesión: {{ usuarioSesion }} <span ng-show="esAdmin" class="text-blue-600 font-black">(Admin)</span></p>
+                    </div>
+                </div>
 
-        <!-- KPIs en Tiempo Real -->
-        <div class="kpi-container">
-            <div class="kpi-card">
-                <h4>Total Actividades</h4>
-                <div class="number" id="kpiTotal">0</div>
-            </div>
-            <div class="kpi-card" style="border-left-color: var(--accent-amber);">
-                <h4>Pendientes / Proceso</h4>
-                <div class="number" id="kpiPendientes">0</div>
-            </div>
-            <div class="kpi-card" style="border-left-color: var(--accent-magenta);">
-                <h4>Tareas Vencidas</h4>
-                <div class="number" id="kpiVencidos">0</div>
-            </div>
-            <div class="kpi-card" style="border-left-color: var(--accent-green);">
-                <h4>Completadas</h4>
-                <div class="number" id="kpiCompletados">0</div>
-            </div>
-            <div class="kpi-card" style="border-left-color: var(--accent-blue);">
-                <h4>Cumplimiento SLA</h4>
-                <div class="number" id="kpiSLA" style="color: var(--accent-blue);">100%</div>
-            </div>
-        </div>
+                <div class="flex items-center gap-3">
+                    <!-- NAVEGACIÓN INTERNA -->
+                    <div class="flex gap-1 bg-slate-100 p-1 rounded-xl">
+                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="seccionActiva = 'matriz'">📋 Matriz</button>
+                        <button class="nav-tab" ng-show="esAdmin" ng-class="{'active': seccionActiva === 'admin'}" ng-click="seccionActiva = 'admin'">⚙ Admin & Auditoría</button>
+                    </div>
 
-        <!-- Barras de Distribución -->
-        <div class="charts-section">
-            <h4>📊 Avance y Distribución Operativa</h4>
-            <div class="chart-row">
-                <div class="chart-label"><span>Cumplimiento General</span><strong id="barTextCumplimiento">0%</strong></div>
-                <div class="progress-bar-bg"><div id="barFillCumplimiento" class="progress-bar-fill" style="background: var(--accent-green);"></div></div>
+                    <a href="intranet.html" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3.5 py-2 rounded-xl border border-blue-100 transition hidden md:inline-flex items-center gap-1">
+                        🏢 Ir al Hub
+                    </a>
+                    
+                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 px-3 py-2 rounded-xl border border-red-100 transition">Salir</button>
+                </div>
             </div>
-            <div class="chart-row">
-                <div class="chart-label"><span>Carga Pendiente / En Proceso</span><strong id="barTextPendientes">0%</strong></div>
-                <div class="progress-bar-bg"><div id="barFillPendientes" class="progress-bar-fill" style="background: var(--accent-amber);"></div></div>
+        </header>
+
+        <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+
+            <!-- SECCIÓN 1: MATRIZ OPERATIVA -->
+            <div ng-show="seccionActiva === 'matriz'" class="space-y-6">
+                <!-- BANNER DE BIENVENIDA -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 p-6 sm:p-8 text-white shadow-xl">
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full text-white">Gestión Operativa en Nube</span>
+                            <h2 class="text-2xl sm:text-3xl font-black mt-2 sm:mt-3">Control de Requerimientos & SLAs</h2>
+                            <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mt-1 font-medium">Registro y actualización centralizada de actividades para las 3 Gerencias.</p>
+                        </div>
+                        <button ng-click="exportarExcel()" class="w-full md:w-auto px-5 py-3.5 rounded-2xl bg-white text-blue-600 font-black text-xs uppercase tracking-wider shadow-lg hover:bg-blue-50 transition border border-white text-center active:scale-95">
+                            📥 Exportar Matriz (.xlsx)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARDS DE METRICAS KPI -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="card-fresca p-4 sm:p-5">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Registros</span>
+                        <div class="text-2xl sm:text-3xl font-black text-slate-800 mt-1">{{ actividades.length }}</div>
+                        <span class="text-[10px] sm:text-xs text-blue-600 font-bold mt-1 sm:mt-2 block">📊 Base General</span>
+                    </div>
+
+                    <div class="card-fresca p-4 sm:p-5">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Pendientes</span>
+                        <div class="text-2xl sm:text-3xl font-black text-amber-600 mt-1">{{ contarPorEstado('Pendiente') }}</div>
+                        <span class="text-[10px] sm:text-xs text-amber-600 font-bold mt-1 sm:mt-2 block">⏳ Por Procesar</span>
+                    </div>
+
+                    <div class="card-fresca p-4 sm:p-5">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">En Proceso</span>
+                        <div class="text-2xl sm:text-3xl font-black text-sky-600 mt-1">{{ contarPorEstado('En Proceso') }}</div>
+                        <span class="text-[10px] sm:text-xs text-sky-600 font-bold mt-1 sm:mt-2 block">⚙ En Ejecución</span>
+                    </div>
+
+                    <div class="card-fresca p-4 sm:p-5">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Completadas</span>
+                        <div class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">{{ contarPorEstado('Completado') }}</div>
+                        <span class="text-[10px] sm:text-xs text-emerald-600 font-bold mt-1 sm:mt-2 block">🟢 Finalizadas</span>
+                    </div>
+                </div>
+
+                <!-- FORMULARIO DE REGISTRO (DISPONIBLE PARA TODOS) -->
+                <div class="card-fresca p-5 sm:p-6 space-y-4">
+                    <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">➕ Registrar Nueva Actividad Operativa</h3>
+
+                    <form ng-submit="agregarActividad()" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                            <div class="sm:col-span-2">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Descripción de la Tarea</label>
+                                <input type="text" ng-model="nuevaAct.descripcion" required placeholder="Ej: Conciliación de cuentas de fin de mes..." class="input-fresco w-full">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Gerencia / Área</label>
+                                <select ng-model="nuevaAct.categoria" required class="input-fresco w-full">
+                                    <option value="Servicios bancarios">Servicios bancarios</option>
+                                    <option value="Recaudación especializada">Recaudación especializada</option>
+                                    <option value="Control contable">Control contable</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Responsable</label>
+                                <input type="text" ng-model="nuevaAct.responsable" required placeholder="Nombre del Analista" class="input-fresco w-full">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Estado Inicial</label>
+                                <select ng-model="nuevaAct.estado" required class="input-fresco w-full">
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="En Proceso">En Proceso</option>
+                                    <option value="Completado">Completado</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Fecha Compromiso (SLA)</label>
+                                <input type="date" ng-model="nuevaAct.fechaLimiteInput" required class="input-fresco w-full">
+                            </div>
+
+                            <div class="flex items-end sm:col-span-2">
+                                <button type="submit" class="w-full py-3 px-6 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase tracking-wider active:scale-95 transition hover:bg-blue-700 shadow-md shadow-blue-500/20">
+                                    + Guardar Tarea en Nube
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- TABLA DE ACTIVIDADES (CON RESTRICCIONES DE ROL) -->
+                <div class="card-fresca p-5 sm:p-6 space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">📋 Matriz General de Requerimientos</h3>
+                        <input type="text" ng-model="busquedaMatriz" placeholder="🔍 Buscar por descripción, responsable, gerencia..." class="input-fresco w-full sm:w-80">
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse min-w-[700px]">
+                            <thead>
+                                <tr class="bg-slate-100/80 text-slate-700 uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                    <th class="p-3 font-extrabold">Descripción</th>
+                                    <th class="p-3 font-extrabold">Gerencia</th>
+                                    <th class="p-3 font-extrabold">Responsable</th>
+                                    <th class="p-3 font-extrabold">Estado</th>
+                                    <th class="p-3 font-extrabold">Fecha Compromiso</th>
+                                    <th class="p-3 font-extrabold">Fecha Cierre</th>
+                                    <th class="p-3 font-extrabold text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="act in actividades | filter:busquedaMatriz" class="border-b border-slate-100 hover:bg-slate-50/80 transition">
+                                    <td class="p-3 font-bold text-slate-800">{{ act.descripcion }}</td>
+                                    <td class="p-3 font-medium text-slate-600">🏢 {{ act.categoria }}</td>
+                                    <td class="p-3 font-bold text-blue-600">👤 {{ act.responsable }}</td>
+                                    <td class="p-3">
+                                        <span class="badge-estado" ng-class="{'badge-pendiente': act.estado==='Pendiente', 'badge-proceso': act.estado==='En Proceso', 'badge-completado': act.estado==='Completado'}">
+                                            {{ act.estado }}
+                                        </span>
+                                    </td>
+                                    <!-- FECHA COMPROMISO: Editable solo si es Admin -->
+                                    <td class="p-3 font-mono text-slate-500">
+                                        <span ng-show="!esAdmin">{{ act.fechaLimite || '--' }}</span>
+                                        <input type="date" ng-show="esAdmin" ng-model="act.fechaLimiteEdit" ng-change="actualizarFechaLimite(act)" class="input-fresco py-1 px-2 text-xs">
+                                    </td>
+                                    <td class="p-3 font-mono text-slate-500">{{ act.fechaCierre || '--' }}</td>
+                                    
+                                    <!-- ACCIONES SEGÚN ROL -->
+                                    <td class="p-3 text-center space-x-1">
+                                        <button ng-click="cambiarEstado(act)" class="px-2.5 py-1.5 bg-blue-50 text-blue-600 font-bold rounded-lg text-[10px] hover:bg-blue-100 transition active:scale-95">⚡ Estado</button>
+                                        <!-- BOTÓN BORRAR: Exclusivo para Administrador -->
+                                        <button ng-show="esAdmin" ng-click="eliminarActividad(act.id)" class="px-2.5 py-1.5 bg-red-50 text-red-500 font-bold rounded-lg text-[10px] hover:bg-red-100 transition active:scale-95">🗑 Borrar</button>
+                                    </td>
+                                </tr>
+                                <tr ng-if="actividades.length === 0">
+                                    <td colspan="7" class="p-6 text-center text-slate-400 font-medium">No hay actividades registradas en la matriz.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="chart-row">
-                <div class="chart-label"><span>Tareas Vencidas</span><strong id="barTextVencidos">0%</strong></div>
-                <div class="progress-bar-bg"><div id="barFillVencidos" class="progress-bar-fill" style="background: var(--accent-magenta);"></div></div>
+
+            <!-- SECCIÓN 2: GESTOR ADMIN & AUDITORÍA (SOLO ADMIN) -->
+            <div ng-show="seccionActiva === 'admin' && esAdmin" class="space-y-6">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight">⚙ Gestor Administrador</h2>
+                    <p class="text-xs text-slate-500 font-semibold">Creación de nuevos usuarios con acceso funcional o administrativo</p>
+                </div>
+
+                <!-- CREAR NUEVO USUARIO -->
+                <div class="card-fresca p-5 sm:p-6 space-y-4">
+                    <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">+ Registrar Nuevo Usuario del Sistema</h3>
+                    <form ng-submit="guardarNuevoUsuario()" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                            <input type="text" ng-model="formUsu.nombre" required placeholder="Nombre Completo" class="input-fresco w-full">
+                            <input type="text" ng-model="formUsu.usuario" required placeholder="Usuario de Ingreso (Ej: mrodriguez)" class="input-fresco w-full">
+                            <input type="password" ng-model="formUsu.password" required placeholder="Contraseña de Ingreso" class="input-fresco w-full">
+                            
+                            <select ng-model="formUsu.rol" required class="input-fresco w-full">
+                                <option value="operador">Rol: Operador (Funcional)</option>
+                                <option value="admin">Rol: Administrador</option>
+                            </select>
+
+                            <select ng-model="formUsu.gerencia" required class="input-fresco w-full">
+                                <option value="Servicios bancarios">Servicios bancarios</option>
+                                <option value="Recaudación especializada">Recaudación especializada</option>
+                                <option value="Control contable">Control contable</option>
+                            </select>
+
+                            <input type="text" ng-model="formUsu.cargo" required placeholder="Cargo" class="input-fresco w-full">
+                            <input type="text" ng-model="formUsu.extension" required placeholder="Extensión Telefónica" class="input-fresco w-full">
+                        </div>
+                        <button type="submit" class="py-3 px-6 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase tracking-wider hover:bg-blue-700 transition active:scale-95">
+                            + Crear Usuario en Firebase
+                        </button>
+                    </form>
+                </div>
+
+                <!-- LOG DE AUDITORÍA -->
+                <div class="card-fresca p-5 sm:p-6 space-y-4">
+                    <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">📜 Log de Auditoría en Vivo</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse min-w-[500px]">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 uppercase">
+                                    <th class="p-2.5 font-bold border-b">Fecha y Hora</th>
+                                    <th class="p-2.5 font-bold border-b">Usuario</th>
+                                    <th class="p-2.5 font-bold border-b">Acción</th>
+                                    <th class="p-2.5 font-bold border-b">Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="log in logsAuditoria" class="border-b hover:bg-slate-50">
+                                    <td class="p-2.5 font-mono text-slate-500">{{ log.fecha }}</td>
+                                    <td class="p-2.5 font-bold text-blue-600">👤 {{ log.usuario }}</td>
+                                    <td class="p-2.5 font-bold text-slate-800">{{ log.accion }}</td>
+                                    <td class="p-2.5 text-slate-600">{{ log.detalle }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Formulario -->
-        <div class="form-grid">
-            <input type="text" id="desc" placeholder="Descripción de la actividad">
-            <select id="categoria">
-                <option value="Servicios bancarios">Servicios bancarios</option>
-                <option value="Recaudación especializada">Recaudación especializada</option>
-                <option value="Control contable">Control contable</option>
-                <option value="Fábrica">Fábrica</option>
-            </select>
-            <input type="text" id="responsable" placeholder="Responsable asignado">
-            <input type="date" id="fechaLimite" title="Fecha de Compromiso">
-            <select id="estado">
-                <option value="Pendiente">Pendiente</option>
-                <option value="En Proceso">En Proceso</option>
-                <option value="Completado">Completado</option>
-            </select>
-        </div>
-        <div class="form-grid-row2">
-            <textarea id="observaciones" placeholder="Observaciones / Detalle de avances del requerimiento..."></textarea>
-        </div>
-        
-        <button id="btnGuardar" class="btn-agregar" onclick="agregarRegistro()">+ Guardar Actividad en Nube</button>
-        <button id="btnActualizar" class="btn-actualizar" onclick="guardarEdicion()">✏ Guardar Cambios</button>
-
-        <!-- Filtros -->
-        <div class="filter-section" style="margin-top: 15px;">
-            <label>🔍 FILTRAR ACTIVIDADES EN TIEMPO REAL</label>
-            <div class="filter-grid">
-                <input type="text" id="buscarTexto" placeholder="Buscar por palabra clave..." oninput="actualizarVista()">
-                <input type="text" id="filtroResponsable" placeholder="Filtrar por Responsable..." oninput="actualizarVista()">
-                <select id="filtroArea" onchange="actualizarVista()">
-                    <option value="TODAS">Todas las Áreas</option>
-                    <option value="Servicios bancarios">Servicios bancarios</option>
-                    <option value="Recaudación especializada">Recaudación especializada</option>
-                    <option value="Control contable">Control contable</option>
-                    <option value="Fábrica">Fábrica</option>
-                </select>
-                <select id="filtroEstado" onchange="actualizarVista()">
-                    <option value="TODOS">Todos los Estados</option>
-                    <option value="Pendiente">Pendiente</option>
-                    <option value="En Proceso">En Proceso</option>
-                    <option value="Completado">Completado</option>
-                </select>
-            </div>
-            <button style="margin-top: 10px; background: var(--bg-input); color: var(--text-muted); border: 1px solid var(--border-color); width: 100%;" onclick="limpiarFiltros()">Limpiar Filtros</button>
-        </div>
-
-        <!-- Barra de Acciones Globales -->
-        <div class="btn-bar">
-            <button class="btn-exportar" onclick="exportarExcelOrdenado()">📊 Exportar CSV (.csv)</button>
-            <button id="btnDashExcel" class="btn-dash-excel" onclick="generarExcelGerencialNativo()">📈 Descargar Dashboard SLA Excel (.xlsx)</button>
-            <button id="btnArchivarCompletadas" class="btn-archivar" onclick="archivarCompletadas()">📦 Archivar Tareas Completadas (Admin)</button>
-        </div>
-
-        <!-- Tabla de Datos -->
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Fecha Compromiso</th>
-                        <th>Descripción</th>
-                        <th>Área</th>
-                        <th>Responsable</th>
-                        <th>Observaciones / Avances</th>
-                        <th>Creado por</th>
-                        <th>Última Modificación</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaBody"></tbody>
-            </table>
-        </div>
+        </main>
     </div>
 
+    <!-- CONTROLADOR ANGULAR & INTEGRACIÓN CON FIREBASE -->
     <script>
-        // CONFIGURACIÓN DE FIREBASE EN LA NUBE
+        // CONFIGURACIÓN DE FIREBASE EN LA NUBE (Tus credenciales reales)
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
   authDomain: "control-operativo-26ec9.firebaseapp.com",
@@ -332,523 +380,214 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const usuariosAutorizados = {
-            "luis": { pass: "control2026", esAdmin: true, areaRestringida: null },
-            "admin": { pass: "1234", esAdmin: true, areaRestringida: null },
-            "jacroner": { pass: "operaciones", esAdmin: false, areaRestringida: null },
-            "simón": { pass: "banco2026", esAdmin: false, areaRestringida: null },
-            "kelvin": { pass: "control123", esAdmin: false, areaRestringida: null },
-            "juan": { pass: "fabrica2026", esAdmin: false, areaRestringida: "Fábrica" }
-        };
+        var app = angular.module('matrizApp', []);
 
+        app.controller('MatrizController', function($scope) {
+            $scope.sesionIniciada = false;
+            $scope.esAdmin = false;
+            $scope.usuarioSesion = "";
+            $scope.seccionActiva = 'matriz';
 
-        let registros = [];
-        let idDocEditando = null;
+            $scope.loginUser = "";
+            $scope.loginPass = "";
+            $scope.loginError = false;
 
-        window.onload = function() {
-            let usuarioSesion = sessionStorage.getItem("usuario_autenticado");
-            if (usuarioSesion) mostrarAplicacion(usuarioSesion);
-            window.addEventListener('online', actualizarEstadoRed);
-            window.addEventListener('offline', actualizarEstadoRed);
-        };
+            $scope.actividades = [];
+            $scope.logsAuditoria = [];
+            $scope.nuevaAct = { categoria: "Servicios bancarios", estado: "Pendiente" };
 
-        function obtenerUsuarioSesion() { return sessionStorage.getItem("usuario_autenticado"); }
-        function esUsuarioAdmin() {
-            let user = obtenerUsuarioSesion();
-            return user && usuariosAutorizados[user] && usuariosAutorizados[user].esAdmin;
-        }
-        function obtenerAreaRestringida() {
-            let user = obtenerUsuarioSesion();
-            return (user && usuariosAutorizados[user]) ? usuariosAutorizados[user].areaRestringida : null;
-        }
-
-        function actualizarEstadoRed() {
-            let netTag = document.getElementById("netTag");
-            if (navigator.onLine) {
-                netTag.textContent = "🟢 Conectado Nube"; netTag.className = "net-tag net-online";
-            } else {
-                netTag.textContent = "🔴 Sin Conexión"; netTag.className = "net-tag net-offline";
-            }
-        }
-
-        function autenticar() {
-            let user = document.getElementById("userInput").value.trim().toLowerCase();
-            let pass = document.getElementById("passInput").value.trim();
-            let errorDiv = document.getElementById("loginError");
-
-            if (usuariosAutorizados[user] && usuariosAutorizados[user].pass === pass) {
-                sessionStorage.setItem("usuario_autenticado", user);
-                errorDiv.style.display = "none";
-                mostrarAplicacion(user);
-            } else {
-                errorDiv.style.display = "block";
-            }
-        }
-
-        function mostrarAplicacion(usuario) {
-            document.getElementById("loginOverlay").style.display = "none";
-            document.getElementById("appContainer").style.display = "block";
-            document.getElementById("userTag").textContent = `Usuario: ${usuario}`;
-
-            let roleTag = document.getElementById("roleTag");
-            let btnArchivar = document.getElementById("btnArchivarCompletadas");
-            let btnDashExcel = document.getElementById("btnDashExcel");
-            let selectCategoria = document.getElementById("categoria");
-            let selectFiltroArea = document.getElementById("filtroArea");
-
-            let areaRestringida = obtenerAreaRestringida();
-
-            if (esUsuarioAdmin()) {
-                roleTag.textContent = "Perfil: Administrador"; roleTag.className = "role-tag role-admin";
-                btnArchivar.style.display = "inline-block"; 
-                btnDashExcel.style.display = "inline-block";
-                selectCategoria.disabled = false; selectFiltroArea.disabled = false;
-            } else if (areaRestringida) {
-                roleTag.textContent = `Perfil: ${areaRestringida}`; roleTag.className = "role-tag role-user";
-                btnArchivar.style.display = "none"; 
-                btnDashExcel.style.display = "none";
-                selectCategoria.value = areaRestringida; selectCategoria.disabled = true;
-                selectFiltroArea.value = areaRestringida; selectFiltroArea.disabled = true;
-            } else {
-                roleTag.textContent = "Perfil: Operador"; roleTag.className = "role-tag role-user";
-                btnArchivar.style.display = "none"; 
-                btnDashExcel.style.display = "none";
-                selectCategoria.disabled = false; selectFiltroArea.disabled = false;
+            // REGISTRO DE LOGS DE AUDITORÍA
+            function registrarLog(accion, detalle) {
+                let nuevoLog = {
+                    usuario: $scope.usuarioSesion || "Anónimo",
+                    accion: accion,
+                    detalle: detalle,
+                    fecha: new Date().toLocaleString()
+                };
+                db.collection("logs_auditoria").add(nuevoLog);
             }
 
-            actualizarEstadoRed();
-            escucharCambiosNube();
-        }
+            function cargarLogs() {
+                if (!$scope.esAdmin) return;
+                db.collection("logs_auditoria").orderBy("fecha", "desc").limit(50).onSnapshot(snapshot => {
+                    $scope.$apply(() => {
+                        $scope.logsAuditoria = [];
+                        snapshot.forEach(doc => $scope.logsAuditoria.push(doc.data()));
+                    });
+                });
+            }
 
-        function cerrarSesion() {
-            sessionStorage.removeItem("usuario_autenticado");
-            document.getElementById("userInput").value = "";
-            document.getElementById("passInput").value = "";
-            document.getElementById("appContainer").style.display = "none";
-            document.getElementById("loginOverlay").style.display = "flex";
-        }
+            // INICIO DE SESIÓN DINÁMICO CONTRA FIREBASE
+            $scope.iniciarSesion = function() {
+                var u = $scope.loginUser.trim().toLowerCase();
+                var p = $scope.loginPass.trim();
 
-        function escucharCambiosNube() {
-            db.collection("actividades_operativas").onSnapshot((snapshot) => {
-                registros = [];
-                snapshot.forEach((doc) => {
-                    let item = doc.data();
-                    item.id = doc.id;
-                    item.diasRestantes = obtenerDiferenciaDias(item.fechaLimite);
-                    registros.push(item);
+                // 1. Superusuario Administrador Principal
+                if (u === 'luis' && p === 'control2026') {
+                    $scope.sesionIniciada = true;
+                    $scope.esAdmin = true;
+                    $scope.usuarioSesion = "Luis Coronado";
+                    $scope.loginError = false;
+                    registrarLog("Inicio de Sesión", "Acceso Administrador Principal");
+                    $scope.sincronizarFirebase();
+                    cargarLogs();
+                    return;
+                }
+
+                // 2. Consulta en la colección unificada de personal
+                db.collection("personal_intranet")
+                  .where("usuario", "==", u)
+                  .where("password", "==", p)
+                  .get()
+                  .then(snapshot => {
+                      $scope.$apply(() => {
+                          if (!snapshot.empty) {
+                              let userData = snapshot.docs[0].data();
+                              $scope.sesionIniciada = true;
+                              $scope.esAdmin = (userData.rol === 'admin');
+                              $scope.usuarioSesion = userData.nombre || u;
+                              $scope.loginError = false;
+
+                              registrarLog("Inicio de Sesión", "Acceso exitoso como " + (userData.rol || 'operador'));
+                              $scope.sincronizarFirebase();
+                              if ($scope.esAdmin) cargarLogs();
+                          } else {
+                              $scope.loginError = true;
+                          }
+                      });
+                  })
+                  .catch(error => {
+                      console.error("Error al validar sesión:", error);
+                      $scope.$apply(() => { $scope.loginError = true; });
+                  });
+            };
+
+            $scope.cerrarSesion = function() {
+                registrarLog("Cierre de Sesión", "El usuario salió de la matriz");
+                $scope.sesionIniciada = false;
+            };
+
+            // SINCRONIZACIÓN DE LA MATRIZ
+            $scope.sincronizarFirebase = function() {
+                db.collection("actividades_operativas").onSnapshot(snapshot => {
+                    $scope.$apply(() => {
+                        $scope.actividades = [];
+                        snapshot.forEach(doc => {
+                            let data = doc.data();
+                            data.id = doc.id;
+                            data.fechaLimiteEdit = data.fechaLimite ? new Date(data.fechaLimite) : null;
+                            $scope.actividades.push(data);
+                        });
+                    });
+                });
+            };
+
+            $scope.contarPorEstado = function(est) {
+                return $scope.actividades.filter(a => a.estado === est).length;
+            };
+
+            // AGREGAR TAREA
+            $scope.agregarActividad = function() {
+                if (!$scope.nuevaAct.descripcion || !$scope.nuevaAct.responsable || !$scope.nuevaAct.fechaLimiteInput) {
+                    return alert("Por favor completa todos los campos obligatorios.");
+                }
+
+                let registro = {
+                    descripcion: $scope.nuevaAct.descripcion,
+                    categoria: $scope.nuevaAct.categoria,
+                    responsable: $scope.nuevaAct.responsable,
+                    estado: $scope.nuevaAct.estado,
+                    fechaLimite: $scope.nuevaAct.fechaLimiteInput.toISOString().split('T')[0],
+                    fechaCierre: ""
+                };
+
+                db.collection("actividades_operativas").add(registro).then(() => {
+                    registrarLog("Creación de Tarea", "Registró: " + $scope.nuevaAct.descripcion);
+                    $scope.$apply(() => {
+                        $scope.nuevaAct = { categoria: "Servicios bancarios", estado: "Pendiente" };
+                    });
+                });
+            };
+
+            // CAMBIAR ESTADO
+            $scope.cambiarEstado = function(act) {
+                let estados = ["Pendiente", "En Proceso", "Completado"];
+                let proxIndex = (estados.indexOf(act.estado) + 1) % estados.length;
+                let nuevoEstado = estados[proxIndex];
+                
+                let updateData = { estado: nuevoEstado };
+                if (nuevoEstado === 'Completado' && !act.fechaCierre) {
+                    updateData.fechaCierre = new Date().toISOString().split('T')[0];
+                }
+
+                db.collection("actividades_operativas").doc(act.id).update(updateData).then(() => {
+                    registrarLog("Actualización de Estado", `Cambió estado de tarea a '${nuevoEstado}'`);
+                });
+            };
+
+            // CAMBIAR FECHA LÍMITE (SOLO ADMIN)
+            $scope.actualizarFechaLimite = function(act) {
+                if (!$scope.esAdmin) return;
+                if (act.fechaLimiteEdit) {
+                    let nuevaFecha = act.fechaLimiteEdit.toISOString().split('T')[0];
+                    db.collection("actividades_operativas").doc(act.id).update({
+                        fechaLimite: nuevaFecha
+                    }).then(() => {
+                        registrarLog("Modificación de SLA", "Actualizó la fecha límite de la tarea");
+                    });
+                }
+            };
+
+            // ELIMINAR ACTIVIDAD (SOLO ADMIN)
+            $scope.eliminarActividad = function(id) {
+                if (!$scope.esAdmin) return alert("No tienes permisos para borrar tareas.");
+                if (confirm("¿Estás seguro de eliminar esta tarea de la matriz?")) {
+                    db.collection("actividades_operativas").doc(id).delete().then(() => {
+                        registrarLog("Eliminación de Tarea", "Eliminó un registro de la matriz");
+                    });
+                }
+            };
+
+            // CREAR NUEVO USUARIO DESDE ADMIN
+            $scope.formUsu = {};
+            $scope.guardarNuevoUsuario = function() {
+                if (!$scope.esAdmin) return;
+                if ($scope.formUsu.nombre && $scope.formUsu.usuario && $scope.formUsu.password) {
+                    db.collection("personal_intranet").add({
+                        nombre: $scope.formUsu.nombre,
+                        usuario: $scope.formUsu.usuario.trim().toLowerCase(),
+                        password: $scope.formUsu.password.trim(),
+                        rol: $scope.formUsu.rol || "operador",
+                        gerencia: $scope.formUsu.gerencia || "Servicios bancarios",
+                        cargo: $scope.formUsu.cargo || "Analista",
+                        extension: $scope.formUsu.extension || "0000",
+                        correo: $scope.formUsu.nombre.toLowerCase().replace(/\s+/g, '') + "@banco.com",
+                        cumpleanos: "Por definir",
+                        foto: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80"
+                    }).then(() => {
+                        registrarLog("Creación de Usuario", "Creó cuenta para: " + $scope.formUsu.usuario);
+                        alert("¡Usuario creado exitosamente!");
+                        $scope.formUsu = {};
+                    });
+                } else {
+                    alert("Por favor completa los campos principales de usuario.");
+                }
+            };
+
+            // EXPORTAR A EXCEL
+            $scope.exportarExcel = function() {
+                let wb = XLSX.utils.book_new();
+                let dataMatriz = [["Descripción", "Gerencia", "Responsable", "Estado", "Fecha Compromiso", "Fecha Cierre"]];
+                
+                $scope.actividades.forEach(a => {
+                    dataMatriz.push([a.descripcion, a.categoria, a.responsable, a.estado, a.fechaLimite || '--', a.fechaCierre || '--']);
                 });
 
-                registros.sort((a, b) => {
-                    let pesoEstado = { "Pendiente": 1, "En Proceso": 2, "Completado": 3 };
-                    if (pesoEstado[a.estado] !== pesoEstado[b.estado]) return pesoEstado[a.estado] - pesoEstado[b.estado];
-                    return (a.fechaLimite || "9999-99-99").localeCompare(b.fechaLimite || "9999-99-99");
-                });
-
-                actualizarVista();
-            }, (error) => console.error(error));
-        }
-
-        function obtenerDiferenciaDias(fechaLimiteStr) {
-            if (!fechaLimiteStr) return null;
-            let hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-            let partes = fechaLimiteStr.split("-");
-            let limite = new Date(partes[0], partes[1] - 1, partes[2]);
-            return Math.ceil((limite - hoy) / (1000 * 60 * 60 * 24));
-        }
-
-        function actualizarVista() {
-            let cuerpo = document.getElementById("tablaBody");
-            cuerpo.innerHTML = "";
-
-            let textoBusqueda = document.getElementById("buscarTexto").value.trim().toLowerCase();
-            let filtroResp = document.getElementById("filtroResponsable").value.trim().toLowerCase();
-            let filtroArea = document.getElementById("filtroArea").value;
-            let filtroEstado = document.getElementById("filtroEstado").value;
-            let areaRestringida = obtenerAreaRestringida();
-            if (areaRestringida) filtroArea = areaRestringida;
-
-            let pendientesCount = 0, completadosCount = 0, vencidosCount = 0, completadosATiempo = 0;
-            let esAdmin = esUsuarioAdmin();
-
-            registros.forEach((item) => {
-                if (areaRestringida && item.categoria !== areaRestringida) return;
-
-                let diasRestantes = item.diasRestantes;
-                let estaVencido = (diasRestantes !== null && diasRestantes < 0 && item.estado !== "Completado");
-                let estaProximo = (diasRestantes !== null && diasRestantes >= 0 && diasRestantes <= 5 && item.estado !== "Completado");
-
-                if (item.estado === "Completado") {
-                    completadosCount++;
-                    if (!item.fechaCierre || (item.fechaLimite && item.fechaCierre <= item.fechaLimite)) {
-                        completadosATiempo++;
-                    }
-                } else {
-                    pendientesCount++;
-                    if (estaVencido) vencidosCount++;
-                }
-
-                let coincideTexto = item.descripcion.toLowerCase().includes(textoBusqueda) || (item.observaciones && item.observaciones.toLowerCase().includes(textoBusqueda));
-                let coincideResp = item.responsable.toLowerCase().includes(filtroResp);
-                let coincideArea = (filtroArea === "TODAS" || item.categoria === filtroArea);
-                let coincideEstado = (filtroEstado === "TODOS" || item.estado === filtroEstado);
-
-                if (coincideTexto && coincideResp && coincideArea && coincideEstado) {
-                    let badgeClass = "badge-pendiente";
-                    if (item.estado === "En Proceso") badgeClass = "badge-proceso";
-                    if (item.estado === "Completado") badgeClass = "badge-completado";
-
-                    let claseFila = "";
-                    let mensajeAlerta = "";
-
-                    if (item.estado !== "Completado") {
-                        if (estaVencido) {
-                            claseFila = "alerta-vencido";
-                            mensajeAlerta = `<span class="alerta-texto rojo">⚠ Vencido (${Math.abs(diasRestantes)}d)</span>`;
-                        } else if (estaProximo) {
-                            claseFila = "alerta-proximo";
-                            mensajeAlerta = `<span class="alerta-texto amarillo">⏳ Vence (${diasRestantes}d)</span>`;
-                        }
-                    }
-
-                    let fechaMostrar = item.fechaLimite ? item.fechaLimite : "Sin fecha";
-                    let creadorMostrar = item.creadoPor ? item.creadoPor : "Sistema";
-                    let modificadoMostrar = item.modificadoPor ? item.modificadoPor : "--";
-                    let obsMostrar = item.observaciones ? item.observaciones : "-";
-
-                    let botonBorrarHTML = esAdmin 
-                        ? `<button class="btn-accion btn-eliminar" onclick="eliminarRegistro('${item.id}')">Borrar</button>`
-                        : `<span style="font-size:10px; color:var(--text-muted);">Protegido</span>`;
-
-                    cuerpo.innerHTML += `
-                        <tr class="${claseFila}">
-                            <td>${fechaMostrar} ${mensajeAlerta}</td>
-                            <td>${item.descripcion}</td>
-                            <td>${item.categoria}</td>
-                            <td><strong>${item.responsable}</strong></td>
-                            <td class="obs-cell">${obsMostrar}</td>
-                            <td><span class="creador-tag">👤 ${creadorMostrar}</span></td>
-                            <td><span class="creador-tag">✏ ${modificadoMostrar}</span></td>
-                            <td><span class="${badgeClass}">${item.estado}</span></td>
-                            <td>
-                                <button class="btn-accion btn-editar" onclick="cargarEdicion('${item.id}')">Editar</button>
-                                ${botonBorrarHTML}
-                            </td>
-                        </tr>
-                    `;
-                }
-            });
-
-            let total = areaRestringida ? (pendientesCount + completadosCount) : registros.length;
-            document.getElementById("kpiTotal").textContent = total;
-            document.getElementById("kpiPendientes").textContent = pendientesCount;
-            document.getElementById("kpiVencidos").textContent = vencidosCount;
-            document.getElementById("kpiCompletados").textContent = completadosCount;
-
-            let pctSLA = completadosCount > 0 ? Math.round((completadosATiempo / completadosCount) * 100) : 100;
-            document.getElementById("kpiSLA").textContent = `${pctSLA}%`;
-
-            let pctCumplimiento = total > 0 ? Math.round((completadosCount / total) * 100) : 0;
-            let pctPendientes = total > 0 ? Math.round((pendientesCount / total) * 100) : 0;
-            let pctVencidos = total > 0 ? Math.round((vencidosCount / total) * 100) : 0;
-
-            document.getElementById("barTextCumplimiento").textContent = `${pctCumplimiento}% (${completadosCount}/${total})`;
-            document.getElementById("barFillCumplimiento").style.width = `${pctCumplimiento}%`;
-            document.getElementById("barTextPendientes").textContent = `${pctPendientes}% (${pendientesCount}/${total})`;
-            document.getElementById("barFillPendientes").style.width = `${pctPendientes}%`;
-            document.getElementById("barTextVencidos").textContent = `${pctVencidos}% (${vencidosCount}/${total})`;
-            document.getElementById("barFillVencidos").style.width = `${pctVencidos}%`;
-        }
-
-        // GENERADOR DE DASHBOARD EJECUTIVO v9.5 - RANKING & AUTO-FIT (100% ONLINE)
-        function generarExcelGerencialNativo() {
-            if (!esUsuarioAdmin()) return alert("Acceso denegado: Solo administradores pueden generar este informe.");
-            if (registros.length === 0) return alert("No hay datos cargados.");
-
-            let hoyStr = new Date().toISOString().split('T')[0];
-            let wb = XLSX.utils.book_new();
-
-            // 1. PROCESAMIENTO DE DATOS Y CÁLCULO DE RANKINGS
-            let statsArea = {};
-            let statsResp = {};
-            let totalCompletadas = 0, totalATiempo = 0, totalVencidas = 0, desviacionTotal = 0;
-
-            registros.forEach(r => {
-                let area = r.categoria || 'General';
-                let resp = r.responsable || 'Sin Asignar';
-
-                if (!statsArea[area]) statsArea[area] = { total: 0, aTiempo: 0, desviadas: 0 };
-                if (!statsResp[resp]) statsResp[resp] = { total: 0, aTiempo: 0, desviadas: 0 };
-
-                statsArea[area].total++;
-                statsResp[resp].total++;
-
-                if (r.estado === "Completado") {
-                    totalCompletadas++;
-                    let cumplio = true;
-                    if (r.fechaLimite) {
-                        let lim = new Date(r.fechaLimite);
-                        let cie = r.fechaCierre ? new Date(r.fechaCierre) : new Date();
-                        let diff = Math.ceil((cie - lim) / (1000 * 60 * 60 * 24));
-                        if (diff > 0) { cumplio = false; desviacionTotal += diff; }
-                    }
-                    if (cumplio) { 
-                        totalATiempo++; 
-                        statsArea[area].aTiempo++; 
-                        statsResp[resp].aTiempo++; 
-                    } else { 
-                        statsArea[area].desviadas++; 
-                        statsResp[resp].desviadas++; 
-                    }
-                } else {
-                    if (r.diasRestantes !== null && r.diasRestantes < 0) totalVencidas++;
-                }
-            });
-
-            let slaGlobal = totalCompletadas > 0 ? Math.round((totalATiempo / totalCompletadas) * 100) : 100;
-
-            // 2. CONSTRUCCIÓN DE LA PESTAÑA 1: RESUMEN EJECUTIVO & RANKINGS
-            let rowsDash = [
-                ["INFORME DE GESTIÓN OPERATIVA & CUMPLIMIENTO SLA"],
-                ["Generado dinámicamente el: " + hoyStr],
-                [],
-                ["MÉTRICAS CLAVE DE GESTIÓN (KPIs)"],
-                ["CUMPLIMIENTO SLA GLOBAL", `${slaGlobal}%`, "TOTAL ACTIVIDADES", registros.length, "TAREAS VENCIDAS", totalVencidas, "DÍAS DESVIACIÓN ACUM.", `${desviacionTotal} días`],
-                [],
-                ["🏆 RANKING DE EFICIENCIA POR ÁREA OPERATIVA"],
-                ["Posición", "Área Operativa", "Total Requerimientos", "Cumplidos a Tiempo", "Desviados", "% Eficiencia SLA", "Estatus"]
-            ];
-
-            // Ordenar Áreas por Ranking de Eficiencia (% SLA descendente)
-            let rankingAreas = Object.keys(statsArea).map(area => {
-                let d = statsArea[area];
-                let eff = d.total > 0 ? Math.round((d.aTiempo / d.total) * 100) : 0;
-                return { area, total: d.total, aTiempo: d.aTiempo, desviadas: d.desviadas, eff };
-            }).sort((a, b) => b.eff - a.eff);
-
-            rankingAreas.forEach((item, index) => {
-                let estatus = item.eff >= 80 ? "ÓPTIMO 🟢" : "REQUIERE AJUSTE 🔴";
-                rowsDash.push([`#${index + 1}`, item.area, item.total, item.aTiempo, item.desviadas, `${item.eff}%`, estatus]);
-            });
-
-            rowsDash.push([]);
-            rowsDash.push(["👤 RANKING DE RENDIMIENTO INDIVIDUAL POR RESPONSABLE"]);
-            rowsDash.push(["Posición", "Responsable", "Tareas Asignadas", "Entregas a Tiempo", "Entregas Fuera de SLA", "% Efectividad", "Desempeño"]);
-
-            // Ordenar Responsables por Ranking de Eficiencia
-            let rankingResp = Object.keys(statsResp).map(resp => {
-                let d = statsResp[resp];
-                let eff = d.total > 0 ? Math.round((d.aTiempo / d.total) * 100) : 0;
-                return { resp, total: d.total, aTiempo: d.aTiempo, desviadas: d.desviadas, eff };
-            }).sort((a, b) => b.eff - a.eff);
-
-            rankingResp.forEach((item, index) => {
-                let calificacion = item.eff >= 85 ? "Alto Rendimiento 🌟" : (item.eff >= 70 ? "En Rango 🟡" : "Atención Requerida 🔴");
-                rowsDash.push([`#${index + 1}`, item.resp, item.total, item.aTiempo, item.desviadas, `${item.eff}%`, calificacion]);
-            });
-
-            let wsDash = XLSX.utils.aoa_to_sheet(rowsDash);
-
-            // 3. CONSTRUCCIÓN DE LA PESTAÑA 2: DETALLE ACTIVIDAD POR ACTIVIDAD
-            let rowsDetalle = [
-                ["Fecha Compromiso", "Fecha Cierre Real", "Descripción de la Actividad", "Área", "Responsable", "Observaciones / Avances", "Estado", "SLA Individual", "Días Desviación"]
-            ];
-
-            registros.forEach(r => {
-                let slaInd = "Pendiente";
-                let diasDesv = 0;
-                if (r.estado === "Completado") {
-                    if (r.fechaLimite) {
-                        let lim = new Date(r.fechaLimite);
-                        let cie = r.fechaCierre ? new Date(r.fechaCierre) : new Date();
-                        diasDesv = Math.ceil((cie - lim) / (1000 * 60 * 60 * 24));
-                        slaInd = diasDesv <= 0 ? "Cumplido 🟢" : "Desviado 🔴";
-                    } else { slaInd = "Cumplido 🟢"; }
-                } else {
-                    slaInd = (r.diasRestantes !== null && r.diasRestantes < 0) ? "Vencido 🔴" : "En Plazo ⏳";
-                }
-
-                rowsDetalle.push([
-                    r.fechaLimite || '--',
-                    r.fechaCierre || '--',
-                    r.descripcion || '',
-                    r.categoria || '',
-                    r.responsable || '',
-                    r.observaciones || '',
-                    r.estado || '',
-                    slaInd,
-                    diasDesv
-                ]);
-            });
-
-            let wsDetalle = XLSX.utils.aoa_to_sheet(rowsDetalle);
-
-            // 4. AUTO-AJUSTE DINÁMICO DE ANCHOS DE COLUMNA (AUTO-FIT)
-            [wsDash, wsDetalle].forEach(ws => {
-                let range = XLSX.utils.decode_range(ws['!ref']);
-                let colWidths = [];
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    let maxLen = 10;
-                    for (let R = range.s.r; R <= range.e.r; ++R) {
-                        let cell = ws[XLSX.utils.encode_cell({ c: C, r: R })];
-                        if (cell && cell.v) {
-                            let len = cell.v.toString().length;
-                            if (len > maxLen) maxLen = len;
-                        }
-                    }
-                    colWidths.push({ wch: Math.min(maxLen + 4, 45) });
-                }
-                ws['!cols'] = colWidths;
-            });
-
-            // 5. COMPILACIÓN Y DESCARGA AUTOMÁTICA
-            XLSX.utils.book_append_sheet(wb, wsDash, "Resumen & Rankings SLA");
-            XLSX.utils.book_append_sheet(wb, wsDetalle, "Detalle Operativo");
-
-            XLSX.writeFile(wb, `Dashboard_Ejecutivo_SLA_${hoyStr}.xlsx`);
-        }
-
-        function agregarRegistro() {
-            let desc = document.getElementById("desc").value.trim();
-            let cat = document.getElementById("categoria").value;
-            let resp = document.getElementById("responsable").value.trim() || "Sin Asignar";
-            let fechaLimite = document.getElementById("fechaLimite").value;
-            let estado = document.getElementById("estado").value;
-            let observaciones = document.getElementById("observaciones").value.trim();
-            let usuarioActual = obtenerUsuarioSesion() || "Anónimo";
-
-            let areaRestringida = obtenerAreaRestringida();
-            if (areaRestringida) cat = areaRestringida;
-            if (desc === "") return alert("Coloca una descripción.");
-
-            let hoyStr = new Date().toISOString().split("T")[0];
-            let fechaCierreFinal = (estado === "Completado") ? hoyStr : null;
-
-            db.collection("actividades_operativas").add({
-                descripcion: desc, categoria: cat, responsable: resp,
-                fechaLimite: fechaLimite, estado: estado, observaciones: observaciones,
-                creadoPor: usuarioActual, modificadoPor: usuarioActual,
-                fechaCierre: fechaCierreFinal, creadoEn: new Date()
-            }).then(() => limpiarFormulario()).catch(e => alert(e.message));
-        }
-
-        function cargarEdicion(id) {
-            idDocEditando = id;
-            let item = registros.find(r => r.id === id);
-            if (!item) return;
-
-            document.getElementById("desc").value = item.descripcion;
-            document.getElementById("categoria").value = item.categoria;
-            document.getElementById("responsable").value = item.responsable;
-            document.getElementById("fechaLimite").value = item.fechaLimite || "";
-            document.getElementById("estado").value = item.estado;
-            document.getElementById("observaciones").value = item.observaciones || "";
-
-            let inputFecha = document.getElementById("fechaLimite");
-            inputFecha.disabled = !esUsuarioAdmin();
-
-            document.getElementById("btnGuardar").style.display = "none";
-            document.getElementById("btnActualizar").style.display = "block";
-        }
-
-        function guardarEdicion() {
-            if (!idDocEditando) return;
-            let usuarioActual = obtenerUsuarioSesion() || "Anónimo";
-            let itemOriginal = registros.find(r => r.id === idDocEditando);
-
-            let nuevoEstado = document.getElementById("estado").value;
-            let hoyStr = new Date().toISOString().split("T")[0];
-            let fechaCierreFinal = itemOriginal ? itemOriginal.fechaCierre : null;
-
-            if (nuevoEstado === "Completado" && itemOriginal.estado !== "Completado") {
-                fechaCierreFinal = hoyStr;
-            } else if (nuevoEstado !== "Completado") {
-                fechaCierreFinal = null;
-            }
-
-            let fechaLimiteFinal = esUsuarioAdmin() 
-                ? document.getElementById("fechaLimite").value 
-                : (itemOriginal ? itemOriginal.fechaLimite : document.getElementById("fechaLimite").value);
-
-            let catFinal = document.getElementById("categoria").value;
-            let areaRestringida = obtenerAreaRestringida();
-            if (areaRestringida) catFinal = areaRestringida;
-
-            db.collection("actividades_operativas").doc(idDocEditando).update({
-                descripcion: document.getElementById("desc").value.trim(),
-                categoria: catFinal,
-                responsable: document.getElementById("responsable").value.trim() || "Sin Asignar",
-                fechaLimite: fechaLimiteFinal,
-                estado: nuevoEstado,
-                observaciones: document.getElementById("observaciones").value.trim(),
-                modificadoPor: usuarioActual,
-                fechaCierre: fechaCierreFinal
-            }).then(() => {
-                document.getElementById("btnGuardar").style.display = "block";
-                document.getElementById("btnActualizar").style.display = "none";
-                document.getElementById("fechaLimite").disabled = false;
-                idDocEditando = null;
-                limpiarFormulario();
-            }).catch(e => alert(e.message));
-        }
-
-        function eliminarRegistro(id) {
-            if (!esUsuarioAdmin()) return alert("⛔ Acción Denegada: Solo administradores pueden eliminar.");
-            if (confirm("¿Deseas eliminar la actividad?")) db.collection("actividades_operativas").doc(id).delete();
-        }
-
-        function archivarCompletadas() {
-            if (!esUsuarioAdmin()) return alert("⛔ Acción Denegada: Solo administradores pueden archivar.");
-            let completadas = registros.filter(r => r.estado === "Completado");
-            if (completadas.length === 0) return alert("No hay actividades completadas.");
-
-            if (confirm(`¿Archivar ${completadas.length} actividades?`)) {
-                let batch = db.batch();
-                completadas.forEach(item => {
-                    batch.set(db.collection("actividades_historico").doc(item.id), { ...item, archivadoEn: new Date() });
-                    batch.delete(db.collection("actividades_operativas").doc(item.id));
-                });
-                batch.commit().then(() => alert("Archivado con éxito.")).catch(e => alert(e.message));
-            }
-        }
-
-        function limpiarFiltros() {
-            document.getElementById("buscarTexto").value = "";
-            document.getElementById("filtroResponsable").value = "";
-            if (!obtenerAreaRestringida()) document.getElementById("filtroArea").value = "TODAS";
-            document.getElementById("filtroEstado").value = "TODOS";
-            actualizarVista();
-        }
-
-        function limpiarFormulario() {
-            document.getElementById("desc").value = "";
-            document.getElementById("responsable").value = "";
-            document.getElementById("fechaLimite").value = "";
-            document.getElementById("observaciones").value = "";
-            document.getElementById("fechaLimite").disabled = false;
-            let area = obtenerAreaRestringida();
-            if (area) document.getElementById("categoria").value = area;
-        }
-
-        function exportarExcelOrdenado() {
-            if (registros.length === 0) return alert("No hay datos para exportar.");
-            let areaRestringida = obtenerAreaRestringida();
-            let listaExportar = areaRestringida ? registros.filter(r => r.categoria === areaRestringida) : registros;
-
-            let csvContent = "\uFEFFsep=;\n";
-            csvContent += "Fecha Compromiso;Fecha Cierre Real;Descripción;Área;Responsable;Observaciones / Avances;Creado Por;Última Modificación;Estado\n";
-
-            listaExportar.forEach(r => {
-                let descLimpia = (r.descripcion || '').replace(/"/g, '""').replace(/\n/g, ' ');
-                let obsLimpia = (r.observaciones || '').replace(/"/g, '""').replace(/\n/g, ' ');
-                csvContent += `"${r.fechaLimite || ''}";"${r.fechaCierre || ''}";"${descLimpia}";"${r.categoria}";"${r.responsable}";"${obsLimpia}";"${r.creadoPor || 'Sistema'}";"${r.modificadoPor || '--'}";"${r.estado}"\n`;
-            });
-
-            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Matriz_Seguimiento_Operativo_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`;
-            link.click();
-        }
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataMatriz), "Matriz Operativa");
+                XLSX.writeFile(wb, `Matriz_Seguimiento_Operativo_${new Date().toISOString().split('T')[0]}.xlsx`);
+                registrarLog("Exportación", "Descargó la matriz en Excel");
+            };
+        });
     </script>
 </body>
 </html>
