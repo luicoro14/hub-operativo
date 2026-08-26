@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz de Seguimiento Operativo v11.0</title>
+    <title>Matriz de Seguimiento Operativo v13.0</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -139,7 +139,6 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <!-- NAVEGACIÓN INTERNA -->
                     <div class="flex gap-1 bg-slate-100 p-1 rounded-xl">
                         <button class="nav-tab" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="seccionActiva = 'matriz'">📋 Matriz</button>
                         <button class="nav-tab" ng-show="esAdmin" ng-class="{'active': seccionActiva === 'admin'}" ng-click="seccionActiva = 'admin'">⚙ Admin & Auditoría</button>
@@ -164,7 +163,7 @@
                         <div>
                             <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full text-white">Gestión Operativa en Nube</span>
                             <h2 class="text-2xl sm:text-3xl font-black mt-2 sm:mt-3">Control de Requerimientos & SLAs</h2>
-                            <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mt-1 font-medium">Registro y actualización centralizada de actividades para las 3 Gerencias.</p>
+                            <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mt-1 font-medium">Registro, actualización de avances y observaciones operativas en tiempo real.</p>
                         </div>
                         <button ng-click="exportarExcel()" class="w-full md:w-auto px-5 py-3.5 rounded-2xl bg-white text-blue-600 font-black text-xs uppercase tracking-wider shadow-lg hover:bg-blue-50 transition border border-white text-center active:scale-95">
                             📥 Exportar Matriz (.xlsx)
@@ -199,14 +198,14 @@
                     </div>
                 </div>
 
-                <!-- FORMULARIO DE REGISTRO (DISPONIBLE PARA TODOS) -->
+                <!-- FORMULARIO DE REGISTRO CON CAMPO DE OBSERVACIONES -->
                 <div class="card-fresca p-5 sm:p-6 space-y-4">
                     <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">➕ Registrar Nueva Actividad Operativa</h3>
 
                     <form ng-submit="agregarActividad()" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                             <div class="sm:col-span-2">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Descripción de la Tarea</label>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Descripción del Requerimiento</label>
                                 <input type="text" ng-model="nuevaAct.descripcion" required placeholder="Ej: Conciliación de cuentas de fin de mes..." class="input-fresco w-full">
                             </div>
 
@@ -238,37 +237,65 @@
                                 <input type="date" ng-model="nuevaAct.fechaLimiteInput" required class="input-fresco w-full">
                             </div>
 
+                            <!-- CAMPO DE OBSERVACIONES / AVANCES EN REGISTRO -->
+                            <div class="sm:col-span-2 md:col-span-4">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Observaciones / Avances Iniciales</label>
+                                <input type="text" ng-model="nuevaAct.observaciones" placeholder="Ej: En espera de confirmación de lote de pago..." class="input-fresco w-full">
+                            </div>
+
                             <div class="flex items-end sm:col-span-2">
                                 <button type="submit" class="w-full py-3 px-6 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase tracking-wider active:scale-95 transition hover:bg-blue-700 shadow-md shadow-blue-500/20">
-                                    + Guardar Tarea en Nube
+                                    + Guardar Requerimiento
                                 </button>
                             </div>
                         </div>
                     </form>
                 </div>
 
-                <!-- TABLA DE ACTIVIDADES (CON RESTRICCIONES DE ROL) -->
+                <!-- TABLA DE ACTIVIDADES CON FILTROS Y CAMPO OBSERVACIONES -->
                 <div class="card-fresca p-5 sm:p-6 space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">📋 Matriz General de Requerimientos</h3>
-                        <input type="text" ng-model="busquedaMatriz" placeholder="🔍 Buscar por descripción, responsable, gerencia..." class="input-fresco w-full sm:w-80">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-2 border-b border-slate-100">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">📋 Matriz General de Requerimientos</h3>
+                            <p class="text-[11px] text-slate-400 font-medium">Filtra la información por área operativa, estado o palabra clave</p>
+                        </div>
+
+                        <!-- PANEL DE FILTROS -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full md:w-auto">
+                            <select ng-model="filtroArea" class="input-fresco text-xs">
+                                <option value="">🏢 Todas las Áreas</option>
+                                <option value="Servicios bancarios">Servicios bancarios</option>
+                                <option value="Recaudación especializada">Recaudación especializada</option>
+                                <option value="Control contable">Control contable</option>
+                            </select>
+
+                            <select ng-model="filtroEstado" class="input-fresco text-xs">
+                                <option value="">⚡ Todos los Estados</option>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En Proceso">En Proceso</option>
+                                <option value="Completado">Completado</option>
+                            </select>
+
+                            <input type="text" ng-model="busquedaMatriz" placeholder="🔍 Requerimiento / Resp..." class="input-fresco text-xs">
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse min-w-[700px]">
+                        <table class="w-full text-left text-xs border-collapse min-w-[850px]">
                             <thead>
                                 <tr class="bg-slate-100/80 text-slate-700 uppercase text-[10px] tracking-wider border-b border-slate-200">
-                                    <th class="p-3 font-extrabold">Descripción</th>
-                                    <th class="p-3 font-extrabold">Gerencia</th>
+                                    <th class="p-3 font-extrabold">Requerimiento / Descripción</th>
+                                    <th class="p-3 font-extrabold">Gerencia / Área</th>
                                     <th class="p-3 font-extrabold">Responsable</th>
                                     <th class="p-3 font-extrabold">Estado</th>
+                                    <th class="p-3 font-extrabold">Observaciones / Avances</th>
                                     <th class="p-3 font-extrabold">Fecha Compromiso</th>
-                                    <th class="p-3 font-extrabold">Fecha Cierre</th>
+                                    <th class="p-3 font-extrabold">Fecha Cierre Real</th>
                                     <th class="p-3 font-extrabold text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="act in actividades | filter:busquedaMatriz" class="border-b border-slate-100 hover:bg-slate-50/80 transition">
+                                <tr ng-repeat="act in actividades | filter:{categoria: filtroArea, estado: filtroEstado} | filter:busquedaMatriz" class="border-b border-slate-100 hover:bg-slate-50/80 transition">
                                     <td class="p-3 font-bold text-slate-800">{{ act.descripcion }}</td>
                                     <td class="p-3 font-medium text-slate-600">🏢 {{ act.categoria }}</td>
                                     <td class="p-3 font-bold text-blue-600">👤 {{ act.responsable }}</td>
@@ -277,26 +304,93 @@
                                             {{ act.estado }}
                                         </span>
                                     </td>
-                                    <!-- FECHA COMPROMISO: Editable solo si es Admin -->
-                                    <td class="p-3 font-mono text-slate-500">
-                                        <span ng-show="!esAdmin">{{ act.fechaLimite || '--' }}</span>
-                                        <input type="date" ng-show="esAdmin" ng-model="act.fechaLimiteEdit" ng-change="actualizarFechaLimite(act)" class="input-fresco py-1 px-2 text-xs">
+                                    <!-- COLUMNA OBSERVACIONES / AVANCE -->
+                                    <td class="p-3 font-medium text-slate-600 max-w-[200px] truncate" title="{{ act.observaciones }}">
+                                        💬 {{ act.observaciones || 'Sin observaciones' }}
                                     </td>
+                                    <td class="p-3 font-mono text-slate-500">{{ act.fechaLimite || '--' }}</td>
                                     <td class="p-3 font-mono text-slate-500">{{ act.fechaCierre || '--' }}</td>
                                     
-                                    <!-- ACCIONES SEGÚN ROL -->
-                                    <td class="p-3 text-center space-x-1">
+                                    <!-- ACCIONES -->
+                                    <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                                        <button ng-click="abrirModalEdicion(act)" class="px-2.5 py-1.5 bg-indigo-50 text-indigo-600 font-bold rounded-lg text-[10px] hover:bg-indigo-100 transition active:scale-95">✏ Modificar</button>
                                         <button ng-click="cambiarEstado(act)" class="px-2.5 py-1.5 bg-blue-50 text-blue-600 font-bold rounded-lg text-[10px] hover:bg-blue-100 transition active:scale-95">⚡ Estado</button>
-                                        <!-- BOTÓN BORRAR: Exclusivo para Administrador -->
                                         <button ng-show="esAdmin" ng-click="eliminarActividad(act.id)" class="px-2.5 py-1.5 bg-red-50 text-red-500 font-bold rounded-lg text-[10px] hover:bg-red-100 transition active:scale-95">🗑 Borrar</button>
                                     </td>
                                 </tr>
                                 <tr ng-if="actividades.length === 0">
-                                    <td colspan="7" class="p-6 text-center text-slate-400 font-medium">No hay actividades registradas en la matriz.</td>
+                                    <td colspan="8" class="p-6 text-center text-slate-400 font-medium">No se encontraron requerimientos registrados.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- MODAL DE EDICIÓN DE TAREA CON EDICIÓN DE OBSERVACIONES -->
+            <div ng-show="modalEdicionAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h3 class="text-base font-black text-slate-800 uppercase">✏ Editar Requerimiento & Avance</h3>
+                        <button ng-click="modalEdicionAbierto = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
+                    </div>
+
+                    <form ng-submit="guardarEdicionTarea()" class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Descripción</label>
+                            <input type="text" ng-model="actEdit.descripcion" required class="input-fresco w-full">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Gerencia / Área</label>
+                                <select ng-model="actEdit.categoria" required class="input-fresco w-full">
+                                    <option value="Servicios bancarios">Servicios bancarios</option>
+                                    <option value="Recaudación especializada">Recaudación especializada</option>
+                                    <option value="Control contable">Control contable</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Responsable</label>
+                                <input type="text" ng-model="actEdit.responsable" required class="input-fresco w-full">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Estado</label>
+                            <select ng-model="actEdit.estado" required class="input-fresco w-full">
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En Proceso">En Proceso</option>
+                                <option value="Completado">Completado</option>
+                            </select>
+                        </div>
+
+                        <!-- EDICIÓN DE OBSERVACIONES / AVANCE -->
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Observaciones / Avances</label>
+                            <textarea ng-model="actEdit.observaciones" rows="3" placeholder="Escribe aquí el avance detallado del requerimiento..." class="input-fresco w-full resize-none"></textarea>
+                        </div>
+
+                        <!-- EDICIÓN DE FECHAS SEGÚN ROL -->
+                        <div class="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200/60">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Fecha Compromiso (SLA)</label>
+                                <input type="date" ng-disabled="!esAdmin" ng-model="actEdit.fechaLimiteInput" class="input-fresco w-full">
+                                <span ng-show="!esAdmin" class="text-[9px] text-slate-400 font-bold">🔒 Exclusivo Administrador</span>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Fecha Cierre Real</label>
+                                <input type="date" ng-disabled="!esAdmin" ng-model="actEdit.fechaCierreInput" class="input-fresco w-full">
+                                <span ng-show="!esAdmin" class="text-[9px] text-slate-400 font-bold">🔒 Exclusivo Administrador</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-2 pt-2">
+                            <button type="button" ng-click="modalEdicionAbierto = false" class="py-2.5 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs uppercase">Cancelar</button>
+                            <button type="submit" class="py-2.5 px-5 rounded-xl bg-blue-600 text-white font-bold text-xs uppercase shadow-md shadow-blue-500/20 active:scale-95">Guardar Cambios</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -369,13 +463,13 @@
     <script>
         // CONFIGURACIÓN DE FIREBASE EN LA NUBE (Tus credenciales reales)
         const firebaseConfig = {
-  apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
-  authDomain: "control-operativo-26ec9.firebaseapp.com",
-  projectId: "control-operativo-26ec9",
-  storageBucket: "control-operativo-26ec9.firebasestorage.app",
-  messagingSenderId: "791633280108",
-  appId: "1:791633280108:web:c3aa0853d1271dee6b2c49"
-};
+            apiKey: "TU_API_KEY_AQUI",
+            authDomain: "TU_PROJECT_ID.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROJECT_ID.appspot.com",
+            messagingSenderId: "TU_MESSAGING_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -395,6 +489,8 @@
             $scope.actividades = [];
             $scope.logsAuditoria = [];
             $scope.nuevaAct = { categoria: "Servicios bancarios", estado: "Pendiente" };
+            $scope.modalEdicionAbierto = false;
+            $scope.actEdit = {};
 
             // REGISTRO DE LOGS DE AUDITORÍA
             function registrarLog(accion, detalle) {
@@ -475,7 +571,6 @@
                         snapshot.forEach(doc => {
                             let data = doc.data();
                             data.id = doc.id;
-                            data.fechaLimiteEdit = data.fechaLimite ? new Date(data.fechaLimite) : null;
                             $scope.actividades.push(data);
                         });
                     });
@@ -486,7 +581,7 @@
                 return $scope.actividades.filter(a => a.estado === est).length;
             };
 
-            // AGREGAR TAREA
+            // AGREGAR TAREA CON OBSERVACIONES
             $scope.agregarActividad = function() {
                 if (!$scope.nuevaAct.descripcion || !$scope.nuevaAct.responsable || !$scope.nuevaAct.fechaLimiteInput) {
                     return alert("Por favor completa todos los campos obligatorios.");
@@ -497,6 +592,7 @@
                     categoria: $scope.nuevaAct.categoria,
                     responsable: $scope.nuevaAct.responsable,
                     estado: $scope.nuevaAct.estado,
+                    observaciones: $scope.nuevaAct.observaciones || "",
                     fechaLimite: $scope.nuevaAct.fechaLimiteInput.toISOString().split('T')[0],
                     fechaCierre: ""
                 };
@@ -509,7 +605,37 @@
                 });
             };
 
-            // CAMBIAR ESTADO
+            // MODAL DE EDICIÓN
+            $scope.abrirModalEdicion = function(act) {
+                $scope.actEdit = angular.copy(act);
+                $scope.actEdit.fechaLimiteInput = act.fechaLimite ? new Date(act.fechaLimite + 'T00:00:00') : null;
+                $scope.actEdit.fechaCierreInput = act.fechaCierre ? new Date(act.fechaCierre + 'T00:00:00') : null;
+                $scope.modalEdicionAbierto = true;
+            };
+
+            $scope.guardarEdicionTarea = function() {
+                let updateData = {
+                    descripcion: $scope.actEdit.descripcion,
+                    categoria: $scope.actEdit.categoria,
+                    responsable: $scope.actEdit.responsable,
+                    estado: $scope.actEdit.estado,
+                    observaciones: $scope.actEdit.observaciones || ""
+                };
+
+                if ($scope.esAdmin) {
+                    updateData.fechaLimite = $scope.actEdit.fechaLimiteInput ? $scope.actEdit.fechaLimiteInput.toISOString().split('T')[0] : "";
+                    updateData.fechaCierre = $scope.actEdit.fechaCierreInput ? $scope.actEdit.fechaCierreInput.toISOString().split('T')[0] : "";
+                }
+
+                db.collection("actividades_operativas").doc($scope.actEdit.id).update(updateData).then(() => {
+                    registrarLog("Edición de Requerimiento", "Actualizó requerimiento y observaciones: " + $scope.actEdit.descripcion);
+                    $scope.$apply(() => {
+                        $scope.modalEdicionAbierto = false;
+                    });
+                });
+            };
+
+            // CAMBIAR ESTADO RÁPIDO
             $scope.cambiarEstado = function(act) {
                 let estados = ["Pendiente", "En Proceso", "Completado"];
                 let proxIndex = (estados.indexOf(act.estado) + 1) % estados.length;
@@ -521,27 +647,14 @@
                 }
 
                 db.collection("actividades_operativas").doc(act.id).update(updateData).then(() => {
-                    registrarLog("Actualización de Estado", `Cambió estado de tarea a '${nuevoEstado}'`);
+                    registrarLog("Actualización de Estado", `Cambió estado de requerimiento a '${nuevoEstado}'`);
                 });
-            };
-
-            // CAMBIAR FECHA LÍMITE (SOLO ADMIN)
-            $scope.actualizarFechaLimite = function(act) {
-                if (!$scope.esAdmin) return;
-                if (act.fechaLimiteEdit) {
-                    let nuevaFecha = act.fechaLimiteEdit.toISOString().split('T')[0];
-                    db.collection("actividades_operativas").doc(act.id).update({
-                        fechaLimite: nuevaFecha
-                    }).then(() => {
-                        registrarLog("Modificación de SLA", "Actualizó la fecha límite de la tarea");
-                    });
-                }
             };
 
             // ELIMINAR ACTIVIDAD (SOLO ADMIN)
             $scope.eliminarActividad = function(id) {
                 if (!$scope.esAdmin) return alert("No tienes permisos para borrar tareas.");
-                if (confirm("¿Estás seguro de eliminar esta tarea de la matriz?")) {
+                if (confirm("¿Estás seguro de eliminar este requerimiento de la matriz?")) {
                     db.collection("actividades_operativas").doc(id).delete().then(() => {
                         registrarLog("Eliminación de Tarea", "Eliminó un registro de la matriz");
                     });
@@ -574,13 +687,13 @@
                 }
             };
 
-            // EXPORTAR A EXCEL
+            // EXPORTAR A EXCEL INCLUYENDO OBSERVACIONES
             $scope.exportarExcel = function() {
                 let wb = XLSX.utils.book_new();
-                let dataMatriz = [["Descripción", "Gerencia", "Responsable", "Estado", "Fecha Compromiso", "Fecha Cierre"]];
+                let dataMatriz = [["Descripción", "Gerencia", "Responsable", "Estado", "Observaciones / Avance", "Fecha Compromiso", "Fecha Cierre Real"]];
                 
                 $scope.actividades.forEach(a => {
-                    dataMatriz.push([a.descripcion, a.categoria, a.responsable, a.estado, a.fechaLimite || '--', a.fechaCierre || '--']);
+                    dataMatriz.push([a.descripcion, a.categoria, a.responsable, a.estado, a.observaciones || '--', a.fechaLimite || '--', a.fechaCierre || '--']);
                 });
 
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataMatriz), "Matriz Operativa");
