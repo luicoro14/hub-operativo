@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Operativo v13.1</title>
+    <title>Hub Operativo v14.0</title>
 
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Angular v1.8 CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+
+    <!-- Firebase SDKs Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <!-- Librería para Exportación a Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
@@ -24,6 +31,7 @@
             color: var(--text-dark);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             padding-bottom: env(safe-area-inset-bottom);
+            -webkit-tap-highlight-color: transparent;
         }
 
         .card-fresca {
@@ -39,8 +47,10 @@
             font-size: 0.8rem;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.04em;
             padding: 0.65rem 1rem;
             border-radius: 12px;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -67,17 +77,24 @@
     <!-- 0. LOGIN HUB OPERATIVO -->
     <div id="loginOverlay" ng-show="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-500/30">
                 HUB
             </div>
             <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Hub Operativo</h2>
             <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-6">Plataforma Ejecutiva & Portal Integrado</p>
 
             <form ng-submit="iniciarSesion()" class="space-y-4">
-                <input type="text" ng-model="loginUser" placeholder="Usuario registrado" required class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-medium text-center">
-                <input type="password" ng-model="loginPass" placeholder="Contraseña" required class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-medium text-center">
+                <div>
+                    <input type="text" ng-model="loginUser" placeholder="Usuario registrado" required
+                           class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-800 outline-none focus:border-blue-600 focus:bg-white transition text-center font-medium">
+                </div>
+                <div>
+                    <input type="password" ng-model="loginPass" placeholder="Contraseña" required
+                           class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-800 outline-none focus:border-blue-600 focus:bg-white transition text-center font-medium">
+                </div>
 
-                <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm uppercase shadow-lg active:scale-95 transition">
+                <button type="submit" 
+                        class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm uppercase tracking-wider shadow-lg shadow-blue-500/25 active:scale-95 transition">
                     Ingresar al Hub Operativo
                 </button>
             </form>
@@ -86,7 +103,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE FELIZ CUMPLEAÑOS (SOLO APARECE SI HOY ALGUIEN CUMPLE AÑOS) -->
+    <!-- MODAL DE FELIZ CUMPLEAÑOS (SOLO APARECE SI HOY MISMO ALGUIEN CUMPLE AÑOS) -->
     <div ng-show="mostrarAlertaCumple && sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-center space-y-4 border-2 border-amber-300">
             <div class="text-5xl animate-bounce">🎂🎉</div>
@@ -115,7 +132,7 @@
                     </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">HUB OPERATIVO</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v13.1</p>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v14.0</p>
                     </div>
                 </div>
 
@@ -139,7 +156,7 @@
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6">
 
-            <!-- 1. INICIO (SOLO MUESTRA LAS 3 GERENCIAS TRADICIONALES, AISLANDO FÁBRICA) -->
+            <!-- 1. INICIO (MUESTRA LAS 3 GERENCIAS TRADICIONALES, AISLANDO FÁBRICA) -->
             <section ng-show="moduloActivo === 'inicio'" class="space-y-6">
                 <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 p-6 sm:p-8 text-white shadow-xl">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -284,7 +301,6 @@
 
                         <p class="text-xs text-slate-800 font-medium">{{ post.texto }}</p>
 
-                        <!-- IMAGEN ADJUNTA SI EXISTE -->
                         <div ng-if="post.mediaUrl" class="rounded-2xl overflow-hidden border border-slate-100 max-h-72">
                             <img ng-src="{{ post.mediaUrl }}" class="w-full object-cover">
                         </div>
@@ -295,7 +311,6 @@
                             </button>
                         </div>
 
-                        <!-- COMENTARIOS -->
                         <div class="space-y-2 pt-2 bg-slate-50/80 p-3 rounded-2xl">
                             <div ng-repeat="com in post.comentarios" class="text-xs">
                                 <strong class="text-slate-800">{{ com.autor }}:</strong> <span class="text-slate-600">{{ com.texto }}</span>
@@ -450,16 +465,21 @@
             // VERIFICACIÓN ESTRICTA DEL DÍA Y MES ACTUAL
             $scope.verificarCumpleanosHoy = function() {
                 let hoy = new Date();
-                let diaActual = hoy.getDate();
+                let diaActual = hoy.getDate(); // 27
                 let meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-                let mesActualNombre = meses[hoy.getMonth()];
+                let mesActualNombre = meses[hoy.getMonth()]; // "agosto"
 
                 let cump = $scope.trabajadores.find(t => {
                     if (!t.cumpleanos) return false;
-                    let txt = t.cumpleanos.toLowerCase();
-                    let coincideDia = txt.includes(diaActual.toString());
+                    let txt = t.cumpleanos.toLowerCase().trim();
+                    
+                    let numerosEncontrados = txt.match(/\d+/g);
+                    let diaGuardado = numerosEncontrados ? parseInt(numerosEncontrados[0]) : null;
+                    
+                    let coincideDiaExacto = (diaGuardado === diaActual);
                     let coincideMes = txt.includes(mesActualNombre);
-                    return coincideDia && coincideMes;
+                    
+                    return coincideDiaExacto && coincideMes;
                 });
                 
                 if (cump) {
