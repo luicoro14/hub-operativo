@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Operativo v14.2</title>
+    <title>Hub Operativo v15.0 - Social Feed</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -70,6 +70,11 @@
             border: 4px solid #ffffff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
+
+        .feed-container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body ng-app="intranetApp" ng-controller="MainController">
@@ -113,7 +118,7 @@
                     </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">HUB OPERATIVO</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v14.2</p>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v15.0</p>
                     </div>
                 </div>
 
@@ -253,54 +258,102 @@
                 </div>
             </section>
 
-            <!-- 5. MURAL INTERACTIVO SOCIAL -->
+            <!-- 5. MURAL INTERACTIVO SOCIAL (FEED MEJORADO TIPO RED SOCIAL) -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6">
-                <div>
+                <div class="text-center max-w-lg mx-auto">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">💬 Mural Interactivo de Trabajo</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Comparte enlaces, imágenes, ideas y reacciona con el equipo</p>
+                    <p class="text-xs text-slate-500 font-semibold">Comparte avances, fotos, videos y enlaces con todo el equipo</p>
                 </div>
 
-                <!-- PUBLICAR POST -->
-                <div class="card-fresca p-5 sm:p-6 space-y-4">
-                    <h3 class="text-sm font-black text-slate-800 uppercase">📝 Crear Nueva Publicación</h3>
-                    <form ng-submit="publicarEnMural()" class="space-y-3">
-                        <textarea ng-model="nuevoPost.texto" required placeholder="Escribe un mensaje, anuncio o saludo..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs resize-none" rows="3"></textarea>
-                        
-                        <input type="text" ng-model="nuevoPost.mediaUrl" placeholder="URL opcional de Imagen o Enlace (https://...)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
-                        
-                        <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl active:scale-95 transition">Publicar en Mural</button>
-                    </form>
-                </div>
-
-                <!-- FEED DE PUBLICACIONES -->
-                <div class="space-y-4">
-                    <div class="card-fresca p-5 space-y-3" ng-repeat="post in muroPosts">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-xs text-blue-600">👤 {{ post.autor }}</span>
-                            <span class="text-[10px] text-slate-400">{{ post.fecha }}</span>
+                <div class="feed-container space-y-6">
+                    <!-- CREAR NUEVA PUBLICACIÓN -->
+                    <div class="card-fresca p-5 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-xs">
+                                {{ usuarioSesion.charAt(0) }}
+                            </div>
+                            <span class="text-xs font-bold text-slate-800">¿Qué quieres compartir hoy, {{ usuarioSesion }}?</span>
                         </div>
 
-                        <p class="text-xs text-slate-800 font-medium">{{ post.texto }}</p>
-
-                        <div ng-if="post.mediaUrl" class="rounded-2xl overflow-hidden border border-slate-100 max-h-72">
-                            <img ng-src="{{ post.mediaUrl }}" class="w-full object-cover">
-                        </div>
-
-                        <div class="flex items-center gap-4 pt-2 border-t border-slate-100">
-                            <button ng-click="darMeGusta(post)" class="text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1.5 rounded-xl flex items-center gap-1 active:scale-95">
-                                ❤️ {{ post.likes || 0 }} Me Gusta
-                            </button>
-                        </div>
-
-                        <div class="space-y-2 pt-2 bg-slate-50/80 p-3 rounded-2xl">
-                            <div ng-repeat="com in post.comentarios" class="text-xs">
-                                <strong class="text-slate-800">{{ com.autor }}:</strong> <span class="text-slate-600">{{ com.texto }}</span>
+                        <form ng-submit="publicarEnMural()" class="space-y-3">
+                            <textarea ng-model="nuevoPost.texto" required placeholder="Escribe tu mensaje, actualización o novedades..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs resize-none outline-none focus:border-blue-600 focus:bg-white transition" rows="3"></textarea>
+                            
+                            <!-- SELECCIÓN DE ADJUNTO: FICHERO LOCAL O LINK -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">📷 Cargar Foto/Video de Galería</label>
+                                    <input type="file" id="muralFileInput" onchange="angular.element(this).scope().cargandoArchivoMural(this)" class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">🔗 O Pega un Enlace/URL Externa</label>
+                                    <input type="text" ng-model="nuevoPost.mediaUrl" placeholder="https://..." class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                </div>
                             </div>
 
-                            <form ng-submit="agregarComentario(post, nuevoComentarioTexto[post.id])" class="flex gap-2 pt-1">
-                                <input type="text" ng-model="nuevoComentarioTexto[post.id]" placeholder="Escribe un comentario..." class="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                                <button type="submit" class="px-3 py-1.5 bg-slate-800 text-white font-bold text-[10px] uppercase rounded-xl">Comentar</button>
-                            </form>
+                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs uppercase rounded-2xl shadow-md active:scale-95 transition">
+                                🚀 Publicar en el Mural
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- FEED DESPLAZABLE DE PUBLICACIONES -->
+                    <div class="space-y-5">
+                        <div class="card-fresca p-5 space-y-3" ng-repeat="post in muroPosts">
+                            <!-- HEADER DEL POST -->
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 text-blue-600 border border-slate-200 font-bold flex items-center justify-center text-xs">
+                                        👤
+                                    </div>
+                                    <div>
+                                        <h4 class="font-black text-xs text-slate-800">{{ post.autor }}</h4>
+                                        <span class="text-[9px] text-slate-400 font-medium block">{{ post.fecha }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- OPCIÓN DE ELIMINAR POST (PROPIETARIO O ADMIN) -->
+                                <button ng-show="puedesEliminarPost(post)" ng-click="eliminarPostMural(post.id)" class="text-[10px] font-bold text-red-500 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-lg transition active:scale-95">
+                                    🗑 Eliminar
+                                </button>
+                            </div>
+
+                            <!-- TEXTO DEL POST -->
+                            <p class="text-xs text-slate-700 font-medium whitespace-pre-line leading-relaxed">{{ post.texto }}</p>
+
+                            <!-- MULTIMEDIA ADJUNTA (IMAGEN O VIDEO) -->
+                            <div ng-if="post.mediaUrl" class="rounded-2xl overflow-hidden border border-slate-100 bg-black/5 max-h-96 flex items-center justify-center">
+                                <!-- VIDEO -->
+                                <video ng-if="esVideo(post.mediaUrl)" controls class="w-full max-h-96 object-contain">
+                                    <source ng-src="{{ post.mediaUrl }}">
+                                    Tu navegador no soporta reproducción de video.
+                                </video>
+                                <!-- IMAGEN -->
+                                <img ng-if="!esVideo(post.mediaUrl)" ng-src="{{ post.mediaUrl }}" class="w-full max-h-96 object-cover hover:scale-105 transition duration-300">
+                            </div>
+
+                            <!-- ACCIONES DE INTERACCIÓN (ME GUSTA) -->
+                            <div class="flex items-center gap-4 pt-2 border-t border-slate-100">
+                                <button ng-click="darMeGusta(post)" class="text-xs font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5 active:scale-95 transition">
+                                    ❤️ {{ post.likes || 0 }} Me Gusta
+                                </button>
+                            </div>
+
+                            <!-- SECCIÓN DE COMENTARIOS TIPO RED SOCIAL -->
+                            <div class="space-y-2 pt-2 bg-slate-50/80 p-3 rounded-2xl border border-slate-100">
+                                <div ng-repeat="com in post.comentarios" class="text-xs leading-tight">
+                                    <strong class="text-slate-800 font-bold">{{ com.autor }}:</strong> 
+                                    <span class="text-slate-600 font-medium">{{ com.texto }}</span>
+                                </div>
+
+                                <form ng-submit="agregarComentario(post, nuevoComentarioTexto[post.id])" class="flex gap-2 pt-1">
+                                    <input type="text" ng-model="nuevoComentarioTexto[post.id]" placeholder="Escribe un comentario..." class="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600">
+                                    <button type="submit" class="px-3.5 py-1.5 bg-slate-800 text-white font-bold text-[10px] uppercase rounded-xl active:scale-95 transition">Comentar</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div ng-if="muroPosts.length === 0" class="text-center p-8 text-slate-400 font-medium text-xs">
+                            Aún no hay publicaciones en el mural. ¡Sé el primero en compartir algo!
                         </div>
                     </div>
                 </div>
@@ -341,7 +394,6 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE FIREBASE EN LA NUBE
         const firebaseConfig = {
             apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
   authDomain: "control-operativo-26ec9.firebaseapp.com",
@@ -356,7 +408,7 @@
 
         var app = angular.module('intranetApp', []);
 
-        app.controller('MainController', function($scope) {
+        app.controller('MainController', function($scope, $sce) {
             $scope.sesionIniciada = false;
             $scope.esAdmin = false;
             $scope.usuarioSesion = "";
@@ -373,7 +425,6 @@
                 var u = ($scope.loginUser || "").trim().toLowerCase();
                 var p = ($scope.loginPass || "").trim();
 
-                // 1. Acceso Administrador Principal garantizado
                 if (u === 'luis' && p === 'control2026') {
                     $scope.sesionIniciada = true;
                     $scope.esAdmin = true;
@@ -383,67 +434,142 @@
                     return;
                 }
 
-                // 2. Consulta de usuarios en Firebase
-                db.collection("personal_intranet").where("usuario", "==", u).where("password", "==", p).get()
-                .then(snapshot => {
-                    $scope.$apply(() => {
-                        if (!snapshot.empty) {
-                            let userData = snapshot.docs[0].data();
-                            $scope.sesionIniciada = true;
-                            $scope.esAdmin = (userData.rol === 'admin');
-                            $scope.usuarioSesion = userData.nombre || u;
-                            $scope.loginError = false;
-                            $scope.sincronizarFirebase();
-                        } else {
-                            $scope.loginError = true;
-                        }
+                if (window.db) {
+                    db.collection("personal_intranet").where("usuario", "==", u).where("password", "==", p).get()
+                    .then(snapshot => {
+                        $scope.$apply(() => {
+                            if (!snapshot.empty) {
+                                let userData = snapshot.docs[0].data();
+                                $scope.sesionIniciada = true;
+                                $scope.esAdmin = (userData.rol === 'admin');
+                                $scope.usuarioSesion = userData.nombre || u;
+                                $scope.loginError = false;
+                                $scope.sincronizarFirebase();
+                            } else {
+                                $scope.loginError = true;
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Error consulta Firebase:", err);
+                        $scope.$apply(() => { $scope.loginError = true; });
                     });
-                })
-                .catch(err => {
-                    console.error("Error al iniciar sesión:", err);
-                    $scope.$apply(() => { $scope.loginError = true; });
-                });
+                } else {
+                    $scope.loginError = true;
+                }
             };
 
             $scope.cerrarSesion = function() { $scope.sesionIniciada = false; };
             $scope.cambiarModulo = function(m) { $scope.moduloActivo = m; };
 
             $scope.sincronizarFirebase = function() {
-                db.collection("actividades_operativas").onSnapshot(snapshot => {
-                    $scope.$apply(() => {
-                        $scope.actividadesMatriz = [];
-                        snapshot.forEach(doc => {
-                            let d = doc.data();
-                            d.id = doc.id;
-                            if (d.categoria !== 'Fábrica') {
-                                $scope.actividadesMatriz.push(d);
-                            }
+                try {
+                    db.collection("actividades_operativas").onSnapshot(snapshot => {
+                        $scope.$apply(() => {
+                            $scope.actividadesMatriz = [];
+                            snapshot.forEach(doc => {
+                                let d = doc.data();
+                                d.id = doc.id;
+                                if (d.categoria !== 'Fábrica') {
+                                    $scope.actividadesMatriz.push(d);
+                                }
+                            });
+                            $scope.calcularRankingsReales();
                         });
-                        $scope.calcularRankingsReales();
                     });
-                });
 
-                db.collection("personal_intranet").onSnapshot(snapshot => {
-                    $scope.$apply(() => {
-                        $scope.trabajadores = [];
-                        snapshot.forEach(doc => {
-                            let t = doc.data();
-                            t.id = doc.id;
-                            $scope.trabajadores.push(t);
+                    db.collection("personal_intranet").onSnapshot(snapshot => {
+                        $scope.$apply(() => {
+                            $scope.trabajadores = [];
+                            snapshot.forEach(doc => {
+                                let t = doc.data();
+                                t.id = doc.id;
+                                $scope.trabajadores.push(t);
+                            });
                         });
                     });
-                });
 
-                db.collection("mural_posts").orderBy("fechaSort", "desc").onSnapshot(snapshot => {
-                    $scope.$apply(() => {
-                        $scope.muroPosts = [];
-                        snapshot.forEach(doc => {
-                            let p = doc.data();
-                            p.id = doc.id;
-                            $scope.muroPosts.push(p);
+                    db.collection("mural_posts").orderBy("fechaSort", "desc").onSnapshot(snapshot => {
+                        $scope.$apply(() => {
+                            $scope.muroPosts = [];
+                            snapshot.forEach(doc => {
+                                let p = doc.data();
+                                p.id = doc.id;
+                                $scope.muroPosts.push(p);
+                            });
                         });
                     });
+                } catch(e) {
+                    console.log("Excepción Firestore:", e);
+                }
+            };
+
+            // CARGA DE FOTO/VIDEO DESDE GALERÍA LOCAL
+            $scope.cargandoArchivoMural = function(element) {
+                let file = element.files[0];
+                if (file) {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        $scope.$apply(() => {
+                            $scope.nuevoPost.mediaUrl = e.target.result;
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            $scope.esVideo = function(url) {
+                if (!url) return false;
+                return url.includes("data:video") || url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".mov");
+            };
+
+            $scope.puedesEliminarPost = function(post) {
+                if ($scope.usuarioSesion === 'Luis Coronado' || $scope.esAdmin) return true;
+                return post.autor === $scope.usuarioSesion;
+            };
+
+            $scope.eliminarPostMural = function(id) {
+                if (confirm("¿Estás seguro de eliminar esta publicación del mural?")) {
+                    db.collection("mural_posts").doc(id).delete();
+                }
+            };
+
+            $scope.publicarEnMural = function() {
+                if ($scope.nuevoPost.texto) {
+                    db.collection("mural_posts").add({
+                        autor: $scope.usuarioSesion,
+                        texto: $scope.nuevoPost.texto,
+                        mediaUrl: $scope.nuevoPost.mediaUrl || "",
+                        likes: 0,
+                        comentarios: [],
+                        fecha: new Date().toLocaleString(),
+                        fechaSort: new Date().getTime()
+                    }).then(() => {
+                        $scope.$apply(() => {
+                            $scope.nuevoPost = {};
+                            let input = document.getElementById('muralFileInput');
+                            if (input) input.value = '';
+                        });
+                    });
+                }
+            };
+
+            $scope.darMeGusta = function(post) {
+                db.collection("mural_posts").doc(post.id).update({
+                    likes: (post.likes || 0) + 1
                 });
+            };
+
+            $scope.agregarComentario = function(post, textoCom) {
+                if (textoCom) {
+                    let nuevosCom = post.comentarios || [];
+                    nuevosCom.push({ autor: $scope.usuarioSesion, texto: textoCom });
+                    db.collection("mural_posts").doc(post.id).update({
+                        comentarios: nuevosCom
+                    }).then(() => {
+                        $scope.$apply(() => { $scope.nuevoComentarioTexto[post.id] = ""; });
+                    });
+                }
             };
 
             $scope.calcularRankingsReales = function() {
@@ -495,40 +621,6 @@
                     let eff = d.total > 0 ? Math.round((d.aTiempo / d.total) * 100) : 0;
                     return { nombre: g, eficiencia: eff };
                 }).sort((a, b) => b.eficiencia - a.eficiencia);
-            };
-
-            $scope.publicarEnMural = function() {
-                if ($scope.nuevoPost.texto) {
-                    db.collection("mural_posts").add({
-                        autor: $scope.usuarioSesion,
-                        texto: $scope.nuevoPost.texto,
-                        mediaUrl: $scope.nuevoPost.mediaUrl || "",
-                        likes: 0,
-                        comentarios: [],
-                        fecha: new Date().toLocaleString(),
-                        fechaSort: new Date().getTime()
-                    }).then(() => {
-                        $scope.$apply(() => { $scope.nuevoPost = {}; });
-                    });
-                }
-            };
-
-            $scope.darMeGusta = function(post) {
-                db.collection("mural_posts").doc(post.id).update({
-                    likes: (post.likes || 0) + 1
-                });
-            };
-
-            $scope.agregarComentario = function(post, textoCom) {
-                if (textoCom) {
-                    let nuevosCom = post.comentarios || [];
-                    nuevosCom.push({ autor: $scope.usuarioSesion, texto: textoCom });
-                    db.collection("mural_posts").doc(post.id).update({
-                        comentarios: nuevosCom
-                    }).then(() => {
-                        $scope.$apply(() => { $scope.nuevoComentarioTexto[post.id] = ""; });
-                    });
-                }
             };
 
             $scope.eliminarUsuarioHub = function(id) {
