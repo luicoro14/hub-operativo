@@ -3,43 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Operativo v15.0 - Responsive</title>
+    <title>Hub Operativo v19.0 Cyber-Executive</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
         :root {
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
+            --bg-main: #0f172a;
             --accent-primary: #2563eb;
-            --text-dark: #0f172a;
         }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-dark);
+            background-color: #0f172a;
+            color: #f8fafc;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+            overflow-x: hidden;
         }
 
         @media (min-width: 768px) {
             body { padding-bottom: 2rem; }
         }
 
+        .bg-cyber {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.25) 0%, transparent 45%),
+                        radial-gradient(circle at 80% 80%, rgba(20, 184, 166, 0.18) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.95) 0%, #060911 100%);
+            animation: pulseBg 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseBg {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.05) rotate(1.5deg); }
+        }
+
         .card-fresca {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
-            transition: all 0.2s ease;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card-fresca:hover {
+            border-color: rgba(37, 99, 235, 0.4);
+            box-shadow: 0 12px 40px 0 rgba(37, 99, 235, 0.2);
+        }
+
+        .input-fresco {
+            background-color: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 0.65rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #f8fafc;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-fresco:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            background-color: rgba(15, 23, 42, 0.95);
         }
 
         .nav-btn {
-            color: #64748b;
+            color: #94a3b8;
             font-size: 0.8rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -54,88 +95,77 @@
         .nav-btn.active {
             background-color: #2563eb;
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-        }
-
-        .profile-avatar-lg {
-            width: 85px;
-            height: 85px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #ffffff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
         }
 
         .bottom-nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem;
-            font-size: 0.6rem;
-            font-weight: 800;
-            color: #64748b;
-            text-transform: uppercase;
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 0.5rem; font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase;
         }
-        .bottom-nav-item.active {
-            color: #2563eb;
-        }
+        .bottom-nav-item.active { color: #3b82f6; }
     </style>
 </head>
 <body ng-app="intranetApp" ng-controller="MainController">
 
-    <!-- LOGIN -->
-    <div id="loginOverlay" ng-show="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg">
+    <!-- FONDO FUTURISTA VISIBLE EN LOGIN Y APP -->
+    <div class="bg-cyber"></div>
+
+    <!-- PANTALLA LOGIN FUTURISTA -->
+    <div id="loginOverlay" ng-show="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md">
+        <div class="card-fresca p-6 sm:p-8 max-w-md w-full text-center border border-slate-700/60 shadow-2xl">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-500/30">
                 HUB
             </div>
-            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Hub Operativo</h2>
-            <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-6">Plataforma Ejecutiva & Portal Integrado</p>
+            <h2 class="text-2xl font-black text-white uppercase tracking-tight">Hub Operativo</h2>
+            <p class="text-xs text-blue-300 font-semibold uppercase tracking-wider mb-6">Plataforma Ejecutiva Cyber-Pro v19.0</p>
 
             <form ng-submit="iniciarSesion()" class="space-y-4">
-                <input type="text" ng-model="loginUser" placeholder="Usuario registrado" required class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-medium text-center">
-                <input type="password" ng-model="loginPass" placeholder="Contraseña" required class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-medium text-center">
+                <input type="text" ng-model="loginUser" placeholder="Usuario registrado" required class="input-fresco w-full text-center font-bold">
+                <input type="password" ng-model="loginPass" placeholder="Contraseña" required class="input-fresco w-full text-center font-bold">
 
-                <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm uppercase shadow-lg active:scale-95 transition">
+                <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm uppercase shadow-lg shadow-blue-500/30 active:scale-95 transition">
                     Ingresar al Hub Operativo
                 </button>
             </form>
 
-            <p ng-show="loginError" class="text-xs text-red-500 font-bold mt-4">⚠ Usuario o contraseña incorrectos</p>
+            <p ng-show="loginError" class="text-xs text-red-400 font-bold mt-4">⚠ Usuario o contraseña incorrectos</p>
         </div>
     </div>
 
     <!-- APP CONTAINER -->
     <div ng-show="sesionIniciada">
-        <!-- HEADER EN ESCRITORIO -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
+        <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-md">
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center font-black text-white text-lg shadow-md">
                         HUB
                     </div>
                     <div>
-                        <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">HUB OPERATIVO</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v15.0 Responsive</p>
+                        <h1 class="font-extrabold text-sm sm:text-base text-white tracking-tight uppercase">HUB OPERATIVO</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-400 font-semibold">Panel v19.0 Cyber-Executive</p>
                     </div>
                 </div>
 
-                <nav class="hidden md:flex flex-wrap gap-1 bg-slate-100 p-1 rounded-2xl">
-                    <button class="nav-btn" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="cambiarModulo('inicio')">🏠 Inicio</button>
-                    <button class="nav-btn" ng-class="{'active': moduloActivo === 'rankings'}" ng-click="cambiarModulo('rankings')">🏆 Top 5</button>
-                    <button class="nav-btn" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="cambiarModulo('directorio')">👥 Directorio</button>
-                    <button class="nav-btn" ng-class="{'active': moduloActivo === 'perfil'}" ng-click="cambiarModulo('perfil')">👤 Perfil</button>
-                    <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="cambiarModulo('mural')">💬 Mural</button>
-                    <button class="nav-btn" ng-show="esAdmin" ng-class="{'active': moduloActivo === 'admin'}" ng-click="cambiarModulo('admin')">⚙ Admin</button>
-                </nav>
+                <div class="hidden md:flex items-center gap-3">
+                    <button ng-click="solicitarPermisoPush()" class="text-xs font-bold text-amber-300 bg-amber-500/10 px-3.5 py-2 rounded-xl border border-amber-500/20 flex items-center gap-1.5 hover:bg-amber-500/20 transition">
+                        🔔 Push
+                    </button>
+
+                    <nav class="flex flex-wrap gap-1 bg-slate-950/50 p-1 rounded-2xl border border-slate-800">
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="cambiarModulo('inicio')">🏠 Inicio</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'calendario'}" ng-click="cambiarModulo('calendario')">📅 Agenda & Audios</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'rankings'}" ng-click="cambiarModulo('rankings')">🏆 Top 5</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="cambiarModulo('directorio')">👥 Directorio</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="cambiarModulo('mural')">💬 Mural Social</button>
+                        <button class="nav-btn" ng-show="esAdmin" ng-class="{'active': moduloActivo === 'admin'}" ng-click="cambiarModulo('admin')">⚙ Admin</button>
+                    </nav>
+                </div>
 
                 <div class="flex items-center gap-3">
-                    <span class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 hidden sm:inline-block">
+                    <span class="text-xs font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 hidden sm:inline-block">
                         👤 {{ usuarioSesion }}
                     </span>
-                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100">Salir</button>
+                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-400 bg-red-500/10 px-3 py-1.5 rounded-xl border border-red-500/20 hover:bg-red-500/20 transition">Salir</button>
                 </div>
             </div>
         </header>
@@ -144,14 +174,13 @@
 
             <!-- 1. INICIO -->
             <section ng-show="moduloActivo === 'inicio'" class="space-y-6">
-                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 p-6 sm:p-8 text-white shadow-xl">
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-teal-600 p-6 sm:p-8 text-white shadow-2xl border border-white/10">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <span class="text-[10px] sm:text-xs font-black uppercase bg-white/20 px-3 py-1 rounded-full">Vista Ejecutiva Real</span>
                             <h2 class="text-2xl sm:text-3xl font-black mt-2">Panel de Eficiencia Operativa</h2>
-                            <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mt-1 font-medium">Estadísticas exclusivas de las 3 Gerencias principales.</p>
                         </div>
-                        <button ng-click="exportarInformeConsolidado()" class="w-full md:w-auto px-5 py-3.5 rounded-2xl bg-white text-blue-600 font-black text-xs uppercase shadow-lg hover:bg-blue-50 transition border border-white">
+                        <button ng-click="exportarInformeConsolidado()" class="w-full md:w-auto px-5 py-3.5 rounded-2xl bg-white text-blue-700 font-black text-xs uppercase shadow-lg hover:bg-blue-50 transition">
                             📥 Reporte Consolidado (.xlsx)
                         </button>
                     </div>
@@ -160,64 +189,101 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     <div class="card-fresca p-4 sm:p-5">
                         <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Tareas 3 Gerencias</span>
-                        <div class="text-2xl sm:text-3xl font-black text-slate-800 mt-1">{{ actividadesMatriz.length }}</div>
-                        <span class="text-[10px] sm:text-xs text-blue-600 font-bold mt-1 block">📊 Base Hub</span>
+                        <div class="text-2xl sm:text-3xl font-black text-white mt-1">{{ actividadesMatriz.length }}</div>
                     </div>
-
                     <div class="card-fresca p-4 sm:p-5">
                         <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">SLA Global</span>
-                        <div class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">{{ slaGlobal }}%</div>
-                        <span class="text-[10px] sm:text-xs text-emerald-600 font-bold mt-1 block">🟢 Efectividad</span>
+                        <div class="text-2xl sm:text-3xl font-black text-emerald-400 mt-1">{{ slaGlobal }}%</div>
                     </div>
-
                     <div class="card-fresca p-4 sm:p-5">
                         <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Líder Top 5</span>
-                        <div class="text-sm sm:text-lg font-black text-blue-600 mt-1 truncate">{{ top5Trabajadores[0].nombre || 'Sin datos' }}</div>
-                        <span class="text-[10px] sm:text-xs text-amber-600 font-bold mt-1 block">🌟 {{ top5Trabajadores[0].eficiencia }}% SLA</span>
+                        <div class="text-sm sm:text-lg font-black text-blue-400 mt-1 truncate">{{ top5Trabajadores[0].nombre || 'Sin datos' }}</div>
                     </div>
-
                     <div class="card-fresca p-4 sm:p-5">
                         <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Gerencia Líder</span>
-                        <div class="text-sm sm:text-lg font-black text-teal-600 mt-1 truncate">{{ gerenciasRanking[0].nombre || 'Sin datos' }}</div>
-                        <span class="text-[10px] sm:text-xs text-teal-600 font-bold mt-1 block">🏆 {{ gerenciasRanking[0].eficiencia }}% SLA</span>
+                        <div class="text-sm sm:text-lg font-black text-teal-400 mt-1 truncate">{{ gerenciasRanking[0].nombre || 'Sin datos' }}</div>
                     </div>
                 </div>
             </section>
 
-            <!-- 2. RANKINGS -->
-            <section ng-show="moduloActivo === 'rankings'" class="space-y-6">
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight">Rankings de Eficiencia (3 Gerencias)</h2>
+            <!-- 2. CALENDARIO EJECUTIVO & AUDIOS MULTIMEDIA -->
+            <section ng-show="moduloActivo === 'calendario'" class="space-y-6">
+                <div class="text-center max-w-lg mx-auto">
+                    <h2 class="text-xl sm:text-2xl font-black text-white uppercase">📅 Agenda Ejecutiva & SLAs</h2>
+                    <p class="text-xs text-slate-400 font-semibold">Control visual de entregas, cierres contables y comunicados de voz</p>
                 </div>
 
+                <div class="card-fresca p-5 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="text-sm font-black text-white uppercase">🗓 Próximos Vencimientos de Compromisos</h3>
+                        <span class="text-xs font-bold text-blue-400">Sincronizado con Matriz en Tiempo Real</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        <div ng-repeat="act in actividadesMatriz | filter:{estado: '!Completado'}" class="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
+                            <div class="flex justify-between items-center text-[10px]">
+                                <span class="font-bold text-slate-400">📅 {{ act.fechaLimite || 'Sin Fecha' }}</span>
+                                <span class="px-2 py-0.5 rounded font-bold uppercase" ng-class="{'bg-amber-500/20 text-amber-300': act.estado==='Pendiente', 'bg-sky-500/20 text-sky-300': act.estado==='En Proceso'}">{{ act.estado }}</span>
+                            </div>
+                            <h4 class="font-bold text-xs text-white leading-snug">{{ act.descripcion }}</h4>
+                            <div class="text-[10px] text-slate-400 flex justify-between border-t border-slate-800/80 pt-2">
+                                <span>👤 {{ act.responsable }}</span>
+                                <span class="text-blue-400 font-bold">🏢 {{ act.categoria }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-fresca p-5 space-y-4">
+                    <h3 class="text-sm font-black text-white uppercase">🎙️ Centro de Comunicados de Voz Corporativos</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl bg-slate-950/40 border border-slate-800 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">📢</span>
+                                <div>
+                                    <h4 class="text-xs font-bold text-white">Lineamientos de Cierre Operativo</h4>
+                                    <p class="text-[10px] text-slate-400">Mensaje de la Gerencia de Control Contable</p>
+                                </div>
+                            </div>
+                            <audio controls class="w-full h-9 rounded-lg mt-2">
+                                <source src="audio_ejemplo.mp3" type="audio/mpeg">
+                                Tu navegador no soporta el reproductor de audio.
+                            </audio>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. RANKINGS -->
+            <section ng-show="moduloActivo === 'rankings'" class="space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="card-fresca p-5 sm:p-6">
-                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase mb-4">🏆 Top 5 Trab. más Eficientes</h3>
+                        <h3 class="text-sm sm:text-base font-black text-white uppercase mb-4">🏆 Top 5 Trab. más Eficientes</h3>
                         <div class="space-y-3">
-                            <div ng-repeat="colab in top5Trabajadores" class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                            <div ng-repeat="colab in top5Trabajadores" class="flex items-center justify-between p-3 rounded-2xl bg-slate-900/60 border border-slate-800">
                                 <div class="flex items-center gap-3">
-                                    <span class="font-bold text-slate-500">#{{ $index + 1 }}</span>
+                                    <span class="font-bold text-slate-400">#{{ $index + 1 }}</span>
                                     <img ng-src="{{ colab.foto }}" class="w-10 h-10 rounded-full object-cover">
                                     <div>
-                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800">{{ colab.nombre }}</h4>
-                                        <p class="text-[10px] text-slate-500">{{ colab.cargo }}</p>
+                                        <h4 class="font-bold text-xs sm:text-sm text-white">{{ colab.nombre }}</h4>
+                                        <p class="text-[10px] text-slate-400">{{ colab.cargo }}</p>
                                     </div>
                                 </div>
-                                <span class="text-sm font-black text-emerald-600">{{ colab.eficiencia }}% SLA</span>
+                                <span class="text-sm font-black text-emerald-400">{{ colab.eficiencia }}% SLA</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="card-fresca p-5 sm:p-6">
-                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase mb-4">🏢 Ranking de las 3 Gerencias</h3>
+                        <h3 class="text-sm sm:text-base font-black text-white uppercase mb-4">🏢 Ranking de las 3 Gerencias</h3>
                         <div class="space-y-4">
                             <div ng-repeat="ger in gerenciasRanking" class="space-y-1">
                                 <div class="flex justify-between text-xs font-bold">
-                                    <span>{{ ger.nombre }}</span>
-                                    <span class="text-blue-600">{{ ger.eficiencia }}% SLA</span>
+                                    <span class="text-slate-300">{{ ger.nombre }}</span>
+                                    <span class="text-blue-400">{{ ger.eficiencia }}% SLA</span>
                                 </div>
-                                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-600 rounded-full" style="width: {{ ger.eficiencia }}%;"></div>
+                                <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                                    <div class="h-full bg-blue-500 rounded-full" style="width: {{ ger.eficiencia }}%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -225,113 +291,106 @@
                 </div>
             </section>
 
-            <!-- 3. DIRECTORIO -->
+            <!-- 4. DIRECTORIO -->
             <section ng-show="moduloActivo === 'directorio'" class="space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">Directorio de Personal</h2>
-                    <input type="text" ng-model="busquedaDirectorio" placeholder="🔍 Buscar nombre..." class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs w-full sm:w-auto">
+                    <h2 class="text-xl sm:text-2xl font-black text-white uppercase">Directorio de Personal</h2>
+                    <input type="text" ng-model="busquedaDirectorio" placeholder="🔍 Buscar nombre..." class="input-fresco w-full sm:w-auto">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="card-fresca p-5 text-center" ng-repeat="trab in trabajadores | filter:busquedaDirectorio">
-                        <img ng-src="{{ trab.foto }}" class="profile-avatar-lg mx-auto mb-3">
-                        <h3 class="font-bold text-sm text-slate-800">{{ trab.nombre }}</h3>
-                        <p class="text-[10px] font-bold text-blue-600 uppercase">{{ trab.cargo }}</p>
-                        <p class="text-xs text-slate-500">🏢 {{ trab.gerencia }}</p>
-                        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 text-left space-y-1">
-                            <p>☎ <strong>Extensión:</strong> {{ trab.extension }}</p>
-                            <p>🎂 <strong>Cumpleaños:</strong> {{ trab.cumpleanos }}</p>
-                        </div>
+                        <img ng-src="{{ trab.foto }}" class="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-blue-500/30">
+                        <h3 class="font-bold text-sm text-white">{{ trab.nombre }}</h3>
+                        <p class="text-[10px] font-bold text-blue-400 uppercase">{{ trab.cargo }}</p>
+                        <p class="text-xs text-slate-400">🏢 {{ trab.gerencia }}</p>
                     </div>
                 </div>
             </section>
 
-            <!-- 4. MI PERFIL -->
-            <section ng-show="moduloActivo === 'perfil'" class="space-y-6">
-                <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">👤 Mi Perfil Corporativo</h2>
-                <div class="card-fresca p-6 max-w-xl mx-auto space-y-4">
-                    <form ng-submit="actualizarMiFoto()" class="space-y-4">
-                        <label class="text-xs font-bold text-slate-600 block">URL Foto de Perfil</label>
-                        <input type="text" ng-model="nuevaFotoURL" placeholder="https://..." required class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
-                        <button type="submit" class="w-full py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl active:scale-95">Guardar Foto</button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- 5. MURAL INTERACTIVO SOCIAL TIPO RED SOCIAL -->
+            <!-- 5. MURAL INTERACTIVO CON DESCARGAS Y REPORTES -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6">
                 <div class="text-center max-w-lg mx-auto">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">💬 Mural Interactivo</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Comparte actualizaciones, imágenes y videos con el equipo</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-white uppercase">💬 Mural Interactivo Cyber-Social</h2>
+                    <p class="text-xs text-slate-400 font-semibold">Comparte actualizaciones, imágenes y videos con el equipo</p>
                 </div>
 
                 <div class="max-w-2xl mx-auto space-y-6">
                     <div class="card-fresca p-5 space-y-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-xs">
-                                {{ usuarioSesion.charAt(0) }}
-                            </div>
-                            <span class="text-xs font-bold text-slate-800">¿Qué quieres publicar, {{ usuarioSesion }}?</span>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-300">¿Qué quieres publicar, {{ usuarioSesion }}?</span>
+                            <button type="button" ng-click="limpiarFormularioMural()" class="text-xs font-bold text-slate-400">🧹 Limpiar</button>
                         </div>
 
                         <form ng-submit="publicarEnMural()" class="space-y-3">
-                            <textarea ng-model="nuevoPost.texto" required placeholder="Escribe un mensaje, avance o anuncio..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs resize-none outline-none focus:border-blue-600" rows="3"></textarea>
+                            <textarea ng-model="nuevoPost.texto" required placeholder="Escribe un mensaje, avance o anuncio..." class="input-fresco w-full resize-none" rows="3"></textarea>
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <div>
-                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">📷 Galería / Archivo</label>
-                                    <input type="file" id="muralFileInput" onchange="angular.element(this).scope().cargandoArchivoMural(this)" class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-600">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">📷 Galería / Archivo</label>
+                                    <input type="file" id="muralFileInput" onchange="angular.element(this).scope().cargandoArchivoMural(this)" class="text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-500/10 file:text-blue-400">
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">🔗 URL o Enlace</label>
-                                    <input type="text" ng-model="nuevoPost.mediaUrl" placeholder="https://..." class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">🔗 URL o Enlace</label>
+                                    <input type="text" ng-model="nuevoPost.mediaUrl" placeholder="https://..." class="input-fresco w-full">
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl shadow-md active:scale-95 transition">
+                            <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition">
                                 🚀 Publicar en Mural
                             </button>
                         </form>
                     </div>
 
-                    <!-- FEED PUBLICACIONES -->
+                    <!-- FEED DE PUBLICACIONES -->
                     <div class="space-y-4">
-                        <div class="card-fresca p-5 space-y-3" ng-repeat="post in muroPosts">
+                        <div class="card-fresca p-5 space-y-3" ng-class="{'border-red-500/40 bg-red-950/10': post.reportado}" ng-repeat="post in muroPosts">
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-full bg-slate-100 text-blue-600 font-bold flex items-center justify-center text-xs border border-slate-200">👤</div>
+                                    <div class="w-8 h-8 rounded-full bg-slate-800 text-blue-400 font-bold flex items-center justify-center text-xs border border-slate-700">👤</div>
                                     <div>
-                                        <h4 class="font-black text-xs text-slate-800">{{ post.autor }}</h4>
+                                        <h4 class="font-black text-xs text-white">{{ post.autor }}</h4>
                                         <span class="text-[9px] text-slate-400 font-medium block">{{ post.fecha }}</span>
                                     </div>
                                 </div>
 
-                                <button ng-show="puedesEliminarPost(post)" ng-click="eliminarPostMural(post.id)" class="text-[10px] font-bold text-red-500 bg-red-50 px-2.5 py-1 rounded-lg">🗑 Eliminar</button>
+                                <div class="flex gap-1">
+                                    <button ng-click="reportarPost(post)" class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">🚩 Reportar</button>
+                                    <button ng-show="puedesEliminarPost(post)" ng-click="eliminarPostMural(post.id)" class="text-[10px] font-bold text-red-400 bg-red-500/10 px-2.5 py-1 rounded-lg border border-red-500/20">🗑 Eliminar</button>
+                                </div>
                             </div>
 
-                            <p class="text-xs text-slate-700 font-medium whitespace-pre-line leading-relaxed">{{ post.texto }}</p>
+                            <p class="text-xs text-slate-200 font-medium whitespace-pre-line leading-relaxed">{{ post.texto }}</p>
 
-                            <div ng-if="post.mediaUrl" class="rounded-2xl overflow-hidden border border-slate-100 bg-black/5 max-h-96 flex items-center justify-center">
-                                <video ng-if="esVideo(post.mediaUrl)" controls class="w-full max-h-96 object-contain">
-                                    <source ng-src="{{ post.mediaUrl }}">
-                                </video>
-                                <img ng-if="!esVideo(post.mediaUrl)" ng-src="{{ post.mediaUrl }}" class="w-full max-h-96 object-cover">
+                            <div ng-if="post.mediaUrl" class="space-y-2">
+                                <div class="rounded-2xl overflow-hidden border border-slate-800 bg-black/40 max-h-96 flex items-center justify-center">
+                                    <video ng-if="esVideo(post.mediaUrl)" controls class="w-full max-h-96 object-contain">
+                                        <source ng-src="{{ post.mediaUrl }}">
+                                    </video>
+                                    <img ng-if="!esVideo(post.mediaUrl)" ng-src="{{ post.mediaUrl }}" class="w-full max-h-96 object-cover">
+                                </div>
+
+                                <div class="flex justify-end">
+                                    <a ng-href="{{ post.mediaUrl }}" download="Publicacion_Hub" target="_blank" class="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-xl border border-blue-500/20 flex items-center gap-1">
+                                        📥 Descargar / Abrir Archivo
+                                    </a>
+                                </div>
                             </div>
 
-                            <div class="flex items-center gap-4 pt-2 border-t border-slate-100">
-                                <button ng-click="darMeGusta(post)" class="text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1.5 rounded-xl flex items-center gap-1.5 active:scale-95">
+                            <div class="flex items-center gap-4 pt-2 border-t border-slate-800">
+                                <button ng-click="darMeGusta(post)" class="text-xs font-bold text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-xl border border-rose-500/20 flex items-center gap-1.5 active:scale-95">
                                     ❤️ {{ post.likes || 0 }} Me Gusta
                                 </button>
                             </div>
 
-                            <div class="space-y-2 pt-2 bg-slate-50/80 p-3 rounded-2xl border border-slate-100">
+                            <div class="space-y-2 pt-2 bg-slate-950/40 p-3 rounded-2xl border border-slate-800/80">
                                 <div ng-repeat="com in post.comentarios" class="text-xs">
-                                    <strong class="text-slate-800 font-bold">{{ com.autor }}:</strong> 
-                                    <span class="text-slate-600 font-medium">{{ com.texto }}</span>
+                                    <strong class="text-white font-bold">{{ com.autor }}:</strong> 
+                                    <span class="text-slate-300 font-medium">{{ com.texto }}</span>
                                 </div>
 
                                 <form ng-submit="agregarComentario(post, nuevoComentarioTexto[post.id])" class="flex gap-2 pt-1">
-                                    <input type="text" ng-model="nuevoComentarioTexto[post.id]" placeholder="Escribe un comentario..." class="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                                    <input type="text" ng-model="nuevoComentarioTexto[post.id]" placeholder="Escribe un comentario..." class="input-fresco flex-1 text-xs">
                                     <button type="submit" class="px-3.5 py-1.5 bg-slate-800 text-white font-bold text-[10px] uppercase rounded-xl">Comentar</button>
                                 </form>
                             </div>
@@ -342,27 +401,25 @@
 
             <!-- 6. ADMIN -->
             <section ng-show="moduloActivo === 'admin' && esAdmin" class="space-y-6">
-                <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">⚙ Gestor Administrador</h2>
-
                 <div class="card-fresca p-5 sm:p-6 space-y-4">
-                    <h3 class="text-sm font-black text-slate-800 uppercase">👥 Usuarios Registrados</h3>
+                    <h3 class="text-sm font-black text-white uppercase">👥 Usuarios Registrados</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs border-collapse min-w-[600px]">
                             <thead>
-                                <tr class="bg-slate-100 text-slate-700 uppercase">
-                                    <th class="p-2.5 font-bold border-b">Nombre</th>
-                                    <th class="p-2.5 font-bold border-b">Usuario</th>
-                                    <th class="p-2.5 font-bold border-b">Rol</th>
-                                    <th class="p-2.5 font-bold border-b text-center">Acción</th>
+                                <tr class="bg-slate-950/60 text-slate-300 uppercase">
+                                    <th class="p-2.5 font-bold border-b border-slate-800">Nombre</th>
+                                    <th class="p-2.5 font-bold border-b border-slate-800">Usuario</th>
+                                    <th class="p-2.5 font-bold border-b border-slate-800">Rol</th>
+                                    <th class="p-2.5 font-bold border-b border-slate-800 text-center">Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="u in trabajadores" class="border-b hover:bg-slate-50">
-                                    <td class="p-2.5 font-bold text-slate-800">{{ u.nombre }}</td>
-                                    <td class="p-2.5 text-blue-600 font-mono">{{ u.usuario }}</td>
-                                    <td class="p-2.5 font-bold uppercase text-[10px] text-slate-600">{{ u.rol || 'operador' }}</td>
+                                <tr ng-repeat="u in trabajadores" class="border-b border-slate-800/60 hover:bg-slate-800/30">
+                                    <td class="p-2.5 font-bold text-white">{{ u.nombre }}</td>
+                                    <td class="p-2.5 text-blue-400 font-mono">{{ u.usuario }}</td>
+                                    <td class="p-2.5 font-bold uppercase text-[10px] text-slate-400">{{ u.rol || 'operador' }}</td>
                                     <td class="p-2.5 text-center">
-                                        <button ng-click="eliminarUsuarioHub(u.id)" class="px-2.5 py-1 bg-red-50 text-red-600 font-bold rounded-lg text-[10px]">🗑 Eliminar</button>
+                                        <button ng-click="eliminarUsuarioHub(u.id)" class="px-2.5 py-1 bg-red-500/10 text-red-400 font-bold rounded-lg border border-red-500/20 text-[10px]">🗑 Eliminar</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -374,24 +431,24 @@
         </main>
 
         <!-- NAVEGACIÓN INFERIOR MÓVIL -->
-        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 flex justify-around shadow-lg">
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 z-50 flex justify-around shadow-lg">
             <a href="#" class="bottom-nav-item" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="cambiarModulo('inicio')">
                 <span class="text-lg">🏠</span>
                 <span>Inicio</span>
+            </a>
+            <a href="#" class="bottom-nav-item" ng-class="{'active': moduloActivo === 'calendario'}" ng-click="cambiarModulo('calendario')">
+                <span class="text-lg">📅</span>
+                <span>Agenda</span>
             </a>
             <a href="#" class="bottom-nav-item" ng-class="{'active': moduloActivo === 'rankings'}" ng-click="cambiarModulo('rankings')">
                 <span class="text-lg">🏆</span>
                 <span>Top 5</span>
             </a>
-            <a href="#" class="bottom-nav-item" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="cambiarModulo('directorio')">
-                <span class="text-lg">👥</span>
-                <span>Directorio</span>
-            </a>
             <a href="#" class="bottom-nav-item" ng-class="{'active': moduloActivo === 'mural'}" ng-click="cambiarModulo('mural')">
                 <span class="text-lg">💬</span>
                 <span>Mural</span>
             </a>
-            <a href="#" class="bottom-nav-item text-red-500" ng-click="cerrarSesion()">
+            <a href="#" class="bottom-nav-item text-red-400" ng-click="cerrarSesion()">
                 <span class="text-lg">🚪</span>
                 <span>Salir</span>
             </a>
@@ -460,8 +517,35 @@
                 }
             };
 
-            $scope.cerrarSesion = function() { $scope.sesionIniciada = false; };
+            $scope.cerrarSesion = function() {
+                $scope.sesionIniciada = false;
+                $scope.loginUser = "";
+                $scope.loginPass = "";
+                $scope.loginError = false;
+                $scope.limpiarFormularioMural();
+            };
+
+            $scope.limpiarFormularioMural = function() {
+                $scope.nuevoPost = {};
+                let input = document.getElementById('muralFileInput');
+                if (input) input.value = '';
+            };
+
             $scope.cambiarModulo = function(m) { $scope.moduloActivo = m; };
+
+            $scope.solicitarPermisoPush = function() {
+                if ('Notification' in window) {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            alert("¡Notificaciones Push activadas en el Hub Operativo!");
+                        } else {
+                            alert("Permiso de notificaciones denegado.");
+                        }
+                    });
+                } else {
+                    alert("Tu navegador no soporta Notificaciones Push.");
+                }
+            };
 
             $scope.sincronizarFirebase = function() {
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
@@ -524,6 +608,14 @@
                 return post.autor === $scope.usuarioSesion;
             };
 
+            $scope.reportarPost = function(post) {
+                db.collection("mural_posts").doc(post.id).update({
+                    reportado: true
+                }).then(() => {
+                    alert("Publicación reportada a los administradores.");
+                });
+            };
+
             $scope.eliminarPostMural = function(id) {
                 if (confirm("¿Eliminar esta publicación?")) {
                     db.collection("mural_posts").doc(id).delete();
@@ -541,11 +633,7 @@
                         fecha: new Date().toLocaleString(),
                         fechaSort: new Date().getTime()
                     }).then(() => {
-                        $scope.$apply(() => {
-                            $scope.nuevoPost = {};
-                            let input = document.getElementById('muralFileInput');
-                            if (input) input.value = '';
-                        });
+                        $scope.$apply(() => { $scope.limpiarFormularioMural(); });
                     });
                 }
             };
