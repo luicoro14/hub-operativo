@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz de Seguimiento Operativo v20.1 Light-Executive</title>
+    <title>Matriz de Seguimiento Operativo v20.2 Light-Executive</title>
 
     <!-- Frameworks & Firebase SDKs (Compat) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -94,27 +94,27 @@
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
 
-    <!-- LOGIN CLARO FIX PARA MÓVILES -->
-    <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+    <!-- LOGIN CLARO FIX UNIFICADO -->
+    <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30 login-logo-animated">
                 📊
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Matriz Operativa</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Light-Executive Edition v20.1</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Light-Executive Edition v20.2</p>
             </div>
 
-            <form ng-submit="iniciarSesion()" class="space-y-4 pt-2">
-                <input type="text" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" class="input-light w-full text-center font-bold">
-                <input type="password" ng-model="loginPass" placeholder="Contraseña" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="current-password" class="input-light w-full text-center font-bold">
+            <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
+                <input type="text" id="inputUser" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" class="input-light w-full text-center font-bold">
+                <input type="password" id="inputPass" ng-model="loginPass" placeholder="Contraseña" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="current-password" class="input-light w-full text-center font-bold">
 
-                <button type="submit" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
+                <button type="button" ng-click="iniciarSesion($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
                     {{ cargandoLogin ? 'Verificando...' : 'Ingresar al Sistema' }}
                 </button>
             </form>
 
-            <p ng-show="loginError" class="text-xs text-red-600 font-bold">⚠ Credenciales incorrectas</p>
+            <p ng-show="loginError" class="text-xs text-red-600 font-bold">⚠ Credenciales incorrectas o error de conexión</p>
         </div>
     </div>
 
@@ -342,7 +342,7 @@
                 </div>
             </div>
 
-            <!-- MODAL DE EDICIÓN (FECHA COMPROMISO BLOQUEADA) -->
+            <!-- MODAL DE EDICIÓN -->
             <div ng-show="modalEdicionAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
                 <div class="card-light p-6 max-w-lg w-full space-y-4 border border-slate-200 shadow-2xl">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -495,7 +495,7 @@
         </main>
     </div>
 
-    <!-- SCRIPT FIREBASE & LOGICA ANGULARJS CON FIX ASÍNCRONO MÓVIL -->
+    <!-- SCRIPT FIREBASE & LOGICA ANGULARJS FIX -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -505,8 +505,10 @@
   messagingSenderId: "791633280108",
   appId: "1:791633280108:web:c3aa0853d1271dee6b2c49"
 };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        var db = firebase.firestore();
 
         var app = angular.module('matrizApp', []);
 
@@ -529,17 +531,21 @@
             $scope.grabandoAudio = false;
             let mediaRecorder, audioChunks = [];
 
-            $scope.iniciarSesion = function() {
-                var u = ($scope.loginUser || "").trim().toLowerCase();
-                var p = ($scope.loginPass || "").trim();
+            $scope.iniciarSesion = function(event) {
+                if (event) event.preventDefault();
 
-                if (!u || !p) return;
+                var valUser = (document.getElementById("inputUser") ? document.getElementById("inputUser").value : "").trim();
+                var valPass = (document.getElementById("inputPass") ? document.getElementById("inputPass").value : "").trim();
+
+                var u = (valUser || $scope.loginUser || "").toLowerCase();
+                var p = (valPass || $scope.loginPass || "");
 
                 $scope.cargandoLogin = true;
                 $scope.loginError = false;
 
+                // ACCESO MAESTRO LUIS
                 if (u === 'luis' && p === 'control2026') {
-                    $timeout(function() {
+                    $scope.$evalAsync(function() {
                         $scope.sesionIniciada = true;
                         $scope.esSuperAdmin = true;
                         $scope.usuarioSesion = "Luis Coronado";
@@ -547,12 +553,21 @@
                         $scope.cargandoLogin = false;
                         $scope.loginError = false;
                         $scope.sincronizarFirebase();
-                    }, 100);
+                    });
                     return;
                 }
 
-                db.collection("personal_intranet").where("usuario", "==", u).where("password", "==", p).get().then(snapshot => {
-                    $timeout(function() {
+                if (!u || !p) {
+                    $scope.$evalAsync(function() {
+                        $scope.cargandoLogin = false;
+                        $scope.loginError = true;
+                    });
+                    return;
+                }
+
+                db.collection("personal_intranet").where("usuario", "==", u).where("password", "==", p).get()
+                .then(function(snapshot) {
+                    $scope.$evalAsync(function() {
                         $scope.cargandoLogin = false;
                         if (!snapshot.empty) {
                             let userData = snapshot.docs[0].data();
@@ -565,12 +580,14 @@
                         } else {
                             $scope.loginError = true;
                         }
-                    }, 100);
-                }).catch(function(err) {
-                    $timeout(function() {
+                    });
+                })
+                .catch(function(error) {
+                    console.error("Error Firebase:", error);
+                    $scope.$evalAsync(function() {
                         $scope.cargandoLogin = false;
                         $scope.loginError = true;
-                    }, 100);
+                    });
                 });
             };
 
@@ -608,7 +625,7 @@
                 if (file) {
                     let reader = new FileReader();
                     reader.onload = function(e) {
-                        $timeout(function() {
+                        $scope.$evalAsync(function() {
                             $scope.nuevaAct.docUrl = e.target.result;
                             $scope.nuevaAct.docNombre = file.name;
                         });
@@ -627,7 +644,7 @@
                             let blob = new Blob(audioChunks, { type: 'audio/mp3' });
                             let reader = new FileReader();
                             reader.onload = function(e) {
-                                $timeout(function() {
+                                $scope.$evalAsync(function() {
                                     $scope.nuevaAct.audioUrl = $sce.trustAsResourceUrl(e.target.result);
                                     $scope.nuevaAct.audioRaw = e.target.result;
                                 });
@@ -635,7 +652,7 @@
                             reader.readAsDataURL(blob);
                         };
                         mediaRecorder.start();
-                        $timeout(function() { $scope.grabandoAudio = true; });
+                        $scope.$evalAsync(function() { $scope.grabandoAudio = true; });
                     });
                 } else {
                     mediaRecorder.stop();
@@ -645,7 +662,7 @@
 
             $scope.sincronizarFirebase = function() {
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
-                    $timeout(function() {
+                    $scope.$evalAsync(function() {
                         $scope.actividadesVisibles = [];
                         snapshot.forEach(doc => {
                             let data = doc.data();
@@ -661,7 +678,7 @@
                 });
 
                 db.collection("sugerencias_sistema").orderBy("fechaSort", "desc").onSnapshot(snapshot => {
-                    $timeout(function() {
+                    $scope.$evalAsync(function() {
                         $scope.listaSugerencias = [];
                         snapshot.forEach(doc => {
                             let s = doc.data();
@@ -690,7 +707,7 @@
                 };
 
                 db.collection("actividades_operativas").add(registro).then(() => {
-                    $timeout(function() { $scope.limpiarFormularioNuevaActividad(); });
+                    $scope.$evalAsync(function() { $scope.limpiarFormularioNuevaActividad(); });
                 });
             };
 
@@ -708,7 +725,7 @@
                         estado: $scope.actEdit.estado,
                         observaciones: $scope.actEdit.observaciones || ""
                     }).then(() => {
-                        $timeout(function() {
+                        $scope.$evalAsync(function() {
                             $scope.modalEdicionAbierto = false;
                         });
                     });
@@ -735,7 +752,7 @@
                         estado: "En Revisión",
                         fechaSort: new Date().getTime()
                     }).then(() => {
-                        $timeout(function() {
+                        $scope.$evalAsync(function() {
                             $scope.nuevaSugerencia = {};
                             alert("¡Sugerencia enviada!");
                         });
@@ -754,7 +771,7 @@
                         cargo: $scope.formUsu.cargo || "Analista"
                     }).then(() => {
                         alert("¡Usuario creado!");
-                        $timeout(function() { $scope.formUsu = {}; });
+                        $scope.$evalAsync(function() { $scope.formUsu = {}; });
                     });
                 }
             };

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Operativo v20.1 Light-Executive</title>
+    <title>Hub Operativo v20.2 Light-Executive</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
@@ -84,7 +84,7 @@
 </head>
 <body ng-app="hubApp" ng-controller="HubController">
 
-    <!-- LOGIN CLARO FIX PARA MÓVILES -->
+    <!-- LOGIN CLARO FIX UNIFICADO -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30 login-logo-animated">
@@ -92,19 +92,19 @@
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Hub Operativo</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Light-Executive Edition v20.1</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Light-Executive Edition v20.2</p>
             </div>
 
-            <form ng-submit="iniciarSesion()" class="space-y-4 pt-2">
-                <input type="text" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" class="input-light w-full text-center font-bold">
-                <input type="password" ng-model="loginPass" placeholder="Contraseña" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="current-password" class="input-light w-full text-center font-bold">
+            <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
+                <input type="text" id="inputUserHub" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" class="input-light w-full text-center font-bold">
+                <input type="password" id="inputPassHub" ng-model="loginPass" placeholder="Contraseña" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="current-password" class="input-light w-full text-center font-bold">
 
-                <button type="submit" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
+                <button type="button" ng-click="iniciarSesion($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
                     {{ cargandoLogin ? 'Verificando...' : 'Ingresar al Hub' }}
                 </button>
             </form>
 
-            <p ng-show="loginError" class="text-xs text-red-600 font-bold">⚠ Credenciales incorrectas</p>
+            <p ng-show="loginError" class="text-xs text-red-600 font-bold">⚠ Credenciales incorrectas o error de conexión</p>
         </div>
     </div>
 
@@ -118,7 +118,7 @@
                     </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-800 tracking-tight uppercase">HUB OPERATIVO</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel Ejecutivo v20.1</p>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel Ejecutivo v20.2</p>
                     </div>
                 </div>
 
@@ -382,7 +382,7 @@
         </main>
     </div>
 
-    <!-- SCRIPT FIREBASE & LOGICA ANGULARJS CON FIX ASÍNCRONO MÓVIL -->
+    <!-- SCRIPT FIREBASE & LOGICA ANGULARJS FIX -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -392,8 +392,10 @@
   messagingSenderId: "791633280108",
   appId: "1:791633280108:web:c3aa0853d1271dee6b2c49"
 };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        var db = firebase.firestore();
 
         var app = angular.module('hubApp', []);
 
@@ -414,29 +416,42 @@
             $scope.grabandoAudio = false;
             let mediaRecorder, chunks = [];
 
-            $scope.iniciarSesion = function() {
-                var u = ($scope.loginUser || "").trim().toLowerCase();
-                var p = ($scope.loginPass || "").trim();
+            $scope.iniciarSesion = function(event) {
+                if (event) event.preventDefault();
 
-                if (!u || !p) return;
+                var valUser = (document.getElementById("inputUserHub") ? document.getElementById("inputUserHub").value : "").trim();
+                var valPass = (document.getElementById("inputPassHub") ? document.getElementById("inputPassHub").value : "").trim();
+
+                var u = (valUser || $scope.loginUser || "").toLowerCase();
+                var p = (valPass || $scope.loginPass || "");
 
                 $scope.cargandoLogin = true;
                 $scope.loginError = false;
 
+                // ACCESO MAESTRO LUIS
                 if (u === 'luis' && p === 'control2026') {
-                    $timeout(function() {
+                    $scope.$evalAsync(function() {
                         $scope.sesionIniciada = true;
                         $scope.esAdmin = true;
                         $scope.usuarioSesion = "Luis Coronado";
                         $scope.cargandoLogin = false;
                         $scope.loginError = false;
                         $scope.sincronizarFirebase();
-                    }, 100);
+                    });
                     return;
                 }
 
-                db.collection("personal_intranet").where("usuario", "==", u).where("password", "==", p).get().then(snapshot => {
-                    $timeout(function() {
+                if (!u || !p) {
+                    $scope.$evalAsync(function() {
+                        $scope.cargandoLogin = false;
+                        $scope.loginError = true;
+                    });
+                    return;
+                }
+
+                db.collection("personal_intranet").where("usuario", "==", u).where("password", "==", p).get()
+                .then(function(snapshot) {
+                    $scope.$evalAsync(function() {
                         $scope.cargandoLogin = false;
                         if (!snapshot.empty) {
                             let userData = snapshot.docs[0].data();
@@ -448,12 +463,14 @@
                         } else {
                             $scope.loginError = true;
                         }
-                    }, 100);
-                }).catch(function(err) {
-                    $timeout(function() {
+                    });
+                })
+                .catch(function(error) {
+                    console.error("Error Firebase:", error);
+                    $scope.$evalAsync(function() {
                         $scope.cargandoLogin = false;
                         $scope.loginError = true;
-                    }, 100);
+                    });
                 });
             };
 
@@ -473,7 +490,7 @@
                             let blob = new Blob(chunks, { type: 'audio/mp3' });
                             let reader = new FileReader();
                             reader.onload = function(e) {
-                                $timeout(function() {
+                                $scope.$evalAsync(function() {
                                     $scope.nuevaConsulta.audioUrl = $sce.trustAsResourceUrl(e.target.result);
                                     $scope.nuevaConsulta.audioRaw = e.target.result;
                                 });
@@ -481,7 +498,7 @@
                             reader.readAsDataURL(blob);
                         };
                         mediaRecorder.start();
-                        $timeout(function() { $scope.grabandoAudio = true; });
+                        $scope.$evalAsync(function() { $scope.grabandoAudio = true; });
                     });
                 } else {
                     mediaRecorder.stop();
@@ -498,14 +515,14 @@
                         audioUrl: $scope.nuevaConsulta.audioRaw || "",
                         fecha: new Date().toISOString()
                     }).then(() => {
-                        $timeout(function() { $scope.nuevaConsulta = {}; });
+                        $scope.$evalAsync(function() { $scope.nuevaConsulta = {}; });
                     });
                 }
             };
 
             $scope.sincronizarFirebase = function() {
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
-                    $timeout(function() {
+                    $scope.$evalAsync(function() {
                         $scope.actividadesMatriz = [];
                         snapshot.forEach(doc => {
                             let d = doc.data();
@@ -517,7 +534,7 @@
                 });
 
                 db.collection("personal_intranet").onSnapshot(snapshot => {
-                    $timeout(function() {
+                    $scope.$evalAsync(function() {
                         $scope.trabajadores = [];
                         snapshot.forEach(doc => {
                             let t = doc.data();
@@ -528,7 +545,7 @@
                 });
 
                 db.collection("mural_posts").orderBy("fechaSort", "desc").onSnapshot(snapshot => {
-                    $timeout(function() {
+                    $scope.$evalAsync(function() {
                         $scope.muroPosts = [];
                         snapshot.forEach(doc => {
                             let p = doc.data();
@@ -539,7 +556,7 @@
                 });
 
                 db.collection("consultas_gerenciales").orderBy("fecha", "desc").onSnapshot(snapshot => {
-                    $timeout(function() {
+                    $scope.$evalAsync(function() {
                         $scope.consultas = [];
                         snapshot.forEach(doc => {
                             let c = doc.data();
@@ -556,7 +573,7 @@
                 if (file) {
                     let reader = new FileReader();
                     reader.onload = function(e) {
-                        $timeout(function() { $scope.nuevoPost.mediaUrl = e.target.result; });
+                        $scope.$evalAsync(function() { $scope.nuevoPost.mediaUrl = e.target.result; });
                     };
                     reader.readAsDataURL(file);
                 }
@@ -577,7 +594,7 @@
                         fecha: new Date().toLocaleString(),
                         fechaSort: new Date().getTime()
                     }).then(() => {
-                        $timeout(function() { $scope.nuevoPost = {}; });
+                        $scope.$evalAsync(function() { $scope.nuevoPost = {}; });
                     });
                 }
             };
