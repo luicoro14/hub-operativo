@@ -3,19 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Ejecutivo & Intranet Operativa v12.0</title>
+    <title>Hub Operativo v13.0</title>
 
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Angular v1.8 CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
-
-    <!-- Firebase SDKs Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-    <!-- Librería para Exportación Consolidada a Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
@@ -24,7 +17,6 @@
             --bg-card: #ffffff;
             --accent-primary: #2563eb;
             --text-dark: #0f172a;
-            --border-color: #e2e8f0;
         }
 
         body {
@@ -32,7 +24,6 @@
             color: var(--text-dark);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             padding-bottom: env(safe-area-inset-bottom);
-            -webkit-tap-highlight-color: transparent;
         }
 
         .card-fresca {
@@ -43,19 +34,13 @@
             transition: all 0.2s ease;
         }
 
-        .card-fresca:active {
-            transform: scale(0.98);
-        }
-
         .nav-btn {
             color: #64748b;
             font-size: 0.8rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
             padding: 0.65rem 1rem;
             border-radius: 12px;
-            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -67,55 +52,6 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
-        /* NAVEGACIÓN INFERIOR PARA MÓVILES (iOS / ANDROID) */
-        .mobile-bottom-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid #e2e8f0;
-            z-index: 50;
-            padding-bottom: max(8px, env(safe-area-inset-bottom));
-            padding-top: 8px;
-        }
-
-        @media (max-width: 768px) {
-            .mobile-bottom-nav {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-            }
-            .desktop-nav {
-                display: none !important;
-            }
-            main {
-                padding-bottom: 90px !important;
-            }
-        }
-
-        .mobile-tab-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 10px;
-            font-weight: 700;
-            color: #64748b;
-            gap: 2px;
-            padding: 4px 8px;
-            border-radius: 10px;
-        }
-
-        .mobile-tab-item.active {
-            color: #2563eb;
-        }
-
-        .mobile-tab-icon {
-            font-size: 18px;
-        }
-
         .profile-avatar-lg {
             width: 85px;
             height: 85px;
@@ -124,48 +60,25 @@
             border: 4px solid #ffffff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
-
-        .badge-rank {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 0.75rem;
-        }
-
-        .rank-1 { background-color: #fef08a; color: #854d0e; border: 2px solid #eab308; }
-        .rank-2 { background-color: #e2e8f0; color: #334155; border: 2px solid #94a3b8; }
-        .rank-3 { background-color: #ffedd5; color: #9a3412; border: 2px solid #f97316; }
-        .rank-other { background-color: #f1f5f9; color: #64748b; }
     </style>
 </head>
 <body ng-app="intranetApp" ng-controller="MainController">
 
-    <!-- 0. LOGIN MÓVIL Y DESKTOP -->
+    <!-- 0. LOGIN HUB OPERATIVO -->
     <div id="loginOverlay" ng-show="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-500/30">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg">
                 HUB
             </div>
-            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Portal Corporativo</h2>
-            <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-6">Matriz Operativa & Intranet Ejecutiva</p>
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Hub Operativo</h2>
+            <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-6">Plataforma Ejecutiva & Portal Integrado</p>
 
             <form ng-submit="iniciarSesion()" class="space-y-4">
-                <div>
-                    <input type="text" ng-model="loginUser" placeholder="Usuario registrado" required
-                           class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-800 outline-none focus:border-blue-600 focus:bg-white transition text-center font-medium">
-                </div>
-                <div>
-                    <input type="password" ng-model="loginPass" placeholder="Contraseña" required
-                           class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-800 outline-none focus:border-blue-600 focus:bg-white transition text-center font-medium">
-                </div>
+                <input type="text" ng-model="loginUser" placeholder="Usuario registrado" required class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-medium text-center">
+                <input type="password" ng-model="loginPass" placeholder="Contraseña" required class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-medium text-center">
 
-                <button type="submit" 
-                        class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm uppercase tracking-wider shadow-lg shadow-blue-500/25 active:scale-95 transition">
-                    Ingresar a la Plataforma
+                <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm uppercase shadow-lg active:scale-95 transition">
+                    Ingresar al Hub Operativo
                 </button>
             </form>
 
@@ -173,138 +86,130 @@
         </div>
     </div>
 
-    <!-- APP CONTAINER PRINCIPAL -->
+    <!-- MODAL DE FELIZ CUMPLEANOS FLOTANTE AL INICIAR -->
+    <div ng-show="mostrarAlertaCumple" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center space-y-4 border-2 border-amber-300">
+            <div class="text-5xl animate-bounce">🎂🎉</div>
+            <h2 class="text-2xl font-black text-slate-800 uppercase">¡Hoy es un día especial!</h2>
+            <p class="text-sm text-slate-600 font-semibold">Le deseamos un muy feliz cumpleaños a:</p>
+            <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 font-black text-lg">
+                🎈 {{ cumplañeroHoy.nombre }}
+            </div>
+            <p class="text-xs text-slate-400">¡Déjale tus buenos deseos en el mural interactivo!</p>
+            <button ng-click="mostrarAlertaCumple = false" class="w-full py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl active:scale-95">Continuar al Hub</button>
+        </div>
+    </div>
+
+    <!-- APP CONTAINER -->
     <div ng-show="sesionIniciada">
-        
-        <!-- HEADER TOP DESKTOP & MOBILE -->
         <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center font-black text-white text-lg shadow-md">
-                        M
+                        HUB
                     </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">HUB OPERATIVO</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v12.0</p>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v13.0</p>
                     </div>
                 </div>
 
-                <!-- NAVEGACIÓN DESKTOP -->
-                <nav class="desktop-nav flex flex-wrap gap-1 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/60">
+                <nav class="hidden md:flex flex-wrap gap-1 bg-slate-100 p-1 rounded-2xl">
                     <button class="nav-btn" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="cambiarModulo('inicio')">🏠 Inicio</button>
                     <button class="nav-btn" ng-class="{'active': moduloActivo === 'rankings'}" ng-click="cambiarModulo('rankings')">🏆 Top 5 & Rankings</button>
                     <button class="nav-btn" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="cambiarModulo('directorio')">👥 Directorio & Anexo</button>
                     <button class="nav-btn" ng-class="{'active': moduloActivo === 'perfil'}" ng-click="cambiarModulo('perfil')">👤 Mi Perfil</button>
-                    <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="cambiarModulo('mural')">🎉 Cumpleaños & Mural</button>
+                    <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="cambiarModulo('mural')">💬 Mural Interactivo</button>
                     <button class="nav-btn" ng-show="esAdmin" ng-class="{'active': moduloActivo === 'admin'}" ng-click="cambiarModulo('admin')">⚙ Admin</button>
                 </nav>
 
-                <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-3">
                     <span class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 hidden sm:inline-block">
-                        👤 {{ usuarioSesion }} <span ng-show="esAdmin" class="text-blue-600 font-black ml-1">(Admin)</span>
+                        👤 {{ usuarioSesion }}
                     </span>
-                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 transition active:scale-95">Salir</button>
+                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100">Salir</button>
                 </div>
             </div>
         </header>
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6">
 
-            <!-- 1. INICIO & RESUMEN DE MATRIZ OPERATIVA -->
-            <section ng-show="moduloActivo === 'inicio'" class="space-y-4 sm:space-y-6">
+            <!-- 1. INICIO (SOLO MUESTRA LAS 3 GERENCIAS TRADICIONALES, AISLANDO FÁBRICA) -->
+            <section ng-show="moduloActivo === 'inicio'" class="space-y-6">
                 <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 p-6 sm:p-8 text-white shadow-xl">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full text-white">Vista Ejecutiva Real</span>
-                            <h2 class="text-2xl sm:text-3xl font-black mt-2 sm:mt-3">Panel de Eficiencia Operativa</h2>
-                            <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mt-1 font-medium">Consumo en vivo de las actividades procesadas en la Matriz Operativa por las 3 Gerencias.</p>
+                            <span class="text-[10px] sm:text-xs font-black uppercase bg-white/20 px-3 py-1 rounded-full">Vista Ejecutiva Real</span>
+                            <h2 class="text-2xl sm:text-3xl font-black mt-2">Panel de Eficiencia Operativa</h2>
+                            <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mt-1 font-medium">Estadísticas exclusivas de las 3 Gerencias principales.</p>
                         </div>
-                        <button ng-click="exportarInformeConsolidado()" class="w-full md:w-auto px-5 py-3.5 rounded-2xl bg-white text-blue-600 font-black text-xs uppercase tracking-wider shadow-lg hover:bg-blue-50 transition border border-white text-center active:scale-95">
+                        <button ng-click="exportarInformeConsolidado()" class="w-full md:w-auto px-5 py-3.5 rounded-2xl bg-white text-blue-600 font-black text-xs uppercase shadow-lg hover:bg-blue-50 active:scale-95 transition border border-white">
                             📥 Reporte Consolidado (.xlsx)
                         </button>
                     </div>
                 </div>
 
-                <!-- CARDS KPI METRICAS -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     <div class="card-fresca p-4 sm:p-5">
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Tareas</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Tareas 3 Gerencias</span>
                         <div class="text-2xl sm:text-3xl font-black text-slate-800 mt-1">{{ actividadesMatriz.length }}</div>
-                        <span class="text-[10px] sm:text-xs text-blue-600 font-bold mt-1 sm:mt-2 block">📊 En Firebase</span>
+                        <span class="text-[10px] sm:text-xs text-blue-600 font-bold mt-1 block">📊 Base Hub</span>
                     </div>
 
                     <div class="card-fresca p-4 sm:p-5">
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">SLA Global</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">SLA Global</span>
                         <div class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">{{ slaGlobal }}%</div>
-                        <span class="text-[10px] sm:text-xs text-emerald-600 font-bold mt-1 sm:mt-2 block">🟢 Efectividad</span>
+                        <span class="text-[10px] sm:text-xs text-emerald-600 font-bold mt-1 block">🟢 Efectividad</span>
                     </div>
 
                     <div class="card-fresca p-4 sm:p-5">
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Líder Top 5</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Líder Top 5</span>
                         <div class="text-sm sm:text-lg font-black text-blue-600 mt-1 truncate">{{ top5Trabajadores[0].nombre || 'Sin datos' }}</div>
-                        <span class="text-[10px] sm:text-xs text-amber-600 font-bold mt-1 sm:mt-2 block">🌟 {{ top5Trabajadores[0].eficiencia }}% SLA</span>
+                        <span class="text-[10px] sm:text-xs text-amber-600 font-bold mt-1 block">🌟 {{ top5Trabajadores[0].eficiencia }}% SLA</span>
                     </div>
 
                     <div class="card-fresca p-4 sm:p-5">
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Gerencia Líder</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Gerencia Líder</span>
                         <div class="text-sm sm:text-lg font-black text-teal-600 mt-1 truncate">{{ gerenciasRanking[0].nombre || 'Sin datos' }}</div>
-                        <span class="text-[10px] sm:text-xs text-teal-600 font-bold mt-1 sm:mt-2 block">🏆 {{ gerenciasRanking[0].eficiencia }}% SLA</span>
+                        <span class="text-[10px] sm:text-xs text-teal-600 font-bold mt-1 block">🏆 {{ gerenciasRanking[0].eficiencia }}% SLA</span>
                     </div>
                 </div>
             </section>
 
-            <!-- 2. TOP 5 TRABAJADORES & RANKING DE 3 GERENCIAS -->
-            <section ng-show="moduloActivo === 'rankings'" class="space-y-6 sm:space-y-8">
+            <!-- 2. RANKINGS -->
+            <section ng-show="moduloActivo === 'rankings'" class="space-y-6">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight">Rankings de Eficiencia</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Calculado en vivo desde la colección de la Matriz Operativa</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight">Rankings de Eficiencia (3 Gerencias)</h2>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-                    <!-- TOP 5 TRABAJADORES -->
                     <div class="card-fresca p-5 sm:p-6">
-                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase mb-4 sm:mb-6 flex items-center justify-between">
-                            <span>🏆 Top 5 Trab. más Eficientes</span>
-                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">Individual</span>
-                        </h3>
-
-                        <div class="space-y-3 sm:space-y-4">
+                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase mb-4">🏆 Top 5 Trab. más Eficientes</h3>
+                        <div class="space-y-3">
                             <div ng-repeat="colab in top5Trabajadores" class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100">
                                 <div class="flex items-center gap-3">
-                                    <span class="badge-rank" ng-class="{'rank-1': $index===0, 'rank-2': $index===1, 'rank-3': $index===2, 'rank-other': $index>2}">#{{ $index + 1 }}</span>
-                                    <img ng-src="{{ colab.foto }}" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
+                                    <span class="font-bold text-slate-500">#{{ $index + 1 }}</span>
+                                    <img ng-src="{{ colab.foto }}" class="w-10 h-10 rounded-full object-cover">
                                     <div>
                                         <h4 class="font-bold text-xs sm:text-sm text-slate-800">{{ colab.nombre }}</h4>
-                                        <p class="text-[10px] sm:text-xs text-slate-500 font-medium">{{ colab.cargo }}</p>
+                                        <p class="text-[10px] text-slate-500">{{ colab.cargo }}</p>
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <span class="text-sm sm:text-base font-black text-emerald-600">{{ colab.eficiencia }}%</span>
-                                    <p class="text-[9px] text-slate-400 font-bold uppercase">{{ colab.completadas }}/{{ colab.total }} ok</p>
-                                </div>
+                                <span class="text-sm font-black text-emerald-600">{{ colab.eficiencia }}% SLA</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- RANKING 3 GERENCIAS -->
                     <div class="card-fresca p-5 sm:p-6">
-                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase mb-4 sm:mb-6 flex items-center justify-between">
-                            <span>🏢 Ranking de las 3 Gerencias</span>
-                            <span class="text-[10px] font-bold text-teal-600 bg-teal-50 px-2.5 py-1 rounded-lg">Áreas</span>
-                        </h3>
-
-                        <div class="space-y-5">
-                            <div ng-repeat="ger in gerenciasRanking" class="space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-black text-xs sm:text-sm text-slate-800 uppercase">#{{ $index + 1 }} {{ ger.nombre }}</span>
-                                    <span class="text-xs sm:text-sm font-black text-blue-600">{{ ger.eficiencia }}% SLA</span>
+                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase mb-4">🏢 Ranking de las 3 Gerencias</h3>
+                        <div class="space-y-4">
+                            <div ng-repeat="ger in gerenciasRanking" class="space-y-1">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span>{{ ger.nombre }}</span>
+                                    <span class="text-blue-600">{{ ger.eficiencia }}% SLA</span>
                                 </div>
-                                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200">
-                                    <div class="h-full bg-gradient-to-r from-blue-500 to-teal-400 rounded-full" style="width: {{ ger.eficiencia }}%;"></div>
-                                </div>
-                                <div class="flex justify-between text-[10px] text-slate-400 font-bold">
-                                    <span>Total: {{ ger.total }}</span>
-                                    <span>A Tiempo: {{ ger.aTiempo }}</span>
+                                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-600 rounded-full" style="width: {{ ger.eficiencia }}%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -312,184 +217,129 @@
                 </div>
             </section>
 
-            <!-- 3. DIRECTORIO & ANEXO TELEFÓNICO -->
-            <section ng-show="moduloActivo === 'directorio'" class="space-y-4 sm:space-y-6">
+            <!-- 3. DIRECTORIO -->
+            <section ng-show="moduloActivo === 'directorio'" class="space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight">Directorio & Anexo</h2>
-                        <p class="text-xs text-slate-500 font-semibold">Extensiones y contacto directo con el personal</p>
-                    </div>
-                    <input type="text" ng-model="busquedaDirectorio" placeholder="🔍 Buscar nombre, extensión..." class="w-full sm:w-72 px-4 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">Directorio de Personal</h2>
+                    <input type="text" ng-model="busquedaDirectorio" placeholder="🔍 Buscar nombre..." class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                    <div class="card-fresca p-5 sm:p-6 text-center" ng-repeat="trab in trabajadores | filter:busquedaDirectorio">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="card-fresca p-5 text-center" ng-repeat="trab in trabajadores | filter:busquedaDirectorio">
                         <img ng-src="{{ trab.foto }}" class="profile-avatar-lg mx-auto mb-3">
-                        <h3 class="font-bold text-sm sm:text-base text-slate-800">{{ trab.nombre }}</h3>
-                        <p class="text-[10px] sm:text-xs font-bold text-blue-600 uppercase mt-0.5">{{ trab.cargo }}</p>
-                        <p class="text-xs text-slate-500 font-medium">🏢 {{ trab.gerencia }}</p>
-                        <div class="my-3 border-t border-slate-100"></div>
-                        <div class="space-y-2 text-left text-xs text-slate-600">
-                            <div class="flex justify-between items-center bg-blue-50 p-2.5 rounded-xl border border-blue-100">
-                                <span class="font-bold text-blue-900">☎ Extensión:</span>
-                                <span class="font-black text-blue-600 text-sm">Ext. {{ trab.extension }}</span>
-                            </div>
-                            <p class="truncate">📧 <strong>Correo:</strong> {{ trab.correo }}</p>
+                        <h3 class="font-bold text-sm text-slate-800">{{ trab.nombre }}</h3>
+                        <p class="text-[10px] font-bold text-blue-600 uppercase">{{ trab.cargo }}</p>
+                        <p class="text-xs text-slate-500">🏢 {{ trab.gerencia }}</p>
+                        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 text-left space-y-1">
+                            <p>☎ <strong>Extensión:</strong> {{ trab.extension }}</p>
                             <p>🎂 <strong>Cumpleaños:</strong> {{ trab.cumpleanos }}</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 4. PERFIL OPERADOR -->
+            <!-- 4. MI PERFIL -->
             <section ng-show="moduloActivo === 'perfil'" class="space-y-6">
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight">👤 Mi Perfil</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Personaliza tu foto de perfil corporativa</p>
-                </div>
-
-                <div class="card-fresca p-6 sm:p-8 max-w-xl mx-auto space-y-4">
+                <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">👤 Mi Perfil Corporativo</h2>
+                <div class="card-fresca p-6 max-w-xl mx-auto space-y-4">
                     <form ng-submit="actualizarMiFoto()" class="space-y-4">
-                        <div>
-                            <label class="text-xs font-bold text-slate-600 uppercase block mb-1">URL de Foto de Perfil</label>
-                            <input type="text" ng-model="nuevaFotoURL" placeholder="https://..." required
-                                   class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
-                        </div>
-                        <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase tracking-wider active:scale-95 transition">
-                            💾 Guardar Foto en Nube
-                        </button>
+                        <label class="text-xs font-bold text-slate-600 block">URL Foto de Perfil</label>
+                        <input type="text" ng-model="nuevaFotoURL" placeholder="https://..." required class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
+                        <button type="submit" class="w-full py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl active:scale-95">Guardar Foto</button>
                     </form>
                 </div>
             </section>
 
-            <!-- 5. CUMPLEAÑOS & MURAL -->
-            <section ng-show="moduloActivo === 'mural'" class="space-y-6 sm:space-y-8">
+            <!-- 5. MURAL INTERACTIVO SOCIAL -->
+            <section ng-show="moduloActivo === 'mural'" class="space-y-6">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight">🎉 Cumpleaños & Mural</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Envía saludos a tus compañeros de equipo</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">💬 Mural Interactivo de Trabajo</h2>
+                    <p class="text-xs text-slate-500 font-semibold">Comparte enlaces, imágenes, ideas y reacciona con el equipo</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="card-fresca p-4 sm:p-5 flex items-center gap-4 bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200/60" ng-repeat="cump in cumpleañerosMes">
-                        <img ng-src="{{ cump.foto }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-amber-400 shadow-md">
-                        <div>
-                            <span class="bg-amber-400/20 text-amber-800 font-black text-[9px] sm:text-[10px] px-2.5 py-1 rounded-lg uppercase">🎂 {{ cump.cumpleanos }}</span>
-                            <h3 class="font-bold text-sm sm:text-base text-slate-800 mt-1">{{ cump.nombre }}</h3>
-                            <p class="text-[10px] sm:text-xs text-slate-500 font-medium">{{ cump.cargo }}</p>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- PUBLICAR POST -->
                 <div class="card-fresca p-5 sm:p-6 space-y-4">
-                    <h3 class="text-base sm:text-lg font-black text-slate-800 uppercase">💬 Mural de Felicitaciones</h3>
-                    <form ng-submit="publicarSaludo()" class="flex flex-col sm:flex-row gap-3">
-                        <input type="text" ng-model="nuevoSaludo" placeholder="Escribe un saludo especial..." required class="flex-1 px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium outline-none focus:border-blue-600">
-                        <button type="submit" class="px-6 py-3.5 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase tracking-wider active:scale-95 transition">Publicar</button>
+                    <h3 class="text-sm font-black text-slate-800 uppercase">📝 Crear Nueva Publicación</h3>
+                    <form ng-submit="publicarEnMural()" class="space-y-3">
+                        <textarea ng-model="nuevoPost.texto" required placeholder="Escribe un mensaje, anuncio o saludo..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs resize-none" rows="3"></textarea>
+                        
+                        <input type="text" ng-model="nuevoPost.mediaUrl" placeholder="URL opcional de Imagen o Enlace (https://...)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                        
+                        <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl active:scale-95 transition">Publicar en Mural</button>
                     </form>
-                    <div class="space-y-3">
-                        <div ng-repeat="msg in muralSaludos" class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                            <div class="flex justify-between items-center"><span class="font-bold text-xs text-blue-600">👤 {{ msg.autor }}</span><span class="text-[9px] text-slate-400">{{ msg.fecha }}</span></div>
-                            <p class="text-xs text-slate-700 font-medium">{{ msg.texto }}</p>
+                </div>
+
+                <!-- FEED DE PUBLICACIONES -->
+                <div class="space-y-4">
+                    <div class="card-fresca p-5 space-y-3" ng-repeat="post in muroPosts">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xs text-blue-600">👤 {{ post.autor }}</span>
+                            <span class="text-[10px] text-slate-400">{{ post.fecha }}</span>
+                        </div>
+
+                        <p class="text-xs text-slate-800 font-medium">{{ post.texto }}</p>
+
+                        <!-- IMAGEN ADJUNTA SI EXISTE -->
+                        <div ng-if="post.mediaUrl" class="rounded-2xl overflow-hidden border border-slate-100 max-h-72">
+                            <img ng-src="{{ post.mediaUrl }}" class="w-full object-cover">
+                        </div>
+
+                        <div class="flex items-center gap-4 pt-2 border-t border-slate-100">
+                            <button ng-click="darMeGusta(post)" class="text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1.5 rounded-xl flex items-center gap-1 active:scale-95">
+                                ❤️ {{ post.likes || 0 }} Me Gusta
+                            </button>
+                        </div>
+
+                        <!-- COMENTARIOS -->
+                        <div class="space-y-2 pt-2 bg-slate-50/80 p-3 rounded-2xl">
+                            <div ng-repeat="com in post.comentarios" class="text-xs">
+                                <strong class="text-slate-800">{{ com.autor }}:</strong> <span class="text-slate-600">{{ com.texto }}</span>
+                            </div>
+
+                            <form ng-submit="agregarComentario(post, nuevoComentarioTexto[post.id])" class="flex gap-2 pt-1">
+                                <input type="text" ng-model="nuevoComentarioTexto[post.id]" placeholder="Escribe un comentario..." class="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                                <button type="submit" class="px-3 py-1.5 bg-slate-800 text-white font-bold text-[10px] uppercase rounded-xl">Comentar</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 6. GESTOR ADMIN CON CREACIÓN DE USUARIOS -->
-            <section ng-show="moduloActivo === 'admin' && esAdmin" class="space-y-6 sm:space-y-8">
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-tight">⚙ Gestor Admin</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Gestión de personal, usuarios y log de auditoría</p>
-                </div>
+            <!-- 6. ADMIN (EDITAR/ELIMINAR USUARIOS) -->
+            <section ng-show="moduloActivo === 'admin' && esAdmin" class="space-y-6">
+                <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">⚙ Gestor Administrador</h2>
 
                 <div class="card-fresca p-5 sm:p-6 space-y-4">
-                    <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">+ Registrar Nuevo Usuario / Trabajador</h3>
-                    <form ng-submit="guardarNuevoTrabajador()" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                            <input type="text" ng-model="formTrab.nombre" required placeholder="Nombre Completo" class="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium outline-none">
-                            
-                            <!-- CREDENCIALES DE ACCESO -->
-                            <input type="text" ng-model="formTrab.usuario" required placeholder="Usuario de Ingreso (ej: cmendoza)" class="px-4 py-3 rounded-2xl bg-slate-50 border border-blue-200 text-xs font-medium outline-none">
-                            <input type="password" ng-model="formTrab.password" required placeholder="Contraseña de Ingreso" class="px-4 py-3 rounded-2xl bg-slate-50 border border-blue-200 text-xs font-medium outline-none">
-                            
-                            <select ng-model="formTrab.rol" required class="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium outline-none">
-                                <option value="operador">Rol: Operador (Funcional)</option>
-                                <option value="admin">Rol: Administrador</option>
-                            </select>
-
-                            <select ng-model="formTrab.gerencia" required class="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium outline-none">
-                                <option value="Servicios bancarios">Servicios bancarios</option>
-                                <option value="Recaudación especializada">Recaudación especializada</option>
-                                <option value="Control contable">Control contable</option>
-                            </select>
-                            
-                            <input type="text" ng-model="formTrab.cargo" required placeholder="Cargo" class="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium outline-none">
-                            <input type="text" ng-model="formTrab.extension" required placeholder="Extensión Telefónica" class="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium outline-none">
-                            <input type="text" ng-model="formTrab.cumpleanos" required placeholder="Fecha Cumpleaños (Ej: 14 de Julio)" class="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium outline-none">
-                            <input type="text" ng-model="formTrab.foto" placeholder="URL Foto de Perfil" class="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium outline-none">
-                        </div>
-                        <button type="submit" class="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase tracking-wider active:scale-95 transition">+ Guardar Usuario en Firebase</button>
-                    </form>
-                </div>
-
-                <div class="card-fresca p-5 sm:p-6 space-y-4">
-                    <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">📜 Log de Auditoría en Vivo</h3>
+                    <h3 class="text-sm font-black text-slate-800 uppercase">👥 Gestión de Usuarios Registrados</h3>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse min-w-[500px]">
+                        <table class="w-full text-left text-xs border-collapse min-w-[600px]">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-700 uppercase">
-                                    <th class="p-2.5 font-bold border-b">Fecha</th>
+                                    <th class="p-2.5 font-bold border-b">Nombre</th>
                                     <th class="p-2.5 font-bold border-b">Usuario</th>
-                                    <th class="p-2.5 font-bold border-b">Acción</th>
-                                    <th class="p-2.5 font-bold border-b">Detalle</th>
+                                    <th class="p-2.5 font-bold border-b">Rol</th>
+                                    <th class="p-2.5 font-bold border-b text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="log in logsAuditoria" class="border-b hover:bg-slate-50">
-                                    <td class="p-2.5 font-mono text-slate-500">{{ log.fecha }}</td>
-                                    <td class="p-2.5 font-bold text-blue-600">👤 {{ log.usuario }}</td>
-                                    <td class="p-2.5 font-bold text-slate-800">{{ log.accion }}</td>
-                                    <td class="p-2.5 text-slate-600">{{ log.detalle }}</td>
+                                <tr ng-repeat="u in trabajadores" class="border-b hover:bg-slate-50">
+                                    <td class="p-2.5 font-bold text-slate-800">{{ u.nombre }}</td>
+                                    <td class="p-2.5 text-blue-600 font-mono">{{ u.usuario }}</td>
+                                    <td class="p-2.5 font-bold uppercase text-[10px] text-slate-600">{{ u.rol || 'operador' }}</td>
+                                    <td class="p-2.5 text-center space-x-1">
+                                        <button ng-click="eliminarUsuarioHub(u.id)" class="px-2.5 py-1 bg-red-50 text-red-600 font-bold rounded-lg text-[10px]">🗑 Eliminar</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
-        </main>
 
-        <!-- BARRA DE NAVEGACIÓN INFERIOR PARA SMARTPHONES (iOS / ANDROID) -->
-        <nav class="mobile-bottom-nav">
-            <a href="#" class="mobile-tab-item" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="cambiarModulo('inicio')">
-                <span class="mobile-tab-icon">🏠</span>
-                <span>Inicio</span>
-            </a>
-            <a href="#" class="mobile-tab-item" ng-class="{'active': moduloActivo === 'rankings'}" ng-click="cambiarModulo('rankings')">
-                <span class="mobile-tab-icon">🏆</span>
-                <span>Rankings</span>
-            </a>
-            <a href="#" class="mobile-tab-item" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="cambiarModulo('directorio')">
-                <span class="mobile-tab-icon">👥</span>
-                <span>Directorio</span>
-            </a>
-            <a href="#" class="mobile-tab-item" ng-class="{'active': moduloActivo === 'mural'}" ng-click="cambiarModulo('mural')">
-                <span class="mobile-tab-icon">🎉</span>
-                <span>Mural</span>
-            </a>
-            <a href="#" class="mobile-tab-item" ng-class="{'active': moduloActivo === 'perfil'}" ng-click="cambiarModulo('perfil')">
-                <span class="mobile-tab-icon">👤</span>
-                <span>Perfil</span>
-            </a>
-            <a href="#" class="mobile-tab-item" ng-show="esAdmin" ng-class="{'active': moduloActivo === 'admin'}" ng-click="cambiarModulo('admin')">
-                <span class="mobile-tab-icon">⚙</span>
-                <span>Admin</span>
-            </a>
-        </nav>
+        </main>
     </div>
 
-    <!-- CONTROLADOR ANGULAR & INTEGRACIÓN CON FIREBASE -->
     <script>
-        // CONFIGURACIÓN DE FIREBASE EN LA NUBE (Reemplaza con tus credenciales)
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
   authDomain: "control-operativo-26ec9.firebaseapp.com",
@@ -510,100 +360,53 @@
             $scope.usuarioSesion = "";
             $scope.moduloActivo = 'inicio';
 
-            $scope.loginUser = "";
-            $scope.loginPass = "";
-            $scope.loginError = false;
-
             $scope.actividadesMatriz = [];
             $scope.trabajadores = [];
-            $scope.logsAuditoria = [];
-            $scope.muralSaludos = [];
+            $scope.muroPosts = [];
+            $scope.nuevoPost = {};
+            $scope.nuevoComentarioTexto = {};
 
-            // REGISTRO DE LOGS DE AUDITORÍA
-            function registrarLog(accion, detalle) {
-                let nuevoLog = {
-                    usuario: $scope.usuarioSesion || "Anónimo",
-                    accion: accion,
-                    detalle: detalle,
-                    fecha: new Date().toLocaleString()
-                };
-                db.collection("logs_auditoria").add(nuevoLog);
-            }
-
-            function cargarLogs() {
-                if (!$scope.esAdmin) return;
-                db.collection("logs_auditoria").orderBy("fecha", "desc").limit(50).onSnapshot(snapshot => {
-                    $scope.$apply(() => {
-                        $scope.logsAuditoria = [];
-                        snapshot.forEach(doc => $scope.logsAuditoria.push(doc.data()));
-                    });
-                });
-            }
-
-            // INICIO DE SESIÓN DINÁMICO CONTRA FIREBASE
             $scope.iniciarSesion = function() {
-                var uInput = $scope.loginUser.trim().toLowerCase();
-                var pInput = $scope.loginPass.trim();
+                var u = $scope.loginUser.trim().toLowerCase();
+                var p = $scope.loginPass.trim();
 
-                // 1. Superusuario Administrador Principal (Reserva de Seguridad)
-                if (uInput === 'luis' && pInput === 'control2026') {
+                if (u === 'luis' && p === 'control2026') {
                     $scope.sesionIniciada = true;
                     $scope.esAdmin = true;
                     $scope.usuarioSesion = "Luis Coronado";
-                    $scope.loginError = false;
-                    registrarLog("Inicio de Sesión", "Acceso Administrador Principal");
                     $scope.sincronizarFirebase();
-                    cargarLogs();
                     return;
                 }
 
-                // 2. Consulta de Usuarios Registrados en Firebase
-                db.collection("personal_intranet")
-                  .where("usuario", "==", uInput)
-                  .where("password", "==", pInput)
-                  .get()
-                  .then(snapshot => {
-                      $scope.$apply(() => {
-                          if (!snapshot.empty) {
-                              let userData = snapshot.docs[0].data();
-                              $scope.sesionIniciada = true;
-                              $scope.esAdmin = (userData.rol === 'admin');
-                              $scope.usuarioSesion = userData.nombre || uInput;
-                              $scope.loginError = false;
-
-                              registrarLog("Inicio de Sesión", "Acceso exitoso como " + (userData.rol || 'operador'));
-                              $scope.sincronizarFirebase();
-                              if ($scope.esAdmin) cargarLogs();
-                          } else {
-                              $scope.loginError = true;
-                          }
-                      });
-                  })
-                  .catch(error => {
-                      console.error("Error al validar sesión:", error);
-                      $scope.$apply(() => { $scope.loginError = true; });
-                  });
+                db.collection("personal_intranet").where("usuario", "==", u).where("password", "==", p).get().then(snapshot => {
+                    $scope.$apply(() => {
+                        if (!snapshot.empty) {
+                            let userData = snapshot.docs[0].data();
+                            $scope.sesionIniciada = true;
+                            $scope.esAdmin = (userData.rol === 'admin');
+                            $scope.usuarioSesion = userData.nombre || u;
+                            $scope.sincronizarFirebase();
+                        } else {
+                            $scope.loginError = true;
+                        }
+                    });
+                });
             };
 
-            $scope.cerrarSesion = function() {
-                registrarLog("Cierre de Sesión", "El usuario salió de la plataforma");
-                $scope.sesionIniciada = false;
-            };
+            $scope.cerrarSesion = function() { $scope.sesionIniciada = false; };
+            $scope.cambiarModulo = function(m) { $scope.moduloActivo = m; };
 
-            $scope.cambiarModulo = function(mod) {
-                $scope.moduloActivo = mod;
-                registrarLog("Navegación", "Accedió al módulo: " + mod);
-            };
-
-            // SINCRONIZACIÓN EN TIEMPO REAL
             $scope.sincronizarFirebase = function() {
+                // EXCLUYE ÁREA DE FÁBRICA DE LAS ESTADÍSTICAS DEL HUB
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
                     $scope.$apply(() => {
                         $scope.actividadesMatriz = [];
                         snapshot.forEach(doc => {
                             let d = doc.data();
                             d.id = doc.id;
-                            $scope.actividadesMatriz.push(d);
+                            if (d.categoria !== 'Fábrica') {
+                                $scope.actividadesMatriz.push(d);
+                            }
                         });
                         $scope.calcularRankingsReales();
                     });
@@ -617,11 +420,37 @@
                             t.id = doc.id;
                             $scope.trabajadores.push(t);
                         });
+                        $scope.verificarCumpleanosHoy();
+                    });
+                });
+
+                db.collection("mural_posts").orderBy("fechaSort", "desc").onSnapshot(snapshot => {
+                    $scope.$apply(() => {
+                        $scope.muroPosts = [];
+                        snapshot.forEach(doc => {
+                            let p = doc.data();
+                            p.id = doc.id;
+                            $scope.muroPosts.push(p);
+                        });
                     });
                 });
             };
 
-            // CÁLCULO DE RANKINGS REALES
+            // ALERTA DE CUMPLEAÑOS AUTOMÁTICA AL INICIAR
+            $scope.verificarCumpleanosHoy = function() {
+                let hoy = new Date();
+                let dia = hoy.getDate();
+                let meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+                let mesNombre = meses[hoy.getMonth()];
+
+                let cump = $scope.trabajadores.find(t => t.cumpleanos && t.cumpleanos.toLowerCase().includes(dia.toString()) && t.cumpleanos.toLowerCase().includes(mesNombre.toLowerCase()));
+                
+                if (cump) {
+                    $scope.cumplañeroHoy = cump;
+                    $scope.mostrarAlertaCumple = true;
+                }
+            };
+
             $scope.calcularRankingsReales = function() {
                 let statsResp = {};
                 let statsGerencia = {
@@ -637,7 +466,7 @@
                     let r = act.responsable || "Sin Asignar";
                     let g = act.categoria || "Servicios bancarios";
 
-                    if (!statsResp[r]) statsResp[r] = { total: 0, aTiempo: 0, gerencia: g };
+                    if (!statsResp[r]) statsResp[r] = { total: 0, aTiempo: 0 };
                     statsResp[r].total++;
 
                     if (statsGerencia[g]) statsGerencia[g].total++;
@@ -661,10 +490,7 @@
                     return {
                         nombre: nombre,
                         cargo: trabObj ? trabObj.cargo : "Operador",
-                        gerencia: d.gerencia,
                         eficiencia: eff,
-                        completadas: d.aTiempo,
-                        total: d.total,
                         foto: trabObj ? trabObj.foto : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80"
                     };
                 }).sort((a, b) => b.eficiencia - a.eficiencia).slice(0, 5);
@@ -672,105 +498,59 @@
                 $scope.gerenciasRanking = Object.keys(statsGerencia).map(g => {
                     let d = statsGerencia[g];
                     let eff = d.total > 0 ? Math.round((d.aTiempo / d.total) * 100) : 0;
-                    return { nombre: g, eficiencia: eff, total: d.total, aTiempo: d.aTiempo };
+                    return { nombre: g, eficiencia: eff };
                 }).sort((a, b) => b.eficiencia - a.eficiencia);
             };
 
-            // ACTUALIZACIÓN DE FOTO DE PERFIL
-            $scope.nuevaFotoURL = "";
-            $scope.actualizarMiFoto = function() {
-                if (!$scope.nuevaFotoURL) return alert("Ingresa una URL válida.");
-                let miPerfil = $scope.trabajadores.find(t => t.nombre.toLowerCase().includes($scope.usuarioSesion.toLowerCase()));
-
-                if (miPerfil) {
-                    db.collection("personal_intranet").doc(miPerfil.id).update({
-                        foto: $scope.nuevaFotoURL
+            // MURAL INTERACTIVO REAL
+            $scope.publicarEnMural = function() {
+                if ($scope.nuevoPost.texto) {
+                    db.collection("mural_posts").add({
+                        autor: $scope.usuarioSesion,
+                        texto: $scope.nuevoPost.texto,
+                        mediaUrl: $scope.nuevoPost.mediaUrl || "",
+                        likes: 0,
+                        comentarios: [],
+                        fecha: new Date().toLocaleString(),
+                        fechaSort: new Date().getTime()
                     }).then(() => {
-                        registrarLog("Actualización de Perfil", "El usuario actualizó su foto corporativa");
-                        alert("¡Foto de perfil actualizada correctamente!");
-                        $scope.nuevaFotoURL = "";
-                    });
-                } else {
-                    db.collection("personal_intranet").add({
-                        nombre: $scope.usuarioSesion,
-                        usuario: $scope.usuarioSesion.toLowerCase().replace(/\s+/g, ''),
-                        rol: "operador",
-                        cargo: "Operador",
-                        gerencia: "Servicios bancarios",
-                        extension: "4000",
-                        correo: $scope.usuarioSesion.toLowerCase() + "@banco.com",
-                        foto: $scope.nuevaFotoURL,
-                        cumpleanos: "Por definir"
-                    }).then(() => {
-                        registrarLog("Creación de Perfil", "El operador creó su perfil de usuario");
-                        alert("¡Perfil creado y foto guardada!");
-                        $scope.nuevaFotoURL = "";
+                        $scope.$apply(() => { $scope.nuevoPost = {}; });
                     });
                 }
             };
 
-            // MURAL Y CUMPLEAÑOS
-            $scope.cumpleañerosMes = [
-                { nombre: "Carlos Mendoza", cargo: "Coordinador de Pagos", gerencia: "Recaudación especializada", cumpleanos: "20 de Agosto", foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" },
-                { nombre: "María Rodríguez", cargo: "Analista Senior", gerencia: "Control contable", cumpleanos: "28 de Agosto", foto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" }
-            ];
-
-            $scope.muralSaludos = [
-                { autor: "Luis Coronado", fecha: "Hoy, 09:15 AM", texto: "¡Feliz cumpleaños a Carlos y María! Gran trabajo en el equipo." }
-            ];
-
-            $scope.publicarSaludo = function() {
-                if ($scope.nuevoSaludo && $scope.nuevoSaludo.trim() !== "") {
-                    $scope.muralSaludos.unshift({ autor: $scope.usuarioSesion, fecha: "Ahora", texto: $scope.nuevoSaludo.trim() });
-                    registrarLog("Publicación en Mural", "Dejó un saludo en el mural de cumpleaños");
-                    $scope.nuevoSaludo = "";
-                }
+            $scope.darMeGusta = function(post) {
+                db.collection("mural_posts").doc(post.id).update({
+                    likes: (post.likes || 0) + 1
+                });
             };
 
-            // GUARDAR NUEVO TRABAJADOR / USUARIO
-            $scope.formTrab = {};
-            $scope.guardarNuevoTrabajador = function() {
-                if ($scope.formTrab.nombre && $scope.formTrab.usuario && $scope.formTrab.password) {
-                    db.collection("personal_intranet").add({
-                        nombre: $scope.formTrab.nombre,
-                        usuario: $scope.formTrab.usuario.trim().toLowerCase(),
-                        password: $scope.formTrab.password.trim(),
-                        rol: $scope.formTrab.rol || "operador",
-                        gerencia: $scope.formTrab.gerencia || "Servicios bancarios",
-                        cargo: $scope.formTrab.cargo || "Analista",
-                        extension: $scope.formTrab.extension || "0000",
-                        correo: $scope.formTrab.nombre.toLowerCase().replace(/\s+/g, '') + "@banco.com",
-                        cumpleanos: $scope.formTrab.cumpleanos || "Por definir",
-                        foto: $scope.formTrab.foto || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80"
+            $scope.agregarComentario = function(post, textoCom) {
+                if (textoCom) {
+                    let nuevosCom = post.comentarios || [];
+                    nuevosCom.push({ autor: $scope.usuarioSesion, texto: textoCom });
+                    db.collection("mural_posts").doc(post.id).update({
+                        comentarios: nuevosCom
                     }).then(() => {
-                        registrarLog("Registro de Usuario", "Creó cuenta para el usuario: " + $scope.formTrab.usuario);
-                        alert("¡Usuario y trabajador guardados exitosamente!");
-                        $scope.formTrab = {};
+                        $scope.$apply(() => { $scope.nuevoComentarioTexto[post.id] = ""; });
                     });
-                } else {
-                    alert("Por favor completa al menos el Nombre, Usuario y Contraseña.");
                 }
             };
 
-            // EXPORTACIÓN CONSOLIDADA A EXCEL
+            $scope.eliminarUsuarioHub = function(id) {
+                if (confirm("¿Deseas eliminar este usuario de la base de datos?")) {
+                    db.collection("personal_intranet").doc(id).delete();
+                }
+            };
+
             $scope.exportarInformeConsolidado = function() {
                 let wb = XLSX.utils.book_new();
-
-                let dataMatriz = [["Descripción", "Área / Gerencia", "Responsable", "Estado", "Fecha Compromiso", "Fecha Cierre Real"]];
+                let dataMatriz = [["Descripción", "Área", "Responsable", "Estado", "SLA"]];
                 $scope.actividadesMatriz.forEach(a => {
-                    dataMatriz.push([a.descripcion, a.categoria, a.responsable, a.estado, a.fechaLimite || '--', a.fechaCierre || '--']);
+                    dataMatriz.push([a.descripcion, a.categoria, a.responsable, a.estado, a.fechaLimite || '--']);
                 });
-
-                let dataPersonal = [["Nombre", "Gerencia", "Cargo", "Extensión", "Cumpleaños", "Correo", "Rol"]];
-                $scope.trabajadores.forEach(t => {
-                    dataPersonal.push([t.nombre, t.gerencia, t.cargo, t.extension, t.cumpleanos, t.correo || '--', t.rol || 'operador']);
-                });
-
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataMatriz), "Matriz Operativa Real");
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataPersonal), "Directorio Personal");
-
-                XLSX.writeFile(wb, `Reporte_Consolidado_Operativo_${new Date().toISOString().split('T')[0]}.xlsx`);
-                registrarLog("Exportación", "Descargó el informe consolidado en Excel");
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataMatriz), "Matriz 3 Gerencias");
+                XLSX.writeFile(wb, `Reporte_Hub_Operativo_${new Date().toISOString().split('T')[0]}.xlsx`);
             };
         });
     </script>
