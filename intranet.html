@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Operativo v13.0</title>
+    <title>Hub Operativo v13.1</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
@@ -86,17 +86,22 @@
         </div>
     </div>
 
-    <!-- MODAL DE FELIZ CUMPLEANOS FLOTANTE AL INICIAR -->
-    <div ng-show="mostrarAlertaCumple" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center space-y-4 border-2 border-amber-300">
+    <!-- MODAL DE FELIZ CUMPLEAÑOS (SOLO APARECE SI HOY ALGUIEN CUMPLE AÑOS) -->
+    <div ng-show="mostrarAlertaCumple && sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-center space-y-4 border-2 border-amber-300">
             <div class="text-5xl animate-bounce">🎂🎉</div>
-            <h2 class="text-2xl font-black text-slate-800 uppercase">¡Hoy es un día especial!</h2>
-            <p class="text-sm text-slate-600 font-semibold">Le deseamos un muy feliz cumpleaños a:</p>
-            <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 font-black text-lg">
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">¡Hoy es un día especial!</h2>
+            <p class="text-xs text-slate-600 font-semibold">Le deseamos un feliz cumpleaños al compañero(a):</p>
+            
+            <div class="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200 text-amber-900 font-black text-lg">
                 🎈 {{ cumplañeroHoy.nombre }}
             </div>
+            
             <p class="text-xs text-slate-400">¡Déjale tus buenos deseos en el mural interactivo!</p>
-            <button ng-click="mostrarAlertaCumple = false" class="w-full py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl active:scale-95">Continuar al Hub</button>
+            
+            <button ng-click="cerrarAlertaCumple()" class="w-full py-3.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl shadow-lg active:scale-95 transition hover:bg-blue-700">
+                Continuar al Hub Operativo 🚀
+            </button>
         </div>
     </div>
 
@@ -110,7 +115,7 @@
                     </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">HUB OPERATIVO</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v13.0</p>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Panel v13.1</p>
                     </div>
                 </div>
 
@@ -360,6 +365,9 @@
             $scope.usuarioSesion = "";
             $scope.moduloActivo = 'inicio';
 
+            $scope.mostrarAlertaCumple = false;
+            $scope.cumplañeroHoy = null;
+
             $scope.actividadesMatriz = [];
             $scope.trabajadores = [];
             $scope.muroPosts = [];
@@ -396,8 +404,11 @@
             $scope.cerrarSesion = function() { $scope.sesionIniciada = false; };
             $scope.cambiarModulo = function(m) { $scope.moduloActivo = m; };
 
+            $scope.cerrarAlertaCumple = function() {
+                $scope.mostrarAlertaCumple = false;
+            };
+
             $scope.sincronizarFirebase = function() {
-                // EXCLUYE ÁREA DE FÁBRICA DE LAS ESTADÍSTICAS DEL HUB
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
                     $scope.$apply(() => {
                         $scope.actividadesMatriz = [];
@@ -436,18 +447,26 @@
                 });
             };
 
-            // ALERTA DE CUMPLEAÑOS AUTOMÁTICA AL INICIAR
+            // VERIFICACIÓN ESTRICTA DEL DÍA Y MES ACTUAL
             $scope.verificarCumpleanosHoy = function() {
                 let hoy = new Date();
-                let dia = hoy.getDate();
-                let meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-                let mesNombre = meses[hoy.getMonth()];
+                let diaActual = hoy.getDate();
+                let meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+                let mesActualNombre = meses[hoy.getMonth()];
 
-                let cump = $scope.trabajadores.find(t => t.cumpleanos && t.cumpleanos.toLowerCase().includes(dia.toString()) && t.cumpleanos.toLowerCase().includes(mesNombre.toLowerCase()));
+                let cump = $scope.trabajadores.find(t => {
+                    if (!t.cumpleanos) return false;
+                    let txt = t.cumpleanos.toLowerCase();
+                    let coincideDia = txt.includes(diaActual.toString());
+                    let coincideMes = txt.includes(mesActualNombre);
+                    return coincideDia && coincideMes;
+                });
                 
                 if (cump) {
                     $scope.cumplañeroHoy = cump;
                     $scope.mostrarAlertaCumple = true;
+                } else {
+                    $scope.mostrarAlertaCumple = false;
                 }
             };
 
@@ -502,7 +521,6 @@
                 }).sort((a, b) => b.eficiencia - a.eficiencia);
             };
 
-            // MURAL INTERACTIVO REAL
             $scope.publicarEnMural = function() {
                 if ($scope.nuevoPost.texto) {
                     db.collection("mural_posts").add({
