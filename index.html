@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz de Seguimiento Operativo v20.3 Light-Executive</title>
+    <title>Matriz de Seguimiento Operativo v20.4 Mobile-Executive</title>
 
     <!-- Frameworks & Firebase SDKs (Compat) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,7 +20,7 @@
             background-color: #F8FAFC;
             color: #1E293B;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+            padding-bottom: calc(6rem + env(safe-area-inset-bottom));
             overflow-x: hidden;
         }
 
@@ -40,8 +40,8 @@
             background-color: #F1F5F9;
             border: 1px solid #CBD5E1;
             border-radius: 12px;
-            padding: 0.65rem 1rem;
-            font-size: 0.8rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
             font-weight: 500;
             color: #0F172A;
             outline: none;
@@ -82,6 +82,25 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
+        .mobile-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #64748B;
+            padding: 0.5rem 0.25rem;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .mobile-nav-btn.active {
+            color: #2563EB;
+            background-color: #EFF6FF;
+        }
+
         .login-logo-animated {
             animation: floatLogo 3s infinite ease-in-out;
         }
@@ -102,7 +121,7 @@
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Matriz Operativa</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Light-Executive Edition v20.3</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Mobile-Executive v20.4</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
@@ -120,15 +139,16 @@
 
     <!-- APLICACIÓN PRINCIPAL -->
     <div ng-if="sesionIniciada">
+        <!-- HEADER DESKTOP / MOBILE TOP -->
         <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
-            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md">
                         M
                     </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-800 tracking-tight uppercase">MATRIZ OPERATIVA</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">Usuario: {{ usuarioSesion }} <span class="text-blue-600 font-bold">({{ rolUsuario }})</span></p>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">👤 {{ usuarioSesion }} <span class="text-blue-600 font-bold">({{ rolUsuario }})</span></p>
                     </div>
                 </div>
 
@@ -150,6 +170,16 @@
                     
                     <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-600 bg-red-50 px-3 py-2 rounded-xl border border-red-200 hover:bg-red-100 transition">Salir</button>
                 </div>
+
+                <!-- ACCESO RÁPIDO HUB Y SALIR EN MÓVIL -->
+                <div class="flex md:hidden items-center gap-2">
+                    <a href="intranet.html" class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-200">
+                        🏢 Hub
+                    </a>
+                    <button ng-click="cerrarSesion()" class="text-[11px] font-bold text-red-600 bg-red-50 px-2.5 py-1.5 rounded-lg border border-red-200">
+                        Salir
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -164,11 +194,11 @@
                             <h2 class="text-2xl sm:text-3xl font-black mt-2">Control de Operaciones & SLAs</h2>
                         </div>
                         <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                            <button ng-click="exportarPDF()" class="px-4 py-3 rounded-2xl bg-slate-900 text-white font-bold text-xs uppercase shadow-md hover:bg-slate-800 transition">
-                                📄 Reporte PDF
+                            <button ng-click="exportarPDF()" class="flex-1 md:flex-none px-4 py-3 rounded-2xl bg-slate-900 text-white font-bold text-xs uppercase shadow-md hover:bg-slate-800 transition">
+                                📄 PDF
                             </button>
-                            <button ng-click="exportarExcel()" class="px-4 py-3 rounded-2xl bg-white text-blue-700 font-black text-xs uppercase shadow-md hover:bg-blue-50 transition">
-                                📥 Exportar Excel
+                            <button ng-click="exportarExcel()" class="flex-1 md:flex-none px-4 py-3 rounded-2xl bg-white text-blue-700 font-black text-xs uppercase shadow-md hover:bg-blue-50 transition">
+                                📥 Excel
                             </button>
                         </div>
                     </div>
@@ -197,7 +227,7 @@
                 <!-- REGISTRO DE NUEVA ACTIVIDAD -->
                 <div class="card-light p-5 sm:p-6 space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">➕ Registrar Requerimiento con Documentación & Audio</h3>
+                        <h3 class="text-xs sm:text-base font-black text-slate-800 uppercase">➕ Registrar Requerimiento</h3>
                         <button type="button" ng-click="limpiarFormularioNuevaActividad()" class="text-xs font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition">
                             🧹 Limpiar
                         </button>
@@ -249,30 +279,30 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                             <div>
                                 <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">📄 Adjuntar Documento de Soporte (Word, Excel, PDF):</label>
-                                <input type="file" id="docFileInput" onchange="angular.element(this).scope().cargarArchivoDoc(this)" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700">
+                                <input type="file" id="docFileInput" onchange="angular.element(this).scope().cargarArchivoDoc(this)" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 w-full">
                                 <span ng-if="nuevaAct.docNombre" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Cargado: {{ nuevaAct.docNombre }}</span>
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Grabar Avance / Instrucción por Voz (Gerencia):</label>
+                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Grabar Avance por Voz:</label>
                                 <div class="flex items-center gap-2">
-                                    <button type="button" ng-click="toggleGrabarAudio()" class="px-4 py-2 rounded-xl font-bold text-xs uppercase shadow-sm transition" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-blue-600 text-white': !grabandoAudio}">
-                                        {{ grabandoAudio ? '⏹ Detener Grabación' : '🎤 Grabar Nota de Voz' }}
+                                    <button type="button" ng-click="toggleGrabarAudio()" class="w-full py-2.5 rounded-xl font-bold text-xs uppercase shadow-sm transition" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-blue-600 text-white': !grabandoAudio}">
+                                        {{ grabandoAudio ? '⏹ Detener' : '🎤 Grabar Voz' }}
                                     </button>
-                                    <span ng-if="nuevaAct.audioUrl" class="text-[10px] font-bold text-emerald-600">✔ Audio grabado</span>
                                 </div>
+                                <span ng-if="nuevaAct.audioUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Audio listo</span>
                                 <audio ng-if="nuevaAct.audioUrl" controls ng-src="{{ nuevaAct.audioUrl }}" class="w-full h-8 mt-2 rounded-lg border border-slate-200"></audio>
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-md active:scale-95 transition">
+                        <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-md active:scale-95 transition">
                             + Guardar Requerimiento Completo
                         </button>
                     </form>
                 </div>
 
-                <!-- TABLA MATRIZ CON BOTÓN DE MODIFICAR -->
-                <div class="card-light p-5 sm:p-6 space-y-4">
+                <!-- TABLA MATRIZ -->
+                <div class="card-light p-4 sm:p-6 space-y-4">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-100 pb-3">
                         <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">📋 Registro General de la Matriz</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full md:w-auto">
@@ -331,9 +361,9 @@
                                         <span ng-if="!act.audioUrl" class="text-slate-400 text-[10px]">Sin audio</span>
                                     </td>
                                     <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                                        <button ng-click="abrirModalEdicion(act)" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 font-bold rounded-lg border border-indigo-200 text-[10px] hover:bg-indigo-100">✏ Modificar</button>
-                                        <button ng-click="cambiarEstado(act)" class="px-2.5 py-1 bg-blue-50 text-blue-600 font-bold rounded-lg border border-blue-200 text-[10px] hover:bg-blue-100">⚡ Estado</button>
-                                        <button ng-show="puedesEliminar(act)" ng-click="eliminarActividad(act.id)" class="px-2.5 py-1 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 text-[10px] hover:bg-red-100">🗑 Borrar</button>
+                                        <button ng-click="abrirModalEdicion(act)" class="px-2.5 py-1.5 bg-indigo-50 text-indigo-600 font-bold rounded-lg border border-indigo-200 text-[10px]">✏ Modificar</button>
+                                        <button ng-click="cambiarEstado(act)" class="px-2.5 py-1.5 bg-blue-50 text-blue-600 font-bold rounded-lg border border-blue-200 text-[10px]">⚡ Estado</button>
+                                        <button ng-show="puedesEliminar(act)" ng-click="eliminarActividad(act.id)" class="px-2.5 py-1.5 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 text-[10px]">🗑 Borrar</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -342,7 +372,7 @@
                 </div>
             </div>
 
-            <!-- MODAL DE EDICIÓN (FECHA COMPROMISO BLOQUEADA) -->
+            <!-- MODAL DE EDICIÓN -->
             <div ng-show="modalEdicionAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
                 <div class="card-light p-6 max-w-lg w-full space-y-4 border border-slate-200 shadow-2xl">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -392,7 +422,7 @@
 
                         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
                             <button type="button" ng-click="modalEdicionAbierto = false" class="py-2.5 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs uppercase">Cancelar</button>
-                            <button type="submit" class="py-2.5 px-5 rounded-xl bg-blue-600 text-white font-bold text-xs uppercase shadow-md hover:bg-blue-700">Guardar Cambios</button>
+                            <button type="submit" class="py-2.5 px-5 rounded-xl bg-blue-600 text-white font-bold text-xs uppercase shadow-md">Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -493,6 +523,26 @@
             </div>
 
         </main>
+
+        <!-- BARRA FLOTANTE NAVEGACIÓN MÓVIL (MOBILE APP BAR) -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 px-2 py-1 flex justify-around items-center shadow-lg">
+            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="seccionActiva = 'matriz'">
+                <span class="text-lg">📋</span>
+                <span>Matriz</span>
+            </button>
+            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'calendario'}" ng-click="seccionActiva = 'calendario'">
+                <span class="text-lg">📅</span>
+                <span>Agenda</span>
+            </button>
+            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'sugerencias'}" ng-click="seccionActiva = 'sugerencias'">
+                <span class="text-lg">💡</span>
+                <span>Buzón</span>
+            </button>
+            <button ng-show="esSuperAdmin" class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'admin'}" ng-click="seccionActiva = 'admin'">
+                <span class="text-lg">⚙</span>
+                <span>Admin</span>
+            </button>
+        </nav>
     </div>
 
     <!-- SCRIPT FIREBASE & LOGICA ANGULARJS FIX -->
