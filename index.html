@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz de Seguimiento Operativo v20.4 Mobile-Executive</title>
+    <title>Matriz de Seguimiento Operativo v20.6 Mobile-Executive</title>
 
-    <!-- Frameworks & Firebase SDKs (Compat) -->
+    <!-- Frameworks & Firebase SDKs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -113,7 +113,7 @@
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
 
-    <!-- LOGIN CLARO FIX UNIFICADO -->
+    <!-- LOGIN CLARO -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30 login-logo-animated">
@@ -121,7 +121,7 @@
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Matriz Operativa</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Mobile-Executive v20.4</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Mobile-Executive v20.6</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
@@ -139,7 +139,6 @@
 
     <!-- APLICACIÓN PRINCIPAL -->
     <div ng-if="sesionIniciada">
-        <!-- HEADER DESKTOP / MOBILE TOP -->
         <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
                 <div class="flex items-center gap-3">
@@ -158,10 +157,10 @@
                     </button>
 
                     <div class="flex gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="seccionActiva = 'matriz'">📋 Matriz</button>
-                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'calendario'}" ng-click="seccionActiva = 'calendario'">📅 Agenda & SLAs</button>
-                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'sugerencias'}" ng-click="seccionActiva = 'sugerencias'">💡 Sugerencias</button>
-                        <button class="nav-tab" ng-show="esSuperAdmin" ng-class="{'active': seccionActiva === 'admin'}" ng-click="seccionActiva = 'admin'">⚙ Admin</button>
+                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="cambiarSeccion('matriz')">📋 Matriz</button>
+                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'calendario'}" ng-click="cambiarSeccion('calendario')">📅 Agenda & SLAs</button>
+                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'sugerencias'}" ng-click="cambiarSeccion('sugerencias')">💡 Sugerencias</button>
+                        <button class="nav-tab" ng-show="esSuperAdmin" ng-class="{'active': seccionActiva === 'admin'}" ng-click="cambiarSeccion('admin')">⚙ Admin</button>
                     </div>
 
                     <a href="intranet.html" class="text-xs font-bold text-blue-600 bg-blue-50 px-3.5 py-2 rounded-xl border border-blue-200 flex items-center gap-1 hover:bg-blue-100 transition">
@@ -171,7 +170,6 @@
                     <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-600 bg-red-50 px-3 py-2 rounded-xl border border-red-200 hover:bg-red-100 transition">Salir</button>
                 </div>
 
-                <!-- ACCESO RÁPIDO HUB Y SALIR EN MÓVIL -->
                 <div class="flex md:hidden items-center gap-2">
                     <a href="intranet.html" class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-200">
                         🏢 Hub
@@ -275,7 +273,7 @@
                             </div>
                         </div>
 
-                        <!-- ADJUNTOS MULTIMEDIA -->
+                        <!-- ADJUNTOS MULTIMEDIA MÓVIL OPTIMIZADOS -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                             <div>
                                 <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">📄 Adjuntar Documento de Soporte (Word, Excel, PDF):</label>
@@ -284,14 +282,14 @@
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Grabar Avance por Voz:</label>
+                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Grabar Avance por Voz (Móvil/PC):</label>
                                 <div class="flex items-center gap-2">
-                                    <button type="button" ng-click="toggleGrabarAudio()" class="w-full py-2.5 rounded-xl font-bold text-xs uppercase shadow-sm transition" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-blue-600 text-white': !grabandoAudio}">
-                                        {{ grabandoAudio ? '⏹ Detener' : '🎤 Grabar Voz' }}
+                                    <button type="button" ng-click="toggleGrabarAudio()" class="w-full py-3 rounded-xl font-bold text-xs uppercase shadow-sm transition" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-blue-600 text-white': !grabandoAudio}">
+                                        {{ grabandoAudio ? '⏹ Detener Grabación' : '🎤 Iniciar Nota de Voz' }}
                                     </button>
                                 </div>
-                                <span ng-if="nuevaAct.audioUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Audio listo</span>
-                                <audio ng-if="nuevaAct.audioUrl" controls ng-src="{{ nuevaAct.audioUrl }}" class="w-full h-8 mt-2 rounded-lg border border-slate-200"></audio>
+                                <span ng-if="nuevaAct.audioUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Audio grabado con éxito</span>
+                                <audio ng-if="nuevaAct.audioUrl" controls ng-src="{{ nuevaAct.audioUrl }}" class="w-full h-9 mt-2 rounded-lg border border-slate-200"></audio>
                             </div>
                         </div>
 
@@ -301,7 +299,7 @@
                     </form>
                 </div>
 
-                <!-- TABLA MATRIZ -->
+                <!-- TABLA MATRIZ CON SCROLL TÁCTIL -->
                 <div class="card-light p-4 sm:p-6 space-y-4">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-100 pb-3">
                         <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">📋 Registro General de la Matriz</h3>
@@ -357,7 +355,7 @@
                                         <span ng-if="!act.docUrl" class="text-slate-400 text-[10px]">Sin archivo</span>
                                     </td>
                                     <td class="p-3">
-                                        <audio ng-if="act.audioUrl" controls ng-src="{{ act.audioUrl }}" class="h-7 w-36 rounded-md"></audio>
+                                        <audio ng-if="act.audioUrl" controls ng-src="{{ act.audioUrl }}" class="h-8 w-36 rounded-md"></audio>
                                         <span ng-if="!act.audioUrl" class="text-slate-400 text-[10px]">Sin audio</span>
                                     </td>
                                     <td class="p-3 text-center space-x-1 whitespace-nowrap">
@@ -372,7 +370,7 @@
                 </div>
             </div>
 
-            <!-- MODAL DE EDICIÓN -->
+            <!-- MODAL DE EDICIÓN DE ACTIVIDAD -->
             <div ng-show="modalEdicionAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
                 <div class="card-light p-6 max-w-lg w-full space-y-4 border border-slate-200 shadow-2xl">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -498,6 +496,7 @@
                             <input type="text" ng-model="formUsu.nombre" required placeholder="Nombre Completo" class="input-light w-full">
                             <input type="text" ng-model="formUsu.usuario" required placeholder="Usuario" class="input-light w-full">
                             <input type="password" ng-model="formUsu.password" required placeholder="Contraseña" class="input-light w-full">
+                            <input type="text" ng-model="formUsu.extension" placeholder="Extensión Telefónica (ej: 4123)" class="input-light w-full">
                             
                             <select ng-model="formUsu.rol" required class="input-light w-full">
                                 <option value="operador">Operador (3 Gerencias)</option>
@@ -526,26 +525,26 @@
 
         <!-- BARRA FLOTANTE NAVEGACIÓN MÓVIL (MOBILE APP BAR) -->
         <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 px-2 py-1 flex justify-around items-center shadow-lg">
-            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="seccionActiva = 'matriz'">
+            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="cambiarSeccion('matriz')">
                 <span class="text-lg">📋</span>
                 <span>Matriz</span>
             </button>
-            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'calendario'}" ng-click="seccionActiva = 'calendario'">
+            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'calendario'}" ng-click="cambiarSeccion('calendario')">
                 <span class="text-lg">📅</span>
                 <span>Agenda</span>
             </button>
-            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'sugerencias'}" ng-click="seccionActiva = 'sugerencias'">
+            <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'sugerencias'}" ng-click="cambiarSeccion('sugerencias')">
                 <span class="text-lg">💡</span>
                 <span>Buzón</span>
             </button>
-            <button ng-show="esSuperAdmin" class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'admin'}" ng-click="seccionActiva = 'admin'">
+            <button ng-show="esSuperAdmin" class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'admin'}" ng-click="cambiarSeccion('admin')">
                 <span class="text-lg">⚙</span>
                 <span>Admin</span>
             </button>
         </nav>
     </div>
 
-    <!-- SCRIPT FIREBASE & LOGICA ANGULARJS FIX -->
+    <!-- SCRIPT FIREBASE & LOGICA ANGULARJS -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -568,7 +567,7 @@
             $scope.esSuperAdmin = false;
             $scope.usuarioSesion = "";
             $scope.rolUsuario = "";
-            $scope.seccionActiva = 'matriz';
+            $scope.seccionActiva = localStorage.getItem('seccionActivaMatriz') || 'matriz';
             $scope.modalEdicionAbierto = false;
 
             $scope.actividadesVisibles = [];
@@ -580,6 +579,21 @@
 
             $scope.grabandoAudio = false;
             let mediaRecorder, audioChunks = [];
+
+            $scope.cambiarSeccion = function(seccion) {
+                $scope.seccionActiva = seccion;
+                localStorage.setItem('seccionActivaMatriz', seccion);
+            };
+
+            $scope.registrarLog = function(accion, detalle) {
+                db.collection("auditoria_logs").add({
+                    usuario: $scope.usuarioSesion || "Sistema",
+                    accion: accion,
+                    detalle: detalle,
+                    fecha: new Date().toISOString().split('T')[0],
+                    timestamp: new Date().getTime()
+                });
+            };
 
             $scope.iniciarSesion = function(event) {
                 if (event) event.preventDefault();
@@ -593,7 +607,6 @@
                 $scope.cargandoLogin = true;
                 $scope.loginError = false;
 
-                // ACCESO MAESTRO LUIS
                 if (u === 'luis' && p === 'control2026') {
                     $scope.$evalAsync(function() {
                         $scope.sesionIniciada = true;
@@ -602,6 +615,7 @@
                         $scope.rolUsuario = "admin_master";
                         $scope.cargandoLogin = false;
                         $scope.loginError = false;
+                        $scope.registrarLog("Inicio de Sesión", "Ingreso como admin_master");
                         $scope.sincronizarFirebase();
                     });
                     return;
@@ -626,6 +640,7 @@
                             $scope.usuarioSesion = userData.nombre || u;
                             $scope.esSuperAdmin = (userData.rol === 'admin');
                             $scope.loginError = false;
+                            $scope.registrarLog("Inicio de Sesión", "Ingreso al sistema");
                             $scope.sincronizarFirebase();
                         } else {
                             $scope.loginError = true;
@@ -687,11 +702,12 @@
             $scope.toggleGrabarAudio = function() {
                 if (!$scope.grabandoAudio) {
                     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                        mediaRecorder = new MediaRecorder(stream);
+                        let mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+                        mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
                         audioChunks = [];
-                        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
                         mediaRecorder.onstop = () => {
-                            let blob = new Blob(audioChunks, { type: 'audio/mp3' });
+                            let blob = new Blob(audioChunks, { type: mimeType });
                             let reader = new FileReader();
                             reader.onload = function(e) {
                                 $scope.$evalAsync(function() {
@@ -703,7 +719,7 @@
                         };
                         mediaRecorder.start();
                         $scope.$evalAsync(function() { $scope.grabandoAudio = true; });
-                    });
+                    }).catch(err => alert("Error al activar micrófono en el dispositivo: " + err.message));
                 } else {
                     mediaRecorder.stop();
                     $scope.grabandoAudio = false;
@@ -757,6 +773,7 @@
                 };
 
                 db.collection("actividades_operativas").add(registro).then(() => {
+                    $scope.registrarLog("Nuevo Requerimiento", registro.descripcion);
                     $scope.$evalAsync(function() { $scope.limpiarFormularioNuevaActividad(); });
                 });
             };
@@ -775,6 +792,7 @@
                         estado: $scope.actEdit.estado,
                         observaciones: $scope.actEdit.observaciones || ""
                     }).then(() => {
+                        $scope.registrarLog("Modificación Requerimiento", $scope.actEdit.descripcion);
                         $scope.$evalAsync(function() {
                             $scope.modalEdicionAbierto = false;
                         });
@@ -784,12 +802,16 @@
 
             $scope.cambiarEstado = function(act) {
                 let nuevoEstado = act.estado === 'Pendiente' ? 'En Proceso' : (act.estado === 'En Proceso' ? 'Completado' : 'Pendiente');
-                db.collection("actividades_operativas").doc(act.id).update({ estado: nuevoEstado });
+                db.collection("actividades_operativas").doc(act.id).update({ estado: nuevoEstado }).then(() => {
+                    $scope.registrarLog("Cambio Estado", `${act.descripcion} -> ${nuevoEstado}`);
+                });
             };
 
             $scope.eliminarActividad = function(id) {
                 if (confirm("¿Eliminar este requerimiento?")) {
-                    db.collection("actividades_operativas").doc(id).delete();
+                    db.collection("actividades_operativas").doc(id).delete().then(() => {
+                        $scope.registrarLog("Eliminación Requerimiento", `ID: ${id}`);
+                    });
                 }
             };
 
@@ -816,6 +838,7 @@
                         nombre: $scope.formUsu.nombre,
                         usuario: $scope.formUsu.usuario.trim().toLowerCase(),
                         password: $scope.formUsu.password.trim(),
+                        extension: $scope.formUsu.extension || "N/A",
                         rol: $scope.formUsu.rol || "operador",
                         gerencia: $scope.formUsu.gerencia || "Servicios bancarios",
                         cargo: $scope.formUsu.cargo || "Analista"
