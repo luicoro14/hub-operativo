@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Operativo v20.6 Mobile-Executive</title>
+    <title>Hub Operativo v20.7 Persistent Executive</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
@@ -103,7 +103,7 @@
 </head>
 <body ng-app="hubApp" ng-controller="HubController">
 
-    <!-- LOGIN CLARO -->
+    <!-- LOGIN CLARO (PERSISTENTE) -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30 login-logo-animated">
@@ -111,7 +111,7 @@
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Hub Operativo</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Mobile-Executive v20.6</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">v20.7 Persistent Edition</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
@@ -162,7 +162,7 @@
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
 
-            <!-- 1. MODULO INICIO (ESPACIADOS OPTIMIZADOS PARA MÓVIL Y PC) -->
+            <!-- 1. MODULO INICIO -->
             <section ng-show="moduloActivo === 'inicio'" class="space-y-6">
                 <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 p-6 sm:p-8 text-white shadow-xl">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -176,7 +176,6 @@
                     </div>
                 </div>
 
-                <!-- TARJETAS KPIS CON VISUALIZACIÓN PULCRA -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="card-light p-5 flex flex-col justify-between">
                         <span class="text-xs font-bold text-slate-400 uppercase">Total Actividades</span>
@@ -210,7 +209,7 @@
                 </div>
             </section>
 
-            <!-- 2. MODULO CONSULTAS -->
+            <!-- 2. MODULO CONSULTAS CON BORRADO DE AUDIO ADMINISTRATIVO -->
             <section ng-show="moduloActivo === 'consultas'" class="space-y-6">
                 <div class="text-center max-w-lg mx-auto">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">🎙 Consultas & Instrucciones Gerenciales</h2>
@@ -223,7 +222,7 @@
                         <textarea ng-model="nuevaConsulta.detalle" placeholder="Detalles en texto (opcional)..." class="input-light w-full resize-none" rows="3"></textarea>
                         
                         <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                            <label class="text-[11px] font-bold text-slate-700 uppercase block">Grabar Nota de Voz Gerencial (Móvil/PC):</label>
+                            <label class="text-[11px] font-bold text-slate-700 uppercase block">Grabar Nota de Voz Gerencial (PC / Móvil):</label>
                             <div class="flex items-center gap-3">
                                 <button type="button" ng-click="grabarAudioConsulta()" class="w-full py-3 rounded-xl font-bold text-xs uppercase shadow-sm transition" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-blue-600 text-white': !grabandoAudio}">
                                     {{ grabandoAudio ? '⏹ Detener Grabación' : '🎤 Iniciar Grabación de Voz' }}
@@ -247,14 +246,20 @@
                         </div>
                         <h4 class="font-black text-sm text-slate-800">{{ item.titulo }}</h4>
                         <p class="text-xs text-slate-600" ng-if="item.detalle">{{ item.detalle }}</p>
-                        <div ng-if="item.audioUrl" class="pt-2">
+
+                        <div ng-if="item.audioUrl" class="pt-2 space-y-2">
                             <audio controls ng-src="{{ item.audioUrl }}" class="w-full h-9 rounded-lg"></audio>
+                            <div class="flex justify-end" ng-show="esAdmin">
+                                <button ng-click="eliminarAudioConsulta(item)" class="text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-lg border border-red-200 hover:bg-red-100 transition">
+                                    🗑 Eliminar Audio
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 3. MODULO RANKINGS CON CUMPLIMIENTO PORCENTUAL -->
+            <!-- 3. MODULO RANKINGS -->
             <section ng-show="moduloActivo === 'rankings'" class="space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="card-light p-5 sm:p-6 space-y-4">
@@ -317,11 +322,11 @@
                 </div>
             </section>
 
-            <!-- 5. MODULO MURAL SOCIAL -->
+            <!-- 5. MODULO MURAL SOCIAL (FEED ABIERTO E INTERACTIVO) -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6">
                 <div class="text-center max-w-lg mx-auto">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">💬 Mural Interactivo Social</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Publicaciones y colaboraciones abiertas para todo el personal</p>
+                    <p class="text-xs text-slate-500 font-semibold">Publicaciones e interacciones comunitarias para todo el personal</p>
                 </div>
 
                 <div class="max-w-2xl mx-auto space-y-6">
@@ -346,7 +351,7 @@
                         </form>
                     </div>
 
-                    <!-- FEED -->
+                    <!-- FEED DE PUBLICACIONES -->
                     <div class="space-y-4">
                         <div class="card-light p-5 space-y-3" ng-repeat="post in muroPosts">
                             <div class="flex justify-between items-center">
@@ -403,7 +408,7 @@
                 </div>
             </section>
 
-            <!-- 6. MODULO LOGS DE AUDITORÍA POR DÍA -->
+            <!-- 6. MODULO LOGS DE AUDITORÍA -->
             <section ng-show="moduloActivo === 'auditoria' && esAdmin" class="space-y-6">
                 <div class="card-light p-5 sm:p-6 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
@@ -597,7 +602,7 @@
         </nav>
     </div>
 
-    <!-- SCRIPT FIREBASE & LOGICA ANGULARJS -->
+    <!-- SCRIPT FIREBASE & ANGULARJS PERSISTENTE -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -615,11 +620,14 @@
         var app = angular.module('hubApp', []);
 
         app.controller('HubController', function($scope, $sce, $timeout) {
-            $scope.sesionIniciada = false;
-            $scope.cargandoLogin = false;
-            $scope.esAdmin = false;
-            $scope.usuarioSesion = "";
+            // VERIFICACIÓN E INICIALIZACIÓN DE SESIÓN PERSISTENTE
+            let sesionGuardada = localStorage.getItem('sesionIniciadaHub') === 'true';
+            $scope.sesionIniciada = sesionGuardada;
+            $scope.usuarioSesion = localStorage.getItem('usuarioSesionHub') || "";
+            $scope.esAdmin = localStorage.getItem('esAdminHub') === 'true';
             $scope.moduloActivo = localStorage.getItem('moduloActivoHub') || 'inicio';
+            
+            $scope.cargandoLogin = false;
             $scope.modalUsuarioAbierto = false;
             $scope.usuarioEdit = {};
 
@@ -633,6 +641,10 @@
 
             $scope.grabandoAudio = false;
             let mediaRecorder, chunks = [];
+
+            if ($scope.sesionIniciada) {
+                $timeout(function() { $scope.sincronizarFirebase(); });
+            }
 
             $scope.cambiarModulo = function(m) {
                 $scope.moduloActivo = m;
@@ -666,9 +678,14 @@
                         $scope.sesionIniciada = true;
                         $scope.esAdmin = true;
                         $scope.usuarioSesion = "Luis Coronado";
+
+                        localStorage.setItem('sesionIniciadaHub', 'true');
+                        localStorage.setItem('usuarioSesionHub', "Luis Coronado");
+                        localStorage.setItem('esAdminHub', 'true');
+
                         $scope.cargandoLogin = false;
                         $scope.loginError = false;
-                        $scope.registrarLog("Inicio Sesión Hub", "Acceso Administrador Maestro");
+                        $scope.registrarLog("Inicio Sesión Hub", "Acceso Maestro");
                         $scope.sincronizarFirebase();
                     });
                     return;
@@ -691,6 +708,11 @@
                             $scope.sesionIniciada = true;
                             $scope.esAdmin = (userData.rol === 'admin');
                             $scope.usuarioSesion = userData.nombre || u;
+
+                            localStorage.setItem('sesionIniciadaHub', 'true');
+                            localStorage.setItem('usuarioSesionHub', $scope.usuarioSesion);
+                            localStorage.setItem('esAdminHub', $scope.esAdmin ? 'true' : 'false');
+
                             $scope.loginError = false;
                             $scope.registrarLog("Inicio Sesión Hub", "Acceso Exitoso");
                             $scope.sincronizarFirebase();
@@ -709,6 +731,9 @@
             };
 
             $scope.cerrarSesion = function() {
+                localStorage.removeItem('sesionIniciadaHub');
+                localStorage.removeItem('usuarioSesionHub');
+                localStorage.removeItem('esAdminHub');
                 $scope.sesionIniciada = false;
             };
 
@@ -750,6 +775,16 @@
                     }).then(() => {
                         $scope.registrarLog("Publicación Consulta", $scope.nuevaConsulta.titulo);
                         $scope.$evalAsync(function() { $scope.nuevaConsulta = {}; });
+                    });
+                }
+            };
+
+            $scope.eliminarAudioConsulta = function(item) {
+                if (confirm("¿Eliminar la nota de voz de esta consulta?")) {
+                    db.collection("consultas_gerenciales").doc(item.id).update({
+                        audioUrl: ""
+                    }).then(() => {
+                        $scope.registrarLog("Eliminación Audio Consulta", item.titulo);
                     });
                 }
             };

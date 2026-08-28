@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz de Seguimiento Operativo v20.6 Mobile-Executive</title>
+    <title>Matriz de Seguimiento Operativo v20.7 Persistent Executive</title>
 
     <!-- Frameworks & Firebase SDKs -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -113,7 +113,7 @@
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
 
-    <!-- LOGIN CLARO -->
+    <!-- LOGIN CLARO (PERSISTENTE) -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30 login-logo-animated">
@@ -121,7 +121,7 @@
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Matriz Operativa</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Mobile-Executive v20.6</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">v20.7 Persistent Edition</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
@@ -273,7 +273,7 @@
                             </div>
                         </div>
 
-                        <!-- ADJUNTOS MULTIMEDIA MÓVIL OPTIMIZADOS -->
+                        <!-- ADJUNTOS MULTIMEDIA PC/MÓVIL -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                             <div>
                                 <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">📄 Adjuntar Documento de Soporte (Word, Excel, PDF):</label>
@@ -282,7 +282,7 @@
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Grabar Avance por Voz (Móvil/PC):</label>
+                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Grabar Avance por Voz (PC / Móvil):</label>
                                 <div class="flex items-center gap-2">
                                     <button type="button" ng-click="toggleGrabarAudio()" class="w-full py-3 rounded-xl font-bold text-xs uppercase shadow-sm transition" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-blue-600 text-white': !grabandoAudio}">
                                         {{ grabandoAudio ? '⏹ Detener Grabación' : '🎤 Iniciar Nota de Voz' }}
@@ -299,7 +299,7 @@
                     </form>
                 </div>
 
-                <!-- TABLA MATRIZ CON SCROLL TÁCTIL -->
+                <!-- TABLA MATRIZ -->
                 <div class="card-light p-4 sm:p-6 space-y-4">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-100 pb-3">
                         <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">📋 Registro General de la Matriz</h3>
@@ -370,7 +370,7 @@
                 </div>
             </div>
 
-            <!-- MODAL DE EDICIÓN DE ACTIVIDAD -->
+            <!-- MODAL DE EDICIÓN -->
             <div ng-show="modalEdicionAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
                 <div class="card-light p-6 max-w-lg w-full space-y-4 border border-slate-200 shadow-2xl">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -496,7 +496,7 @@
                             <input type="text" ng-model="formUsu.nombre" required placeholder="Nombre Completo" class="input-light w-full">
                             <input type="text" ng-model="formUsu.usuario" required placeholder="Usuario" class="input-light w-full">
                             <input type="password" ng-model="formUsu.password" required placeholder="Contraseña" class="input-light w-full">
-                            <input type="text" ng-model="formUsu.extension" placeholder="Extensión Telefónica (ej: 4123)" class="input-light w-full">
+                            <input type="text" ng-model="formUsu.extension" placeholder="Extensión Telefónica" class="input-light w-full">
                             
                             <select ng-model="formUsu.rol" required class="input-light w-full">
                                 <option value="operador">Operador (3 Gerencias)</option>
@@ -523,7 +523,7 @@
 
         </main>
 
-        <!-- BARRA FLOTANTE NAVEGACIÓN MÓVIL (MOBILE APP BAR) -->
+        <!-- BARRA FLOTANTE MÓVIL -->
         <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 px-2 py-1 flex justify-around items-center shadow-lg">
             <button class="mobile-nav-btn" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="cambiarSeccion('matriz')">
                 <span class="text-lg">📋</span>
@@ -544,7 +544,7 @@
         </nav>
     </div>
 
-    <!-- SCRIPT FIREBASE & LOGICA ANGULARJS -->
+    <!-- SCRIPT FIREBASE & ANGULARJS PERSISTENTE -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -562,12 +562,15 @@
         var app = angular.module('matrizApp', []);
 
         app.controller('MatrizController', function($scope, $sce, $timeout) {
-            $scope.sesionIniciada = false;
-            $scope.cargandoLogin = false;
-            $scope.esSuperAdmin = false;
-            $scope.usuarioSesion = "";
-            $scope.rolUsuario = "";
+            // VERIFICACIÓN E INICIALIZACIÓN DE SESIÓN PERSISTENTE
+            let sesionGuardada = localStorage.getItem('sesionIniciadaMatriz') === 'true';
+            $scope.sesionIniciada = sesionGuardada;
+            $scope.usuarioSesion = localStorage.getItem('usuarioSesionMatriz') || "";
+            $scope.rolUsuario = localStorage.getItem('rolUsuarioMatriz') || "";
+            $scope.esSuperAdmin = localStorage.getItem('esSuperAdminMatriz') === 'true';
             $scope.seccionActiva = localStorage.getItem('seccionActivaMatriz') || 'matriz';
+            
+            $scope.cargandoLogin = false;
             $scope.modalEdicionAbierto = false;
 
             $scope.actividadesVisibles = [];
@@ -579,6 +582,10 @@
 
             $scope.grabandoAudio = false;
             let mediaRecorder, audioChunks = [];
+
+            if ($scope.sesionIniciada) {
+                $timeout(function() { $scope.sincronizarFirebase(); });
+            }
 
             $scope.cambiarSeccion = function(seccion) {
                 $scope.seccionActiva = seccion;
@@ -613,9 +620,15 @@
                         $scope.esSuperAdmin = true;
                         $scope.usuarioSesion = "Luis Coronado";
                         $scope.rolUsuario = "admin_master";
+                        
+                        localStorage.setItem('sesionIniciadaMatriz', 'true');
+                        localStorage.setItem('usuarioSesionMatriz', "Luis Coronado");
+                        localStorage.setItem('rolUsuarioMatriz', "admin_master");
+                        localStorage.setItem('esSuperAdminMatriz', 'true');
+
                         $scope.cargandoLogin = false;
                         $scope.loginError = false;
-                        $scope.registrarLog("Inicio de Sesión", "Ingreso como admin_master");
+                        $scope.registrarLog("Inicio Sesión Matriz", "Acceso Maestro");
                         $scope.sincronizarFirebase();
                     });
                     return;
@@ -639,8 +652,14 @@
                             $scope.rolUsuario = userData.rol || 'operador';
                             $scope.usuarioSesion = userData.nombre || u;
                             $scope.esSuperAdmin = (userData.rol === 'admin');
+
+                            localStorage.setItem('sesionIniciadaMatriz', 'true');
+                            localStorage.setItem('usuarioSesionMatriz', $scope.usuarioSesion);
+                            localStorage.setItem('rolUsuarioMatriz', $scope.rolUsuario);
+                            localStorage.setItem('esSuperAdminMatriz', $scope.esSuperAdmin ? 'true' : 'false');
+
                             $scope.loginError = false;
-                            $scope.registrarLog("Inicio de Sesión", "Ingreso al sistema");
+                            $scope.registrarLog("Inicio Sesión Matriz", "Acceso Exitoso");
                             $scope.sincronizarFirebase();
                         } else {
                             $scope.loginError = true;
@@ -657,11 +676,11 @@
             };
 
             $scope.cerrarSesion = function() {
+                localStorage.removeItem('sesionIniciadaMatriz');
+                localStorage.removeItem('usuarioSesionMatriz');
+                localStorage.removeItem('rolUsuarioMatriz');
+                localStorage.removeItem('esSuperAdminMatriz');
                 $scope.sesionIniciada = false;
-                $scope.loginUser = "";
-                $scope.loginPass = "";
-                $scope.loginError = false;
-                $scope.limpiarFormularioNuevaActividad();
             };
 
             $scope.limpiarFormularioNuevaActividad = function() {
@@ -719,7 +738,7 @@
                         };
                         mediaRecorder.start();
                         $scope.$evalAsync(function() { $scope.grabandoAudio = true; });
-                    }).catch(err => alert("Error al activar micrófono en el dispositivo: " + err.message));
+                    }).catch(err => alert("Error al activar micrófono: " + err.message));
                 } else {
                     mediaRecorder.stop();
                     $scope.grabandoAudio = false;
