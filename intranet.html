@@ -107,7 +107,7 @@
         </div>
     </div>
 
-    <!-- LOGIN PERSISTENTE CON ACCESO DIRECTO DE EMERGENCIA -->
+    <!-- LOGIN CON CAMPOS LIMPIOS Y SEGUROS -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30">
@@ -115,25 +115,25 @@
             </div>
             <div>
                 <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant v21.1</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant v22.0</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-3 pt-2 text-left">
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Código de Empresa (Tenant ID)</label>
-                    <input type="text" id="inputTenantHub" ng-model="loginTenant" placeholder="GL-MONITOREO" class="input-light w-full text-center font-bold uppercase">
+                    <input type="text" id="inputTenantHub" ng-model="loginTenant" placeholder="Ingresa el código de empresa" class="input-light w-full text-center font-bold uppercase">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario</label>
-                    <input type="text" id="inputUserHub" ng-model="loginUser" placeholder="luis" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
+                    <input type="text" id="inputUserHub" ng-model="loginUser" placeholder="Ingresa tu usuario" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña</label>
-                    <input type="password" id="inputPassHub" ng-model="loginPass" placeholder="control2026" required autocomplete="current-password" class="input-light w-full text-center font-bold">
+                    <input type="password" id="inputPassHub" ng-model="loginPass" placeholder="••••••••" required autocomplete="current-password" class="input-light w-full text-center font-bold">
                 </div>
 
                 <button type="submit" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition mt-2">
-                    {{ cargandoLogin ? 'Iniciando Sesión...' : 'Ingresar al Hub' }}
+                    {{ cargandoLogin ? 'Verificando acceso...' : 'Ingresar al Hub' }}
                 </button>
             </form>
 
@@ -619,7 +619,7 @@
         </nav>
     </div>
 
-    <!-- SCRIPT FIREBASE AUTO-MIGRACIÓN INVISIBLE -->
+    <!-- SCRIPT FIREBASE CON AUTENTICACIÓN SEGURA Y PRIVADA -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -629,6 +629,7 @@
   messagingSenderId: "791633280108",
   appId: "1:791633280108:web:c3aa0853d1271dee6b2c49"
 };
+
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -706,6 +707,7 @@
                 });
             };
 
+            // INICIO DE SESIÓN LIMPIO Y CONSULTA A FIRESTORE
             $scope.iniciarSesion = function(event) {
                 if (event) event.preventDefault();
 
@@ -713,36 +715,13 @@
                 var valUser = ($scope.loginUser || "").trim().toLowerCase();
                 var valPass = ($scope.loginPass || "").trim();
 
+                if (!valUser || !valPass) {
+                    $scope.loginError = true;
+                    return;
+                }
+
                 $scope.cargandoLogin = true;
                 $scope.loginError = false;
-
-                // ACCESO MAESTRO Y DE EMERGENCIA
-                if (valUser === 'luis' && valPass === 'control2026') {
-                    $scope.$evalAsync(function() {
-                        $scope.sesionIniciada = true;
-                        $scope.esAdmin = true;
-                        $scope.usuarioSesion = "Luis Coronado";
-                        $scope.tenantIdActual = "GL-MONITOREO";
-                        $scope.nombreEmpresaActual = "GL Monitoreo y OP de Servicios";
-
-                        localStorage.setItem('sesionIniciadaHub', 'true');
-                        localStorage.setItem('usuarioSesionHub', "Luis Coronado");
-                        localStorage.setItem('esAdminHub', 'true');
-                        localStorage.setItem('tenantIdHub', "GL-MONITOREO");
-                        localStorage.setItem('nombreEmpresaHub', "GL Monitoreo y OP de Servicios");
-
-                        $scope.cargandoLogin = false;
-                        $scope.loginError = false;
-                        $scope.registrarLog("Inicio Sesión Hub", "Acceso Maestro GL Monitoreo");
-                        $scope.sincronizarFirebase();
-                    });
-                    return;
-                }
-
-                if (!valUser || !valPass) {
-                    $scope.$evalAsync(function() { $scope.cargandoLogin = false; $scope.loginError = true; });
-                    return;
-                }
 
                 db.collection("personal_intranet")
                 .where("usuario", "==", valUser)
@@ -752,8 +731,7 @@
                     $scope.$evalAsync(function() {
                         $scope.cargandoLogin = false;
                         if (!snapshot.empty) {
-                            let docRef = snapshot.docs[0];
-                            let userData = docRef.data();
+                            let userData = snapshot.docs[0].data();
 
                             $scope.sesionIniciada = true;
                             $scope.esAdmin = (userData.rol === 'admin' || userData.rol === 'admin_master');
@@ -776,8 +754,11 @@
                     });
                 })
                 .catch(function(error) {
-                    console.error("Error Firebase:", error);
-                    $scope.$evalAsync(function() { $scope.cargandoLogin = false; $scope.loginError = true; });
+                    console.error("Error al conectar con Firebase:", error);
+                    $scope.$evalAsync(function() { 
+                        $scope.cargandoLogin = false; 
+                        $scope.loginError = true; 
+                    });
                 });
             };
 
