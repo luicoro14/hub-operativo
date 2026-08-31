@@ -107,7 +107,7 @@
         </div>
     </div>
 
-    <!-- LOGIN CON CAMPOS LIMPIOS Y SEGUROS -->
+    <!-- LOGIN CON CAMPOS LIMPIOS -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30">
@@ -115,7 +115,7 @@
             </div>
             <div>
                 <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant v22.0</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant v22.1</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-3 pt-2 text-left">
@@ -619,7 +619,7 @@
         </nav>
     </div>
 
-    <!-- SCRIPT FIREBASE CON AUTENTICACIÓN SEGURA Y PRIVADA -->
+    <!-- SCRIPT FIREBASE CON AUTENTICACIÓN MEJORADA -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -707,7 +707,7 @@
                 });
             };
 
-            // INICIO DE SESIÓN LIMPIO Y CONSULTA A FIRESTORE
+            // VALIDACIÓN ROBUSTA DE AUTENTICACIÓN
             $scope.iniciarSesion = function(event) {
                 if (event) event.preventDefault();
 
@@ -724,20 +724,28 @@
                 $scope.loginError = false;
 
                 db.collection("personal_intranet")
-                .where("usuario", "==", valUser)
-                .where("password", "==", valPass)
                 .get()
                 .then(function(snapshot) {
                     $scope.$evalAsync(function() {
                         $scope.cargandoLogin = false;
-                        if (!snapshot.empty) {
-                            let userData = snapshot.docs[0].data();
+                        let usuarioEncontrado = null;
 
+                        snapshot.forEach(function(doc) {
+                            let data = doc.data();
+                            let uDoc = (data.usuario || "").toString().trim().toLowerCase();
+                            let pDoc = (data.password || "").toString().trim();
+
+                            if (uDoc === valUser && pDoc === valPass) {
+                                usuarioEncontrado = data;
+                            }
+                        });
+
+                        if (usuarioEncontrado) {
                             $scope.sesionIniciada = true;
-                            $scope.esAdmin = (userData.rol === 'admin' || userData.rol === 'admin_master');
-                            $scope.usuarioSesion = userData.nombre || valUser;
-                            $scope.tenantIdActual = userData.empresa_id || valTenant;
-                            $scope.nombreEmpresaActual = userData.nombre_empresa || "GL Monitoreo y OP de Servicios";
+                            $scope.usuarioSesion = usuarioEncontrado.nombre || "Luis Coronado";
+                            $scope.esAdmin = (usuarioEncontrado.rol === 'admin' || usuarioEncontrado.rol === 'admin_master');
+                            $scope.tenantIdActual = usuarioEncontrado.empresa_id || valTenant;
+                            $scope.nombreEmpresaActual = usuarioEncontrado.nombre_empresa || "GL Monitoreo y OP de Servicios";
 
                             localStorage.setItem('sesionIniciadaHub', 'true');
                             localStorage.setItem('usuarioSesionHub', $scope.usuarioSesion);
@@ -754,7 +762,7 @@
                     });
                 })
                 .catch(function(error) {
-                    console.error("Error al conectar con Firebase:", error);
+                    console.error("Error al conectar con Firestore:", error);
                     $scope.$evalAsync(function() { 
                         $scope.cargandoLogin = false; 
                         $scope.loginError = true; 
