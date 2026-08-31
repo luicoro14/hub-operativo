@@ -117,7 +117,7 @@
         </div>
     </div>
 
-    <!-- LOGIN CON SELECCIÓN / AUTO-CONFIG GL MONITOREO -->
+    <!-- LOGIN CON ACCESO DIRECTO DE EMERGENCIA -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30">
@@ -125,7 +125,7 @@
             </div>
             <div>
                 <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Matriz Operativa Multi-Tenant v21.0</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Matriz Operativa Multi-Tenant v21.1</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-3 pt-2 text-left">
@@ -135,15 +135,15 @@
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario</label>
-                    <input type="text" id="inputUser" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
+                    <input type="text" id="inputUser" ng-model="loginUser" placeholder="luis" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña</label>
-                    <input type="password" id="inputPass" ng-model="loginPass" placeholder="Contraseña" required autocomplete="current-password" class="input-light w-full text-center font-bold">
+                    <input type="password" id="inputPass" ng-model="loginPass" placeholder="control2026" required autocomplete="current-password" class="input-light w-full text-center font-bold">
                 </div>
 
-                <button type="button" ng-click="iniciarSesion($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition mt-2">
-                    {{ cargandoLogin ? 'Sincronizando Empresa...' : 'Ingresar a la Plataforma' }}
+                <button type="submit" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition mt-2">
+                    {{ cargandoLogin ? 'Iniciando Sesión...' : 'Ingresar a la Plataforma' }}
                 </button>
             </form>
 
@@ -567,7 +567,7 @@
         </nav>
     </div>
 
-    <!-- SCRIPT FIREBASE MULTI-TENANT & AUTO-MIGRACIÓN -->
+    <!-- SCRIPT FIREBASE MULTI-TENANT & ACCESO DIRECTO -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -577,7 +577,6 @@
   messagingSenderId: "791633280108",
   appId: "1:791633280108:web:c3aa0853d1271dee6b2c49"
 };
-
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -664,7 +663,7 @@
                 });
             };
 
-            // INICIO SESIÓN COMPATIBLE HISTÓRICO
+            // VALIDACIÓN FLEXIBLE DE CREDENCIALES Y ACCESO DIRECTO
             $scope.iniciarSesion = function(event) {
                 if (event) event.preventDefault();
 
@@ -675,21 +674,22 @@
                 $scope.cargandoLogin = true;
                 $scope.loginError = false;
 
+                // ACCESO MAESTRO Y DE EMERGENCIA
                 if (valUser === 'luis' && valPass === 'control2026') {
                     $scope.$evalAsync(function() {
                         $scope.sesionIniciada = true;
                         $scope.esSuperAdmin = true;
                         $scope.usuarioSesion = "Luis Coronado";
                         $scope.rolUsuario = "admin_master";
-                        $scope.tenantIdActual = valTenant;
+                        $scope.tenantIdActual = "GL-MONITOREO";
                         $scope.nombreEmpresaActual = "GL Monitoreo y OP de Servicios";
                         
                         localStorage.setItem('sesionIniciadaMatriz', 'true');
                         localStorage.setItem('usuarioSesionMatriz', "Luis Coronado");
                         localStorage.setItem('rolUsuarioMatriz', "admin_master");
                         localStorage.setItem('esSuperAdminMatriz', 'true');
-                        localStorage.setItem('tenantIdMatriz', $scope.tenantIdActual);
-                        localStorage.setItem('nombreEmpresaMatriz', $scope.nombreEmpresaActual);
+                        localStorage.setItem('tenantIdMatriz', "GL-MONITOREO");
+                        localStorage.setItem('nombreEmpresaMatriz', "GL Monitoreo y OP de Servicios");
 
                         $scope.cargandoLogin = false;
                         $scope.loginError = false;
@@ -714,18 +714,11 @@
                         if (!snapshot.empty) {
                             let docRef = snapshot.docs[0];
                             let userData = docRef.data();
-                            
-                            if (!userData.empresa_id) {
-                                db.collection("personal_intranet").doc(docRef.id).update({
-                                    empresa_id: "GL-MONITOREO",
-                                    nombre_empresa: "GL Monitoreo y OP de Servicios"
-                                });
-                            }
 
                             $scope.sesionIniciada = true;
                             $scope.rolUsuario = userData.rol || 'operador';
                             $scope.usuarioSesion = userData.nombre || valUser;
-                            $scope.esSuperAdmin = (userData.rol === 'admin');
+                            $scope.esSuperAdmin = (userData.rol === 'admin' || userData.rol === 'admin_master');
                             $scope.tenantIdActual = userData.empresa_id || valTenant;
                             $scope.nombreEmpresaActual = userData.nombre_empresa || "GL Monitoreo y OP de Servicios";
 
@@ -837,7 +830,7 @@
                 }
             };
 
-            // SINCRONIZACIÓN Y AUTO-MIGRACIÓN INVISIBLE
+            // SINCRONIZACIÓN GENERAL
             $scope.sincronizarFirebase = function() {
                 let inicioSnapshot = true;
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
