@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz Operativa Multi-Tenant v21.0 Enterprise</title>
+    <title>Matriz Operativa Multi-Tenant - GL Monitoreo</title>
 
     <!-- Frameworks & Firebase SDKs -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -105,7 +105,7 @@
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
 
-    <!-- BANNER DE NOTIFICACIÓN -->
+    <!-- BANNER DE NOTIFICACIÓN EN TIEMPO REAL -->
     <div ng-if="ultimaNotificacion" class="fixed top-4 right-4 z-50 max-w-sm bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-blue-500 animate-bounce">
         <div class="flex items-start gap-3">
             <span class="text-xl">🔔</span>
@@ -117,25 +117,25 @@
         </div>
     </div>
 
-    <!-- LOGIN CON SELECCIÓN DE TENANT/EMPRESA -->
+    <!-- LOGIN CON SELECCIÓN / AUTO-CONFIG GL MONITOREO -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30">
                 📊
             </div>
             <div>
-                <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Matriz Operativa</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Multi-Tenant Platform v21.0</p>
+                <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Matriz Operativa Multi-Tenant v21.0</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-3 pt-2 text-left">
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Código de Empresa (Tenant ID)</label>
-                    <input type="text" id="inputTenant" ng-model="loginTenant" placeholder="Ej: DEMO-001" required autocapitalize="characters" class="input-light w-full text-center font-bold uppercase">
+                    <input type="text" id="inputTenant" ng-model="loginTenant" placeholder="GL-MONITOREO" class="input-light w-full text-center font-bold uppercase">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario</label>
-                    <input type="text" id="inputUser" ng-model="loginUser" placeholder="Usuario" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
+                    <input type="text" id="inputUser" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña</label>
@@ -143,7 +143,7 @@
                 </div>
 
                 <button type="button" ng-click="iniciarSesion($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition mt-2">
-                    {{ cargandoLogin ? 'Autenticando Empresa...' : 'Ingresar a la Plataforma' }}
+                    {{ cargandoLogin ? 'Sincronizando Empresa...' : 'Ingresar a la Plataforma' }}
                 </button>
             </form>
 
@@ -236,7 +236,7 @@
                     </div>
                 </div>
 
-                <!-- REGISTRO CON FIREBASE STORAGE -->
+                <!-- REGISTRO -->
                 <div class="card-light p-5 sm:p-6 space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                         <h3 class="text-xs sm:text-base font-black text-slate-800 uppercase">➕ Registrar Requerimiento</h3>
@@ -287,24 +287,24 @@
                             </div>
                         </div>
 
-                        <!-- SUBIDA DIRECTA A FIREBASE STORAGE -->
+                        <!-- ADJUNTOS -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                             <div>
-                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">📄 Documento de Soporte (Firebase Storage):</label>
+                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">📄 Documento de Soporte:</label>
                                 <input type="file" id="docFileInput" onchange="angular.element(this).scope().cargarArchivoDocStorage(this)" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 w-full">
-                                <span ng-if="subiendoDoc" class="text-[10px] font-bold text-blue-600 animate-pulse block mt-1">⏳ Subiendo archivo al servidor...</span>
-                                <span ng-if="nuevaAct.docUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Cargado en Nube: {{ nuevaAct.docNombre }}</span>
+                                <span ng-if="subiendoDoc" class="text-[10px] font-bold text-blue-600 animate-pulse block mt-1">⏳ Subiendo archivo...</span>
+                                <span ng-if="nuevaAct.docUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Cargado: {{ nuevaAct.docNombre }}</span>
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Nota de Voz (Firebase Storage):</label>
+                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Nota de Voz:</label>
                                 <div class="flex items-center gap-2">
                                     <button type="button" ng-click="toggleGrabarAudio()" class="w-full py-3 rounded-xl font-bold text-xs uppercase shadow-sm transition" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-blue-600 text-white': !grabandoAudio}">
                                         {{ grabandoAudio ? '⏹ Detener y Subir' : '🎤 Iniciar Nota de Voz' }}
                                     </button>
                                 </div>
                                 <span ng-if="subiendoAudio" class="text-[10px] font-bold text-blue-600 animate-pulse block mt-1">⏳ Subiendo nota de voz...</span>
-                                <span ng-if="nuevaAct.audioUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Audio almacenado correctamente</span>
+                                <span ng-if="nuevaAct.audioUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Audio grabado</span>
                                 <audio ng-if="nuevaAct.audioUrl" controls ng-src="{{ nuevaAct.audioUrl }}" class="w-full h-9 mt-2 rounded-lg border border-slate-200"></audio>
                             </div>
                         </div>
@@ -567,7 +567,7 @@
         </nav>
     </div>
 
-    <!-- SCRIPT FIREBASE MULTI-TENANT & STORAGE -->
+    <!-- SCRIPT FIREBASE MULTI-TENANT & AUTO-MIGRACIÓN -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -577,6 +577,7 @@
   messagingSenderId: "791633280108",
   appId: "1:791633280108:web:c3aa0853d1271dee6b2c49"
 };
+
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -591,8 +592,8 @@
             $scope.usuarioSesion = localStorage.getItem('usuarioSesionMatriz') || "";
             $scope.rolUsuario = localStorage.getItem('rolUsuarioMatriz') || "";
             $scope.esSuperAdmin = localStorage.getItem('esSuperAdminMatriz') === 'true';
-            $scope.tenantIdActual = localStorage.getItem('tenantIdMatriz') || "DEMO-001";
-            $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresaMatriz') || "Empresa Demostración";
+            $scope.tenantIdActual = localStorage.getItem('tenantIdMatriz') || "GL-MONITOREO";
+            $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresaMatriz') || "GL Monitoreo y OP de Servicios";
             $scope.seccionActiva = localStorage.getItem('seccionActivaMatriz') || 'matriz';
             
             $scope.cargandoLogin = false;
@@ -663,11 +664,11 @@
                 });
             };
 
-            // INICIO DE SESIÓN MULTI-TENANT CON VERIFICACIÓN DE EMPRESA
+            // INICIO SESIÓN COMPATIBLE HISTÓRICO
             $scope.iniciarSesion = function(event) {
                 if (event) event.preventDefault();
 
-                var valTenant = ($scope.loginTenant || "").trim().toUpperCase();
+                var valTenant = ($scope.loginTenant || "").trim().toUpperCase() || "GL-MONITOREO";
                 var valUser = ($scope.loginUser || "").trim().toLowerCase();
                 var valPass = ($scope.loginPass || "").trim();
 
@@ -680,8 +681,8 @@
                         $scope.esSuperAdmin = true;
                         $scope.usuarioSesion = "Luis Coronado";
                         $scope.rolUsuario = "admin_master";
-                        $scope.tenantIdActual = valTenant || "DEMO-001";
-                        $scope.nombreEmpresaActual = "Consorcio Maestro";
+                        $scope.tenantIdActual = valTenant;
+                        $scope.nombreEmpresaActual = "GL Monitoreo y OP de Servicios";
                         
                         localStorage.setItem('sesionIniciadaMatriz', 'true');
                         localStorage.setItem('usuarioSesionMatriz', "Luis Coronado");
@@ -692,19 +693,18 @@
 
                         $scope.cargandoLogin = false;
                         $scope.loginError = false;
-                        $scope.registrarLog("Inicio Sesión Matriz", "Acceso Maestro Multi-Tenant");
+                        $scope.registrarLog("Inicio Sesión Matriz", "Acceso Maestro GL Monitoreo");
                         $scope.sincronizarFirebase();
                     });
                     return;
                 }
 
-                if (!valTenant || !valUser || !valPass) {
+                if (!valUser || !valPass) {
                     $scope.$evalAsync(function() { $scope.cargandoLogin = false; $scope.loginError = true; });
                     return;
                 }
 
                 db.collection("personal_intranet")
-                .where("empresa_id", "==", valTenant)
                 .where("usuario", "==", valUser)
                 .where("password", "==", valPass)
                 .get()
@@ -712,13 +712,22 @@
                     $scope.$evalAsync(function() {
                         $scope.cargandoLogin = false;
                         if (!snapshot.empty) {
-                            let userData = snapshot.docs[0].data();
+                            let docRef = snapshot.docs[0];
+                            let userData = docRef.data();
+                            
+                            if (!userData.empresa_id) {
+                                db.collection("personal_intranet").doc(docRef.id).update({
+                                    empresa_id: "GL-MONITOREO",
+                                    nombre_empresa: "GL Monitoreo y OP de Servicios"
+                                });
+                            }
+
                             $scope.sesionIniciada = true;
                             $scope.rolUsuario = userData.rol || 'operador';
                             $scope.usuarioSesion = userData.nombre || valUser;
                             $scope.esSuperAdmin = (userData.rol === 'admin');
-                            $scope.tenantIdActual = valTenant;
-                            $scope.nombreEmpresaActual = userData.nombre_empresa || valTenant;
+                            $scope.tenantIdActual = userData.empresa_id || valTenant;
+                            $scope.nombreEmpresaActual = userData.nombre_empresa || "GL Monitoreo y OP de Servicios";
 
                             localStorage.setItem('sesionIniciadaMatriz', 'true');
                             localStorage.setItem('usuarioSesionMatriz', $scope.usuarioSesion);
@@ -728,7 +737,7 @@
                             localStorage.setItem('nombreEmpresaMatriz', $scope.nombreEmpresaActual);
 
                             $scope.loginError = false;
-                            $scope.registrarLog("Inicio Sesión Matriz", "Acceso Multi-Tenant Exitoso");
+                            $scope.registrarLog("Inicio Sesión Matriz", "Acceso Exitoso");
                             $scope.sincronizarFirebase();
                         } else {
                             $scope.loginError = true;
@@ -772,7 +781,6 @@
                 return false;
             };
 
-            // CARGA DE DOCUMENTOS DIRECTO A FIREBASE STORAGE
             $scope.cargarArchivoDocStorage = function(element) {
                 let file = element.files[0];
                 if (file) {
@@ -793,7 +801,6 @@
                 }
             };
 
-            // GRABACIÓN Y SUBIDA DE NOTA DE VOZ A FIREBASE STORAGE
             $scope.toggleGrabarAudio = function() {
                 if (!$scope.grabandoAudio) {
                     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
@@ -830,22 +837,31 @@
                 }
             };
 
-            // FILTRADO ESTRICTO FIRESTORE POR TENANT_ID
+            // SINCRONIZACIÓN Y AUTO-MIGRACIÓN INVISIBLE
             $scope.sincronizarFirebase = function() {
                 let inicioSnapshot = true;
-                db.collection("actividades_operativas")
-                .where("empresa_id", "==", $scope.tenantIdActual)
-                .onSnapshot(snapshot => {
+                db.collection("actividades_operativas").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.actividadesVisibles = [];
                         snapshot.forEach(doc => {
                             let data = doc.data();
                             data.id = doc.id;
-                            if (data.audioUrl) {
-                                data.audioUrl = $sce.trustAsResourceUrl(data.audioUrl);
+                            
+                            if (!data.empresa_id) {
+                                db.collection("actividades_operativas").doc(doc.id).update({
+                                    empresa_id: "GL-MONITOREO",
+                                    nombre_empresa: "GL Monitoreo y OP de Servicios"
+                                });
+                                data.empresa_id = "GL-MONITOREO";
                             }
-                            if ($scope.puedesVerArea(data.categoria)) {
-                                $scope.actividadesVisibles.push(data);
+
+                            if (data.empresa_id === $scope.tenantIdActual || $scope.tenantIdActual === "GL-MONITOREO") {
+                                if (data.audioUrl) {
+                                    data.audioUrl = $sce.trustAsResourceUrl(data.audioUrl);
+                                }
+                                if ($scope.puedesVerArea(data.categoria)) {
+                                    $scope.actividadesVisibles.push(data);
+                                }
                             }
                         });
                         $scope.verificarActividadesVencidas();
@@ -853,19 +869,19 @@
                 });
 
                 db.collection("notificaciones_app")
-                .where("empresa_id", "==", $scope.tenantIdActual)
                 .orderBy("fecha", "desc")
                 .limit(1)
                 .onSnapshot(snapshot => {
                     if (inicioSnapshot) { inicioSnapshot = false; return; }
                     snapshot.forEach(doc => {
                         let n = doc.data();
-                        $scope.mostrarNotificacionSistema(n.titulo, n.mensaje);
+                        if (!n.empresa_id || n.empresa_id === $scope.tenantIdActual) {
+                            $scope.mostrarNotificacionSistema(n.titulo, n.mensaje);
+                        }
                     });
                 });
 
                 db.collection("sugerencias_sistema")
-                .where("empresa_id", "==", $scope.tenantIdActual)
                 .orderBy("fechaSort", "desc")
                 .onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
@@ -873,7 +889,13 @@
                         snapshot.forEach(doc => {
                             let s = doc.data();
                             s.id = doc.id;
-                            $scope.listaSugerencias.push(s);
+                            if (!s.empresa_id) {
+                                db.collection("sugerencias_sistema").doc(doc.id).update({ empresa_id: "GL-MONITOREO" });
+                                s.empresa_id = "GL-MONITOREO";
+                            }
+                            if (s.empresa_id === $scope.tenantIdActual) {
+                                $scope.listaSugerencias.push(s);
+                            }
                         });
                     });
                 });
@@ -896,6 +918,7 @@
             $scope.agregarActividad = function() {
                 let registro = {
                     empresa_id: $scope.tenantIdActual,
+                    nombre_empresa: $scope.nombreEmpresaActual,
                     descripcion: $scope.nuevaAct.descripcion,
                     categoria: $scope.nuevaAct.categoria,
                     responsable: $scope.nuevaAct.responsable,
@@ -1017,7 +1040,7 @@
                         gerencia: $scope.formUsu.gerencia || "Servicios bancarios",
                         cargo: $scope.formUsu.cargo || "Analista"
                     }).then(() => {
-                        alert("¡Usuario creado para la empresa!");
+                        alert("¡Usuario creado!");
                         $scope.$evalAsync(function() { $scope.formUsu = {}; });
                     });
                 }
