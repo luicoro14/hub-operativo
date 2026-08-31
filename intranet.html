@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Operativo v20.7 Persistent Executive</title>
+    <title>Hub Operativo v20.8 Commercial Ready</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
@@ -90,20 +90,11 @@
             color: #2563EB;
             background-color: #EFF6FF;
         }
-
-        .login-logo-animated {
-            animation: floatLogo 3s infinite ease-in-out;
-        }
-
-        @keyframes floatLogo {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(-2deg); }
-        }
     </style>
 </head>
 <body ng-app="hubApp" ng-controller="HubController">
 
-    <!-- BANNER DE NOTIFICACIÓN EN TIEMPO REAL -->
+    <!-- BANNER NOTIFICACIONES -->
     <div ng-if="ultimaNotificacion" class="fixed top-4 right-4 z-50 max-w-sm bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-blue-500 animate-bounce">
         <div class="flex items-start gap-3">
             <span class="text-xl">🔔</span>
@@ -115,20 +106,20 @@
         </div>
     </div>
 
-    <!-- LOGIN CLARO (PERSISTENTE) -->
+    <!-- LOGIN PERSISTENTE -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
-            <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30 login-logo-animated">
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30">
                 🏢
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Hub Operativo</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">v20.7 Persistent Edition</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">v20.8 Executive Edition</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
-                <input type="text" id="inputUserHub" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" class="input-light w-full text-center font-bold">
-                <input type="password" id="inputPassHub" ng-model="loginPass" placeholder="Contraseña" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="current-password" class="input-light w-full text-center font-bold">
+                <input type="text" id="inputUserHub" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
+                <input type="password" id="inputPassHub" ng-model="loginPass" placeholder="Contraseña" required autocomplete="current-password" class="input-light w-full text-center font-bold">
 
                 <button type="button" ng-click="iniciarSesion($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
                     {{ cargandoLogin ? 'Verificando...' : 'Ingresar al Hub' }}
@@ -221,7 +212,7 @@
                 </div>
             </section>
 
-            <!-- 2. MODULO CONSULTAS CON BORRADO DE AUDIO ADMINISTRATIVO -->
+            <!-- 2. MODULO CONSULTAS -->
             <section ng-show="moduloActivo === 'consultas'" class="space-y-6">
                 <div class="text-center max-w-lg mx-auto">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">🎙 Consultas & Instrucciones Gerenciales</h2>
@@ -334,7 +325,7 @@
                 </div>
             </section>
 
-            <!-- 5. MODULO MURAL SOCIAL (FEED ABIERTO E INTERACTIVO / IMÁGENES COMPRIMIDAS) -->
+            <!-- 5. MODULO MURAL SOCIAL -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6">
                 <div class="text-center max-w-lg mx-auto">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">💬 Mural Interactivo Social</h2>
@@ -344,15 +335,15 @@
                 <div class="max-w-2xl mx-auto space-y-6">
                     <div class="card-light p-5 space-y-4">
                         <form ng-submit="publicarEnMural()" class="space-y-3">
-                            <textarea ng-model="nuevoPost.texto" required placeholder="Escribe una actualización o anuncio (sin límite de publicaciones)..." class="input-light w-full resize-none" rows="3"></textarea>
+                            <textarea ng-model="nuevoPost.texto" required placeholder="Escribe una actualización..." class="input-light w-full resize-none" rows="3"></textarea>
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <div>
-                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">📷 Imagen / Video (Optimizado Móvil)</label>
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">📷 Imagen / Video (Optimizado)</label>
                                     <input type="file" id="muralFileInput" accept="image/*,video/*" onchange="angular.element(this).scope().cargandoArchivoMural(this)" class="text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-600 w-full">
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">🔗 URL Enlace (Opcional)</label>
+                                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">🔗 URL Enlace</label>
                                     <input type="text" ng-model="nuevoPost.mediaUrl" placeholder="https://..." class="input-light w-full">
                                 </div>
                             </div>
@@ -363,7 +354,6 @@
                         </form>
                     </div>
 
-                    <!-- FEED DE PUBLICACIONES -->
                     <div class="space-y-4">
                         <div class="card-light p-5 space-y-3" ng-repeat="post in muroPosts">
                             <div class="flex justify-between items-center">
@@ -375,8 +365,7 @@
                                     </div>
                                 </div>
 
-                                <!-- SOLAMENTE EL AUTOR O EL ADMINISTRADOR PUEDEN ELIMINAR LA PUBLICACIÓN -->
-                                <button ng-show="puedesEliminarPost(post)" ng-click="eliminarPostMural(post.id)" class="text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-lg border border-red-200 hover:bg-red-100 transition">
+                                <button type="button" ng-show="puedesEliminarPost(post)" ng-click="eliminarPostMural(post.id)" class="text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-lg border border-red-200 hover:bg-red-100 transition">
                                     🗑 Borrar
                                 </button>
                             </div>
@@ -423,7 +412,7 @@
                 </div>
             </section>
 
-            <!-- 6. MODULO LOGS DE AUDITORÍA -->
+            <!-- 6. MODULO LOGS AUDITORÍA -->
             <section ng-show="moduloActivo === 'auditoria' && esAdmin" class="space-y-6">
                 <div class="card-light p-5 sm:p-6 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
@@ -462,7 +451,7 @@
                 </div>
             </section>
 
-            <!-- 7. MODULO ADMIN CON EDICIÓN DE USUARIOS -->
+            <!-- 7. MODULO ADMIN (CREACIÓN Y EDICIÓN REUTILIZABLE) -->
             <section ng-show="moduloActivo === 'admin' && esAdmin" class="space-y-6">
                 <div class="card-light p-5 sm:p-6 space-y-4">
                     <h3 class="text-sm font-black text-slate-800 uppercase">+ Crear Usuario</h3>
@@ -515,8 +504,8 @@
                                     <td class="p-3 font-mono text-slate-600 font-bold">{{ u.extension || 'N/A' }}</td>
                                     <td class="p-3 font-bold uppercase text-[10px] text-slate-500">{{ u.rol || 'operador' }}</td>
                                     <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                                        <button ng-click="abrirModalEditarUsuario(u)" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 font-bold rounded-lg border border-indigo-200 text-[10px]">✏ Modificar</button>
-                                        <button ng-click="eliminarUsuarioHub(u.id)" class="px-2.5 py-1 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 text-[10px]">🗑 Eliminar</button>
+                                        <button type="button" ng-click="abrirModalEditarUsuario(u)" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-[10px]">✏ Modificar</button>
+                                        <button type="button" ng-click="eliminarUsuarioHub(u.id)" class="px-2.5 py-1 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 text-[10px]">🗑 Eliminar</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -525,12 +514,12 @@
                 </div>
             </section>
 
-            <!-- MODAL EDITAR USUARIO -->
-            <div ng-show="modalUsuarioAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                <div class="card-light p-6 max-w-lg w-full space-y-4 border border-slate-200 shadow-2xl">
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+            <!-- MODAL EDITAR USUARIO OPTIMIZADO PARA MÓVIL Y PC -->
+            <div ng-show="modalUsuarioAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
+                <div class="card-light p-5 sm:p-6 max-w-lg w-full my-auto space-y-4 border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3 sticky top-0 bg-white z-10">
                         <h3 class="text-base font-black text-slate-800 uppercase">✏ Editar Datos de Usuario</h3>
-                        <button ng-click="modalUsuarioAbierto = false" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+                        <button type="button" ng-click="cerrarModalEditarUsuario()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
                     </div>
 
                     <form ng-submit="guardarUsuarioEditado()" class="space-y-3">
@@ -574,9 +563,9 @@
                             </select>
                         </div>
 
-                        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                            <button type="button" ng-click="modalUsuarioAbierto = false" class="py-2.5 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs uppercase">Cancelar</button>
-                            <button type="submit" class="py-2.5 px-5 rounded-xl bg-blue-600 text-white font-bold text-xs uppercase shadow-md">Guardar Usuario</button>
+                        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-3 border-t border-slate-100">
+                            <button type="button" ng-click="cerrarModalEditarUsuario()" class="w-full sm:w-auto py-2.5 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs uppercase">Cancelar</button>
+                            <button type="submit" class="w-full sm:w-auto py-2.5 px-5 rounded-xl bg-blue-600 text-white font-bold text-xs uppercase shadow-md">Guardar Usuario</button>
                         </div>
                     </form>
                 </div>
@@ -896,7 +885,6 @@
                 });
             };
 
-            // COMPRESIÓN Y OPTIMIZACIÓN DE IMÁGENES PARA DISPOSITIVOS MÓVILES
             $scope.cargandoArchivoMural = function(element) {
                 let file = element.files[0];
                 if (file) {
@@ -990,7 +978,6 @@
                 }
             };
 
-            // REGLA DE SEGURIDAD: SOLO AUTOR O ADMINISTRADOR PUEDEN ELIMINAR SU PUBLICACIÓN
             $scope.puedesEliminarPost = function(post) {
                 return $scope.usuarioSesion === 'Luis Coronado' || $scope.esAdmin || post.autor === $scope.usuarioSesion;
             };
@@ -1039,14 +1026,25 @@
                 }).sort((a, b) => b.eficiencia - a.eficiencia);
             };
 
+            // MODIFICACIÓN DE USUARIOS REUTILIZABLE
             $scope.abrirModalEditarUsuario = function(u) {
-                $scope.usuarioEdit = angular.copy(u);
-                $scope.modalUsuarioAbierto = true;
+                $scope.$evalAsync(function() {
+                    $scope.usuarioEdit = angular.copy(u);
+                    $scope.modalUsuarioAbierto = true;
+                });
+            };
+
+            $scope.cerrarModalEditarUsuario = function() {
+                $scope.$evalAsync(function() {
+                    $scope.usuarioEdit = {};
+                    $scope.modalUsuarioAbierto = false;
+                });
             };
 
             $scope.guardarUsuarioEditado = function() {
-                if ($scope.usuarioEdit.id) {
-                    db.collection("personal_intranet").doc($scope.usuarioEdit.id).update({
+                if ($scope.usuarioEdit && $scope.usuarioEdit.id) {
+                    let idUsu = $scope.usuarioEdit.id;
+                    db.collection("personal_intranet").doc(idUsu).update({
                         nombre: $scope.usuarioEdit.nombre,
                         usuario: $scope.usuarioEdit.usuario.trim().toLowerCase(),
                         password: $scope.usuarioEdit.password.trim(),
@@ -1055,10 +1053,10 @@
                         gerencia: $scope.usuarioEdit.gerencia
                     }).then(() => {
                         $scope.registrarLog("Edición Usuario", $scope.usuarioEdit.usuario);
-                        $scope.$evalAsync(function() {
-                            $scope.modalUsuarioAbierto = false;
-                            alert("¡Usuario modificado con éxito!");
-                        });
+                        $scope.cerrarModalEditarUsuario();
+                        alert("¡Usuario modificado con éxito!");
+                    }).catch(err => {
+                        alert("Error al editar usuario: " + err.message);
                     });
                 }
             };

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz de Seguimiento Operativo v20.7 Persistent Executive</title>
+    <title>Matriz de Seguimiento Operativo v20.8 Commercial Ready</title>
 
     <!-- Frameworks & Firebase SDKs -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,15 +100,6 @@
             color: #2563EB;
             background-color: #EFF6FF;
         }
-
-        .login-logo-animated {
-            animation: floatLogo 3s infinite ease-in-out;
-        }
-
-        @keyframes floatLogo {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(2deg); }
-        }
     </style>
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
@@ -125,20 +116,20 @@
         </div>
     </div>
 
-    <!-- LOGIN CLARO (PERSISTENTE) -->
+    <!-- LOGIN PERSISTENTE -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
-            <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30 login-logo-animated">
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30">
                 📊
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Matriz Operativa</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">v20.7 Persistent Edition</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">v20.8 Executive Edition</p>
             </div>
 
             <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
-                <input type="text" id="inputUser" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" class="input-light w-full text-center font-bold">
-                <input type="password" id="inputPass" ng-model="loginPass" placeholder="Contraseña" required autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="current-password" class="input-light w-full text-center font-bold">
+                <input type="text" id="inputUser" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
+                <input type="password" id="inputPass" ng-model="loginPass" placeholder="Contraseña" required autocomplete="current-password" class="input-light w-full text-center font-bold">
 
                 <button type="button" ng-click="iniciarSesion($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
                     {{ cargandoLogin ? 'Verificando...' : 'Ingresar al Sistema' }}
@@ -374,9 +365,9 @@
                                         <span ng-if="!act.audioUrl" class="text-slate-400 text-[10px]">Sin audio</span>
                                     </td>
                                     <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                                        <button ng-click="abrirModalEdicion(act)" class="px-2.5 py-1.5 bg-indigo-50 text-indigo-600 font-bold rounded-lg border border-indigo-200 text-[10px]">✏ Modificar</button>
-                                        <button ng-click="cambiarEstado(act)" class="px-2.5 py-1.5 bg-blue-50 text-blue-600 font-bold rounded-lg border border-blue-200 text-[10px]">⚡ Estado</button>
-                                        <button ng-show="puedesEliminar(act)" ng-click="eliminarActividad(act.id)" class="px-2.5 py-1.5 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 text-[10px]">🗑 Borrar</button>
+                                        <button type="button" ng-click="abrirModalEdicion(act)" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-[10px] shadow-sm transition">✏ Modificar</button>
+                                        <button type="button" ng-click="cambiarEstado(act)" class="px-2.5 py-1.5 bg-blue-50 text-blue-600 font-bold rounded-lg border border-blue-200 text-[10px]">⚡ Estado</button>
+                                        <button type="button" ng-show="puedesEliminar(act)" ng-click="eliminarActividad(act.id)" class="px-2.5 py-1.5 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 text-[10px]">🗑 Borrar</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -385,57 +376,62 @@
                 </div>
             </div>
 
-            <!-- MODAL DE EDICIÓN -->
-            <div ng-show="modalEdicionAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                <div class="card-light p-6 max-w-lg w-full space-y-4 border border-slate-200 shadow-2xl">
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <h3 class="text-base font-black text-slate-800 uppercase">✏ Modificar Requerimiento</h3>
-                        <button ng-click="modalEdicionAbierto = false" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+            <!-- MODAL DE EDICIÓN CON PERMISO EXCLUSIVO DE SLA PARA ADMINISTRADORES -->
+            <div ng-show="modalEdicionAbierto" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
+                <div class="card-light p-5 sm:p-6 max-w-xl w-full my-auto space-y-4 border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3 sticky top-0 bg-white z-10">
+                        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase">✏ Modificar Requerimiento</h3>
+                        <button type="button" ng-click="cerrarModalEdicion()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
                     </div>
 
-                    <form ng-submit="guardarEdicionTarea()" class="space-y-3">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Descripción</label>
-                            <input type="text" ng-model="actEdit.descripcion" required class="input-light w-full">
+                    <form ng-submit="guardarEdicionTarea()" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div class="sm:col-span-2">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Descripción</label>
+                                <input type="text" ng-model="actEdit.descripcion" required class="input-light w-full">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Gerencia / Área</label>
+                                <select ng-model="actEdit.categoria" required class="input-light w-full">
+                                    <option value="Servicios bancarios">Servicios bancarios</option>
+                                    <option value="Recaudación especializada">Recaudación especializada</option>
+                                    <option value="Control contable">Control contable</option>
+                                    <option value="Fábrica">Fábrica</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Responsable</label>
+                                <input type="text" ng-model="actEdit.responsable" required placeholder="Responsable" class="input-light w-full">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Estado</label>
+                                <select ng-model="actEdit.estado" required class="input-light w-full">
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="En Proceso">En Proceso</option>
+                                    <option value="Completado">Completado</option>
+                                </select>
+                            </div>
+
+                            <!-- CAMPO SLA: EDITABLE SOLO PARA ADMINISTRADORES -->
+                            <div>
+                                <label class="text-[10px] font-bold uppercase block mb-1" ng-class="{'text-blue-600': esAdministrador(), 'text-slate-400': !esAdministrador()}">
+                                    SLA (Fecha Compromiso) {{ esAdministrador() ? '🔓 (Editable Admin)' : '🔒 (Solo Admin)' }}
+                                </label>
+                                <input type="date" ng-model="actEdit.fechaLimiteInputEdit" ng-disabled="!esAdministrador()" class="input-light w-full font-mono text-slate-700 font-bold" ng-class="{'bg-slate-200/80 cursor-not-allowed': !esAdministrador()}">
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Observaciones</label>
+                                <textarea ng-model="actEdit.observaciones" rows="3" class="input-light w-full resize-none"></textarea>
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Gerencia / Área</label>
-                            <select ng-model="actEdit.categoria" required class="input-light w-full">
-                                <option value="Servicios bancarios">Servicios bancarios</option>
-                                <option value="Recaudación especializada">Recaudación especializada</option>
-                                <option value="Control contable">Control contable</option>
-                                <option value="Fábrica">Fábrica</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Responsable</label>
-                            <input type="text" ng-model="actEdit.responsable" required placeholder="Responsable" class="input-light w-full">
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Estado</label>
-                            <select ng-model="actEdit.estado" required class="input-light w-full">
-                                <option value="Pendiente">Pendiente</option>
-                                <option value="En Proceso">En Proceso</option>
-                                <option value="Completado">Completado</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Fecha Compromiso (SLA) 🔒 (No modificable)</label>
-                            <input type="text" ng-model="actEdit.fechaLimite" disabled class="input-light w-full bg-slate-200/80 font-mono text-slate-600 font-bold cursor-not-allowed">
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Observaciones</label>
-                            <textarea ng-model="actEdit.observaciones" rows="3" class="input-light w-full resize-none"></textarea>
-                        </div>
-
-                        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                            <button type="button" ng-click="modalEdicionAbierto = false" class="py-2.5 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs uppercase">Cancelar</button>
-                            <button type="submit" class="py-2.5 px-5 rounded-xl bg-blue-600 text-white font-bold text-xs uppercase shadow-md">Guardar Cambios</button>
+                        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-3 border-t border-slate-100">
+                            <button type="button" ng-click="cerrarModalEdicion()" class="w-full sm:w-auto py-3 px-5 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs uppercase">Cancelar</button>
+                            <button type="submit" class="w-full sm:w-auto py-3 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-md transition">Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -601,6 +597,10 @@
             if ($scope.sesionIniciada) {
                 $timeout(function() { $scope.sincronizarFirebase(); });
             }
+
+            $scope.esAdministrador = function() {
+                return $scope.rolUsuario === 'admin_master' || $scope.rolUsuario === 'admin' || $scope.rolUsuario === 'admin_fabrica' || $scope.esSuperAdmin;
+            };
 
             $scope.cambiarSeccion = function(seccion) {
                 $scope.seccionActiva = seccion;
@@ -863,28 +863,55 @@
                 });
             };
 
+            // APERTURA DE MODAL Y Detección DE FECHA PARA EDICIÓN
             $scope.abrirModalEdicion = function(act) {
-                $scope.actEdit = angular.copy(act);
-                $scope.modalEdicionAbierto = true;
+                $scope.$evalAsync(function() {
+                    $scope.actEdit = angular.copy(act);
+                    if (act.fechaLimite) {
+                        let partes = act.fechaLimite.split('-');
+                        if (partes.length === 3) {
+                            $scope.actEdit.fechaLimiteInputEdit = new Date(partes[0], partes[1] - 1, partes[2]);
+                        }
+                    }
+                    $scope.modalEdicionAbierto = true;
+                });
+            };
+
+            $scope.cerrarModalEdicion = function() {
+                $scope.$evalAsync(function() {
+                    $scope.actEdit = {};
+                    $scope.modalEdicionAbierto = false;
+                });
             };
 
             $scope.guardarEdicionTarea = function() {
-                if ($scope.actEdit.id) {
-                    let estadoAnterior = $scope.actividadesVisibles.find(a => a.id === $scope.actEdit.id)?.estado;
-                    db.collection("actividades_operativas").doc($scope.actEdit.id).update({
+                if ($scope.actEdit && $scope.actEdit.id) {
+                    let idEdicion = $scope.actEdit.id;
+                    let estadoAnterior = $scope.actividadesVisibles.find(a => a.id === idEdicion)?.estado;
+                    
+                    let datosUpdate = {
                         descripcion: $scope.actEdit.descripcion,
                         categoria: $scope.actEdit.categoria,
                         responsable: $scope.actEdit.responsable,
                         estado: $scope.actEdit.estado,
                         observaciones: $scope.actEdit.observaciones || ""
-                    }).then(() => {
+                    };
+
+                    // MODIFICACIÓN DE FECHA SLA SOLO SI ES ADMINISTRADOR
+                    if ($scope.esAdministrador() && $scope.actEdit.fechaLimiteInputEdit) {
+                        let fechaNueva = $scope.actEdit.fechaLimiteInputEdit.toISOString().split('T')[0];
+                        datosUpdate.fechaLimite = fechaNueva;
+                        datosUpdate.notificadoVencido = false; // Resetear bandera al cambiar fecha
+                    }
+
+                    db.collection("actividades_operativas").doc(idEdicion).update(datosUpdate).then(() => {
                         $scope.registrarLog("Modificación Requerimiento", $scope.actEdit.descripcion);
                         if (estadoAnterior !== 'Completado' && $scope.actEdit.estado === 'Completado') {
                             $scope.emitirNotificacionGlobal("⚡ REQUERIMIENTO COMPLETADO", `${$scope.usuarioSesion} ha marcado completado: "${$scope.actEdit.descripcion}"`);
                         }
-                        $scope.$evalAsync(function() {
-                            $scope.modalEdicionAbierto = false;
-                        });
+                        $scope.cerrarModalEdicion();
+                    }).catch(err => {
+                        alert("Error al actualizar requerimiento: " + err.message);
                     });
                 }
             };
