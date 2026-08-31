@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz de Seguimiento Operativo v20.8 Commercial Ready</title>
+    <title>Matriz Operativa Multi-Tenant v21.0 Enterprise</title>
 
     <!-- Frameworks & Firebase SDKs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -104,7 +105,7 @@
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
 
-    <!-- BANNER DE NOTIFICACIÓN EN TIEMPO REAL -->
+    <!-- BANNER DE NOTIFICACIÓN -->
     <div ng-if="ultimaNotificacion" class="fixed top-4 right-4 z-50 max-w-sm bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-blue-500 animate-bounce">
         <div class="flex items-start gap-3">
             <span class="text-xl">🔔</span>
@@ -116,7 +117,7 @@
         </div>
     </div>
 
-    <!-- LOGIN PERSISTENTE -->
+    <!-- LOGIN CON SELECCIÓN DE TENANT/EMPRESA -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm">
         <div class="card-light p-8 max-w-md w-full text-center shadow-2xl space-y-5 border border-slate-200">
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-4xl shadow-lg shadow-blue-500/30">
@@ -124,19 +125,29 @@
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Matriz Operativa</h2>
-                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">v20.8 Executive Edition</p>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Multi-Tenant Platform v21.0</p>
             </div>
 
-            <form ng-submit="iniciarSesion($event)" class="space-y-4 pt-2">
-                <input type="text" id="inputUser" ng-model="loginUser" placeholder="Usuario registrado" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
-                <input type="password" id="inputPass" ng-model="loginPass" placeholder="Contraseña" required autocomplete="current-password" class="input-light w-full text-center font-bold">
+            <form ng-submit="iniciarSesion($event)" class="space-y-3 pt-2 text-left">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Código de Empresa (Tenant ID)</label>
+                    <input type="text" id="inputTenant" ng-model="loginTenant" placeholder="Ej: DEMO-001" required autocapitalize="characters" class="input-light w-full text-center font-bold uppercase">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario</label>
+                    <input type="text" id="inputUser" ng-model="loginUser" placeholder="Usuario" required autocapitalize="none" autocomplete="username" class="input-light w-full text-center font-bold">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña</label>
+                    <input type="password" id="inputPass" ng-model="loginPass" placeholder="Contraseña" required autocomplete="current-password" class="input-light w-full text-center font-bold">
+                </div>
 
-                <button type="button" ng-click="iniciarSesion($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
-                    {{ cargandoLogin ? 'Verificando...' : 'Ingresar al Sistema' }}
+                <button type="button" ng-click="iniciarSesion($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition mt-2">
+                    {{ cargandoLogin ? 'Autenticando Empresa...' : 'Ingresar a la Plataforma' }}
                 </button>
             </form>
 
-            <p ng-show="loginError" class="text-xs text-red-600 font-bold">⚠ Credenciales incorrectas o error de conexión</p>
+            <p ng-show="loginError" class="text-xs text-red-600 font-bold">⚠ Credenciales o Código de Empresa incorrectos</p>
         </div>
     </div>
 
@@ -146,11 +157,11 @@
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md">
-                        M
+                        🏢
                     </div>
                     <div>
-                        <h1 class="font-extrabold text-sm sm:text-base text-slate-800 tracking-tight uppercase">MATRIZ OPERATIVA</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">👤 {{ usuarioSesion }} <span class="text-blue-600 font-bold">({{ rolUsuario }})</span></p>
+                        <h1 class="font-extrabold text-sm sm:text-base text-slate-800 tracking-tight uppercase">{{ nombreEmpresaActual }}</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">👤 {{ usuarioSesion }} <span class="text-blue-600 font-bold">({{ rolUsuario }})</span> | Tenant: <span class="font-mono text-slate-700">{{ tenantIdActual }}</span></p>
                     </div>
                 </div>
 
@@ -191,7 +202,7 @@
                 <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 p-6 sm:p-8 text-white shadow-xl">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">Gestión de Requerimientos</span>
+                            <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">{{ nombreEmpresaActual }}</span>
                             <h2 class="text-2xl sm:text-3xl font-black mt-2">Control de Operaciones & SLAs</h2>
                         </div>
                         <div class="flex flex-wrap gap-2 w-full md:w-auto">
@@ -225,7 +236,7 @@
                     </div>
                 </div>
 
-                <!-- REGISTRO DE NUEVA ACTIVIDAD -->
+                <!-- REGISTRO CON FIREBASE STORAGE -->
                 <div class="card-light p-5 sm:p-6 space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                         <h3 class="text-xs sm:text-base font-black text-slate-800 uppercase">➕ Registrar Requerimiento</h3>
@@ -276,27 +287,29 @@
                             </div>
                         </div>
 
-                        <!-- ADJUNTOS MULTIMEDIA PC/MÓVIL -->
+                        <!-- SUBIDA DIRECTA A FIREBASE STORAGE -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                             <div>
-                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">📄 Adjuntar Documento de Soporte (Word, Excel, PDF):</label>
-                                <input type="file" id="docFileInput" onchange="angular.element(this).scope().cargarArchivoDoc(this)" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 w-full">
-                                <span ng-if="nuevaAct.docNombre" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Cargado: {{ nuevaAct.docNombre }}</span>
+                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">📄 Documento de Soporte (Firebase Storage):</label>
+                                <input type="file" id="docFileInput" onchange="angular.element(this).scope().cargarArchivoDocStorage(this)" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 w-full">
+                                <span ng-if="subiendoDoc" class="text-[10px] font-bold text-blue-600 animate-pulse block mt-1">⏳ Subiendo archivo al servidor...</span>
+                                <span ng-if="nuevaAct.docUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Cargado en Nube: {{ nuevaAct.docNombre }}</span>
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Grabar Avance por Voz (PC / Móvil):</label>
+                                <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">🎙 Nota de Voz (Firebase Storage):</label>
                                 <div class="flex items-center gap-2">
                                     <button type="button" ng-click="toggleGrabarAudio()" class="w-full py-3 rounded-xl font-bold text-xs uppercase shadow-sm transition" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-blue-600 text-white': !grabandoAudio}">
-                                        {{ grabandoAudio ? '⏹ Detener Grabación' : '🎤 Iniciar Nota de Voz' }}
+                                        {{ grabandoAudio ? '⏹ Detener y Subir' : '🎤 Iniciar Nota de Voz' }}
                                     </button>
                                 </div>
-                                <span ng-if="nuevaAct.audioUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Audio grabado con éxito</span>
+                                <span ng-if="subiendoAudio" class="text-[10px] font-bold text-blue-600 animate-pulse block mt-1">⏳ Subiendo nota de voz...</span>
+                                <span ng-if="nuevaAct.audioUrl" class="text-[10px] font-bold text-emerald-600 block mt-1">✔ Audio almacenado correctamente</span>
                                 <audio ng-if="nuevaAct.audioUrl" controls ng-src="{{ nuevaAct.audioUrl }}" class="w-full h-9 mt-2 rounded-lg border border-slate-200"></audio>
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-md active:scale-95 transition">
+                        <button type="submit" ng-disabled="subiendoDoc || subiendoAudio" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-md active:scale-95 transition">
                             + Guardar Requerimiento Completo
                         </button>
                     </form>
@@ -355,8 +368,8 @@
                                         <span ng-if="esActividadVencida(act)" class="block text-[9px] text-red-600">⚠ VENCIDO</span>
                                     </td>
                                     <td class="p-3">
-                                        <a ng-if="act.docUrl" ng-href="{{ act.docUrl }}" download="{{ act.docNombre || 'Documento_Especificacion' }}" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 inline-flex items-center gap-1">
-                                            📄 Descargar
+                                        <a ng-if="act.docUrl" ng-href="{{ act.docUrl }}" target="_blank" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 inline-flex items-center gap-1">
+                                            📄 Ver Archivo
                                         </a>
                                         <span ng-if="!act.docUrl" class="text-slate-400 text-[10px]">Sin archivo</span>
                                     </td>
@@ -415,7 +428,6 @@
                                 </select>
                             </div>
 
-                            <!-- CAMPO SLA: EDITABLE SOLO PARA ADMINISTRADORES -->
                             <div>
                                 <label class="text-[10px] font-bold uppercase block mb-1" ng-class="{'text-blue-600': esAdministrador(), 'text-slate-400': !esAdministrador()}">
                                     SLA (Fecha Compromiso) {{ esAdministrador() ? '🔓 (Editable Admin)' : '🔒 (Solo Admin)' }}
@@ -441,7 +453,7 @@
             <div ng-show="seccionActiva === 'calendario'" class="space-y-6">
                 <div class="text-center max-w-lg mx-auto">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">📅 Agenda Ejecutiva & SLAs</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Visualización de vencimientos y registro de comunicados de voz</p>
+                    <p class="text-xs text-slate-500 font-semibold">Visualización de vencimientos para {{ nombreEmpresaActual }}</p>
                 </div>
 
                 <div class="card-light p-5 sm:p-6 space-y-4">
@@ -470,7 +482,7 @@
             <div ng-show="seccionActiva === 'sugerencias'" class="space-y-6">
                 <div class="text-center max-w-lg mx-auto">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 uppercase">💡 Buzón de Sugerencias</h2>
-                    <p class="text-xs text-slate-500 font-semibold">Propuestas enviadas a la administración</p>
+                    <p class="text-xs text-slate-500 font-semibold">Propuestas internas para {{ nombreEmpresaActual }}</p>
                 </div>
 
                 <div class="max-w-xl mx-auto space-y-6">
@@ -501,7 +513,7 @@
             <!-- 4. SECCIÓN ADMIN -->
             <div ng-show="seccionActiva === 'admin' && esSuperAdmin" class="space-y-6">
                 <div class="card-light p-5 sm:p-6 space-y-4">
-                    <h3 class="text-sm font-black text-slate-800 uppercase">+ Crear Usuario</h3>
+                    <h3 class="text-sm font-black text-slate-800 uppercase">+ Crear Usuario para {{ nombreEmpresaActual }}</h3>
                     <form ng-submit="guardarNuevoUsuario()" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <input type="text" ng-model="formUsu.nombre" required placeholder="Nombre Completo" class="input-light w-full">
@@ -555,7 +567,7 @@
         </nav>
     </div>
 
-    <!-- SCRIPT FIREBASE & ANGULARJS PERSISTENTE -->
+    <!-- SCRIPT FIREBASE MULTI-TENANT & STORAGE -->
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyDkAiU9BnVR6IUG8JcpbepCmR18yCRRx_M",
@@ -569,6 +581,7 @@
             firebase.initializeApp(firebaseConfig);
         }
         var db = firebase.firestore();
+        var storage = firebase.storage();
 
         var app = angular.module('matrizApp', []);
 
@@ -578,9 +591,13 @@
             $scope.usuarioSesion = localStorage.getItem('usuarioSesionMatriz') || "";
             $scope.rolUsuario = localStorage.getItem('rolUsuarioMatriz') || "";
             $scope.esSuperAdmin = localStorage.getItem('esSuperAdminMatriz') === 'true';
+            $scope.tenantIdActual = localStorage.getItem('tenantIdMatriz') || "DEMO-001";
+            $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresaMatriz') || "Empresa Demostración";
             $scope.seccionActiva = localStorage.getItem('seccionActivaMatriz') || 'matriz';
             
             $scope.cargandoLogin = false;
+            $scope.subiendoDoc = false;
+            $scope.subiendoAudio = false;
             $scope.modalEdicionAbierto = false;
             $scope.ultimaNotificacion = null;
 
@@ -609,6 +626,7 @@
 
             $scope.emitirNotificacionGlobal = function(titulo, mensaje) {
                 db.collection("notificaciones_app").add({
+                    empresa_id: $scope.tenantIdActual,
                     titulo: titulo,
                     mensaje: mensaje,
                     fecha: new Date().getTime()
@@ -636,6 +654,7 @@
 
             $scope.registrarLog = function(accion, detalle) {
                 db.collection("auditoria_logs").add({
+                    empresa_id: $scope.tenantIdActual,
                     usuario: $scope.usuarioSesion || "Sistema",
                     accion: accion,
                     detalle: detalle,
@@ -644,47 +663,51 @@
                 });
             };
 
+            // INICIO DE SESIÓN MULTI-TENANT CON VERIFICACIÓN DE EMPRESA
             $scope.iniciarSesion = function(event) {
                 if (event) event.preventDefault();
 
-                var valUser = (document.getElementById("inputUser") ? document.getElementById("inputUser").value : "").trim();
-                var valPass = (document.getElementById("inputPass") ? document.getElementById("inputPass").value : "").trim();
-
-                var u = (valUser || $scope.loginUser || "").toLowerCase();
-                var p = (valPass || $scope.loginPass || "");
+                var valTenant = ($scope.loginTenant || "").trim().toUpperCase();
+                var valUser = ($scope.loginUser || "").trim().toLowerCase();
+                var valPass = ($scope.loginPass || "").trim();
 
                 $scope.cargandoLogin = true;
                 $scope.loginError = false;
 
-                if (u === 'luis' && p === 'control2026') {
+                if (valUser === 'luis' && valPass === 'control2026') {
                     $scope.$evalAsync(function() {
                         $scope.sesionIniciada = true;
                         $scope.esSuperAdmin = true;
                         $scope.usuarioSesion = "Luis Coronado";
                         $scope.rolUsuario = "admin_master";
+                        $scope.tenantIdActual = valTenant || "DEMO-001";
+                        $scope.nombreEmpresaActual = "Consorcio Maestro";
                         
                         localStorage.setItem('sesionIniciadaMatriz', 'true');
                         localStorage.setItem('usuarioSesionMatriz', "Luis Coronado");
                         localStorage.setItem('rolUsuarioMatriz', "admin_master");
                         localStorage.setItem('esSuperAdminMatriz', 'true');
+                        localStorage.setItem('tenantIdMatriz', $scope.tenantIdActual);
+                        localStorage.setItem('nombreEmpresaMatriz', $scope.nombreEmpresaActual);
 
                         $scope.cargandoLogin = false;
                         $scope.loginError = false;
-                        $scope.registrarLog("Inicio Sesión Matriz", "Acceso Maestro");
+                        $scope.registrarLog("Inicio Sesión Matriz", "Acceso Maestro Multi-Tenant");
                         $scope.sincronizarFirebase();
                     });
                     return;
                 }
 
-                if (!u || !p) {
-                    $scope.$evalAsync(function() {
-                        $scope.cargandoLogin = false;
-                        $scope.loginError = true;
-                    });
+                if (!valTenant || !valUser || !valPass) {
+                    $scope.$evalAsync(function() { $scope.cargandoLogin = false; $scope.loginError = true; });
                     return;
                 }
 
-                db.collection("personal_intranet").where("usuario", "==", u).where("password", "==", p).get()
+                db.collection("personal_intranet")
+                .where("empresa_id", "==", valTenant)
+                .where("usuario", "==", valUser)
+                .where("password", "==", valPass)
+                .get()
                 .then(function(snapshot) {
                     $scope.$evalAsync(function() {
                         $scope.cargandoLogin = false;
@@ -692,16 +715,20 @@
                             let userData = snapshot.docs[0].data();
                             $scope.sesionIniciada = true;
                             $scope.rolUsuario = userData.rol || 'operador';
-                            $scope.usuarioSesion = userData.nombre || u;
+                            $scope.usuarioSesion = userData.nombre || valUser;
                             $scope.esSuperAdmin = (userData.rol === 'admin');
+                            $scope.tenantIdActual = valTenant;
+                            $scope.nombreEmpresaActual = userData.nombre_empresa || valTenant;
 
                             localStorage.setItem('sesionIniciadaMatriz', 'true');
                             localStorage.setItem('usuarioSesionMatriz', $scope.usuarioSesion);
                             localStorage.setItem('rolUsuarioMatriz', $scope.rolUsuario);
                             localStorage.setItem('esSuperAdminMatriz', $scope.esSuperAdmin ? 'true' : 'false');
+                            localStorage.setItem('tenantIdMatriz', $scope.tenantIdActual);
+                            localStorage.setItem('nombreEmpresaMatriz', $scope.nombreEmpresaActual);
 
                             $scope.loginError = false;
-                            $scope.registrarLog("Inicio Sesión Matriz", "Acceso Exitoso");
+                            $scope.registrarLog("Inicio Sesión Matriz", "Acceso Multi-Tenant Exitoso");
                             $scope.sincronizarFirebase();
                         } else {
                             $scope.loginError = true;
@@ -710,10 +737,7 @@
                 })
                 .catch(function(error) {
                     console.error("Error Firebase:", error);
-                    $scope.$evalAsync(function() {
-                        $scope.cargandoLogin = false;
-                        $scope.loginError = true;
-                    });
+                    $scope.$evalAsync(function() { $scope.cargandoLogin = false; $scope.loginError = true; });
                 });
             };
 
@@ -722,6 +746,8 @@
                 localStorage.removeItem('usuarioSesionMatriz');
                 localStorage.removeItem('rolUsuarioMatriz');
                 localStorage.removeItem('esSuperAdminMatriz');
+                localStorage.removeItem('tenantIdMatriz');
+                localStorage.removeItem('nombreEmpresaMatriz');
                 $scope.sesionIniciada = false;
             };
 
@@ -746,20 +772,28 @@
                 return false;
             };
 
-            $scope.cargarArchivoDoc = function(element) {
+            // CARGA DE DOCUMENTOS DIRECTO A FIREBASE STORAGE
+            $scope.cargarArchivoDocStorage = function(element) {
                 let file = element.files[0];
                 if (file) {
-                    let reader = new FileReader();
-                    reader.onload = function(e) {
+                    $scope.$evalAsync(function() { $scope.subiendoDoc = true; });
+                    let storageRef = storage.ref(`empresas/${$scope.tenantIdActual}/documentos/${Date.now()}_${file.name}`);
+                    storageRef.put(file).then(snapshot => {
+                        return snapshot.ref.getDownloadURL();
+                    }).then(url => {
                         $scope.$evalAsync(function() {
-                            $scope.nuevaAct.docUrl = e.target.result;
+                            $scope.nuevaAct.docUrl = url;
                             $scope.nuevaAct.docNombre = file.name;
+                            $scope.subiendoDoc = false;
                         });
-                    };
-                    reader.readAsDataURL(file);
+                    }).catch(err => {
+                        alert("Error al subir documento: " + err.message);
+                        $scope.$evalAsync(function() { $scope.subiendoDoc = false; });
+                    });
                 }
             };
 
+            // GRABACIÓN Y SUBIDA DE NOTA DE VOZ A FIREBASE STORAGE
             $scope.toggleGrabarAudio = function() {
                 if (!$scope.grabandoAudio) {
                     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
@@ -769,14 +803,23 @@
                         mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
                         mediaRecorder.onstop = () => {
                             let blob = new Blob(audioChunks, { type: mimeType });
-                            let reader = new FileReader();
-                            reader.onload = function(e) {
+                            $scope.$evalAsync(function() { $scope.subiendoAudio = true; });
+                            
+                            let filename = `empresas/${$scope.tenantIdActual}/audios/${Date.now()}_avance.webm`;
+                            let storageRef = storage.ref(filename);
+                            
+                            storageRef.put(blob).then(snapshot => {
+                                return snapshot.ref.getDownloadURL();
+                            }).then(url => {
                                 $scope.$evalAsync(function() {
-                                    $scope.nuevaAct.audioUrl = $sce.trustAsResourceUrl(e.target.result);
-                                    $scope.nuevaAct.audioRaw = e.target.result;
+                                    $scope.nuevaAct.audioUrl = $sce.trustAsResourceUrl(url);
+                                    $scope.nuevaAct.audioRaw = url;
+                                    $scope.subiendoAudio = false;
                                 });
-                            };
-                            reader.readAsDataURL(blob);
+                            }).catch(err => {
+                                alert("Error al subir audio: " + err.message);
+                                $scope.$evalAsync(function() { $scope.subiendoAudio = false; });
+                            });
                         };
                         mediaRecorder.start();
                         $scope.$evalAsync(function() { $scope.grabandoAudio = true; });
@@ -787,9 +830,12 @@
                 }
             };
 
+            // FILTRADO ESTRICTO FIRESTORE POR TENANT_ID
             $scope.sincronizarFirebase = function() {
                 let inicioSnapshot = true;
-                db.collection("actividades_operativas").onSnapshot(snapshot => {
+                db.collection("actividades_operativas")
+                .where("empresa_id", "==", $scope.tenantIdActual)
+                .onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.actividadesVisibles = [];
                         snapshot.forEach(doc => {
@@ -806,7 +852,11 @@
                     });
                 });
 
-                db.collection("notificaciones_app").orderBy("fecha", "desc").limit(1).onSnapshot(snapshot => {
+                db.collection("notificaciones_app")
+                .where("empresa_id", "==", $scope.tenantIdActual)
+                .orderBy("fecha", "desc")
+                .limit(1)
+                .onSnapshot(snapshot => {
                     if (inicioSnapshot) { inicioSnapshot = false; return; }
                     snapshot.forEach(doc => {
                         let n = doc.data();
@@ -814,7 +864,10 @@
                     });
                 });
 
-                db.collection("sugerencias_sistema").orderBy("fechaSort", "desc").onSnapshot(snapshot => {
+                db.collection("sugerencias_sistema")
+                .where("empresa_id", "==", $scope.tenantIdActual)
+                .orderBy("fechaSort", "desc")
+                .onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.listaSugerencias = [];
                         snapshot.forEach(doc => {
@@ -842,6 +895,7 @@
 
             $scope.agregarActividad = function() {
                 let registro = {
+                    empresa_id: $scope.tenantIdActual,
                     descripcion: $scope.nuevaAct.descripcion,
                     categoria: $scope.nuevaAct.categoria,
                     responsable: $scope.nuevaAct.responsable,
@@ -863,7 +917,6 @@
                 });
             };
 
-            // APERTURA DE MODAL Y Detección DE FECHA PARA EDICIÓN
             $scope.abrirModalEdicion = function(act) {
                 $scope.$evalAsync(function() {
                     $scope.actEdit = angular.copy(act);
@@ -897,11 +950,10 @@
                         observaciones: $scope.actEdit.observaciones || ""
                     };
 
-                    // MODIFICACIÓN DE FECHA SLA SOLO SI ES ADMINISTRADOR
                     if ($scope.esAdministrador() && $scope.actEdit.fechaLimiteInputEdit) {
                         let fechaNueva = $scope.actEdit.fechaLimiteInputEdit.toISOString().split('T')[0];
                         datosUpdate.fechaLimite = fechaNueva;
-                        datosUpdate.notificadoVencido = false; // Resetear bandera al cambiar fecha
+                        datosUpdate.notificadoVencido = false;
                     }
 
                     db.collection("actividades_operativas").doc(idEdicion).update(datosUpdate).then(() => {
@@ -937,6 +989,7 @@
             $scope.enviarSugerencia = function() {
                 if ($scope.nuevaSugerencia.titulo && $scope.nuevaSugerencia.detalle) {
                     db.collection("sugerencias_sistema").add({
+                        empresa_id: $scope.tenantIdActual,
                         autor: $scope.usuarioSesion,
                         titulo: $scope.nuevaSugerencia.titulo,
                         detalle: $scope.nuevaSugerencia.detalle,
@@ -954,6 +1007,8 @@
             $scope.guardarNuevoUsuario = function() {
                 if ($scope.formUsu.nombre && $scope.formUsu.usuario && $scope.formUsu.password) {
                     db.collection("personal_intranet").add({
+                        empresa_id: $scope.tenantIdActual,
+                        nombre_empresa: $scope.nombreEmpresaActual,
                         nombre: $scope.formUsu.nombre,
                         usuario: $scope.formUsu.usuario.trim().toLowerCase(),
                         password: $scope.formUsu.password.trim(),
@@ -962,7 +1017,7 @@
                         gerencia: $scope.formUsu.gerencia || "Servicios bancarios",
                         cargo: $scope.formUsu.cargo || "Analista"
                     }).then(() => {
-                        alert("¡Usuario creado!");
+                        alert("¡Usuario creado para la empresa!");
                         $scope.$evalAsync(function() { $scope.formUsu = {}; });
                     });
                 }
@@ -972,7 +1027,7 @@
                 let element = document.getElementById('pdfReportContainer');
                 let opt = {
                     margin: 0.5,
-                    filename: `Reporte_Matriz_${new Date().toISOString().split('T')[0]}.pdf`,
+                    filename: `Reporte_Matriz_${$scope.tenantIdActual}_${new Date().toISOString().split('T')[0]}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2, backgroundColor: '#FFFFFF' },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
@@ -987,7 +1042,7 @@
                     dataMatriz.push([a.descripcion, a.categoria, a.responsable, a.estado, a.observaciones || '--', a.fechaLimite || '--']);
                 });
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataMatriz), "Matriz Operativa");
-                XLSX.writeFile(wb, `Matriz_Seguimiento_${new Date().toISOString().split('T')[0]}.xlsx`);
+                XLSX.writeFile(wb, `Matriz_${$scope.tenantIdActual}_${new Date().toISOString().split('T')[0]}.xlsx`);
             };
 
             $scope.solicitarPermisoPush = function() {
