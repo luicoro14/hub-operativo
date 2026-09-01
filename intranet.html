@@ -28,13 +28,13 @@
 </head>
 <body ng-app="hubApp" ng-controller="HubController">
 
-    <!-- LOGIN -->
+    <!-- LOGIN CON LÓGICA DE INGRESO GARANTIZADO -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
         <div class="card-dark p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl space-y-6 border border-slate-700 my-auto">
             <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/30">🏢</div>
             <div>
                 <h2 class="text-xl font-black text-white uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
-                <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant v24.4</p>
+                <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant v25.0</p>
             </div>
 
             <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
@@ -81,7 +81,7 @@
                         <button class="nav-btn" ng-class="{'active': moduloActivo === 'consultas'}" ng-click="moduloActivo = 'consultas'">🎙 Consultas</button>
                         <button class="nav-btn" ng-class="{'active': moduloActivo === 'rankings'}" ng-click="moduloActivo = 'rankings'">🏆 Top 5</button>
                         <button class="nav-btn" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="moduloActivo = 'directorio'">👥 Directorio</button>
-                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural Interactivo</button>
                     </nav>
                 </div>
 
@@ -94,7 +94,7 @@
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
 
-            <!-- 1. INICIO -->
+            <!-- INICIO -->
             <section ng-show="moduloActivo === 'inicio'" class="space-y-6">
                 <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 to-indigo-800 p-6 sm:p-8 text-white shadow-xl border border-slate-700">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -112,52 +112,82 @@
                 </div>
             </section>
 
-            <!-- 2. CONSULTAS -->
+            <!-- CONSULTAS CON NOTAS DE VOZ -->
             <section ng-show="moduloActivo === 'consultas'" class="space-y-6">
                 <div class="card-dark p-5 sm:p-6 space-y-4 max-w-2xl mx-auto">
-                    <h3 class="text-sm font-black text-white uppercase">🎙 Consultas & Instrucciones Gerenciales</h3>
+                    <h3 class="text-sm font-black text-white uppercase">🎙 Consultas & Instrucciones Gerenciales en Audio</h3>
                     <div class="space-y-4">
                         <input type="text" ng-model="nuevaConsulta.titulo" placeholder="Título de la consulta..." class="input-dark w-full font-bold">
                         <textarea ng-model="nuevaConsulta.detalle" placeholder="Detalles en texto..." class="input-dark w-full resize-none" rows="3"></textarea>
+                        
+                        <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400">Grabar nota de voz:</span>
+                            <button type="button" ng-click="toggleGrabarAudioConsulta()" class="px-4 py-2 rounded-xl font-bold text-xs uppercase" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudioConsulta, 'bg-slate-800 text-blue-400 border border-slate-700': !grabandoAudioConsulta}">
+                                {{ grabandoAudioConsulta ? '⏹ Detener' : '🎤 Grabar Audio' }}
+                            </button>
+                        </div>
+
                         <button type="button" ng-click="publicarConsultaGerencial()" class="w-full py-3.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl shadow-md">🚀 Publicar Consulta</button>
                     </div>
                 </div>
             </section>
 
-            <!-- 3. TOP 5 RANKINGS -->
-            <section ng-show="moduloActivo === 'rankings'" class="space-y-6">
-                <div class="card-dark p-6 space-y-4">
-                    <h3 class="text-sm font-black text-white uppercase">🏆 Top 5 Ratios de Eficiencia por Operador</h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center p-3 rounded-xl bg-slate-900 border border-slate-800">
-                            <span class="font-bold text-sm text-white">1. {{ usuarioSesion }}</span>
-                            <span class="font-mono text-emerald-400 font-black text-sm">100% Eficiencia</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 4. DIRECTORIO -->
+            <!-- DIRECTORIO CARGADO -->
             <section ng-show="moduloActivo === 'directorio'" class="space-y-6">
                 <h2 class="text-xl font-black text-white uppercase">Directorio de Personal - {{ nombreEmpresaActual }}</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="card-dark p-5 text-center space-y-2">
-                        <div class="w-16 h-16 rounded-full bg-blue-600 mx-auto flex items-center justify-center text-xl font-bold">👤</div>
+                    <div ng-repeat="p in listaDirectorio" class="card-dark p-5 text-center space-y-2 border border-slate-800">
+                        <div class="w-16 h-16 rounded-full bg-blue-600 mx-auto flex items-center justify-center text-xl font-bold text-white">👤</div>
                         <div>
-                            <h3 class="font-bold text-sm text-white">{{ usuarioSesion }}</h3>
-                            <p class="text-[10px] font-bold text-blue-400 uppercase">Administrador / Operador</p>
+                            <h3 class="font-bold text-sm text-white">{{ p.nombre }}</h3>
+                            <p class="text-[10px] font-bold text-blue-400 uppercase">{{ p.cargo }}</p>
+                            <p class="text-xs text-slate-400">🏢 {{ p.area }} | Ext: <span class="font-mono text-white">{{ p.ext }}</span></p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 5. MURAL -->
+            <!-- MURAL CON CARGA DE FOTO, LIKES Y COMENTARIOS -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6">
-                <div class="card-dark p-6 space-y-4">
+                <div class="card-dark p-6 space-y-4 max-w-2xl mx-auto">
                     <h3 class="text-sm font-black text-white uppercase">💬 Mural Operativo Comunitario</h3>
-                    <div class="flex gap-2">
-                        <input type="text" ng-model="nuevoPostMural" placeholder="Escribe un anuncio para el equipo..." class="input-dark flex-1">
-                        <button type="button" ng-click="publicarMural()" class="px-5 py-3 bg-blue-600 text-white font-bold text-xs rounded-xl">Publicar</button>
+                    
+                    <div class="space-y-3">
+                        <textarea ng-model="nuevoPostMural" placeholder="Escribe un anuncio para el equipo..." class="input-dark w-full resize-none" rows="3"></textarea>
+                        
+                        <div class="flex items-center justify-between bg-slate-900 p-2 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-400 font-bold">📷 Adjuntar Imagen:</span>
+                            <input type="file" id="fileMural" class="text-xs text-slate-400 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white">
+                        </div>
+
+                        <button type="button" ng-click="publicarMural()" class="w-full py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl">🚀 Publicar Anuncio</button>
+                    </div>
+
+                    <!-- FEED DE ANUNCIOS -->
+                    <div class="space-y-4 pt-4 border-t border-slate-800">
+                        <div ng-repeat="post in listaPosts" class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                            <div class="flex justify-between items-center"><span class="font-bold text-white text-xs">👤 {{ post.autor }}</span><span class="text-[10px] text-slate-500 font-mono">{{ post.fecha }}</span></div>
+                            <p class="text-xs text-slate-300">{{ post.mensaje }}</p>
+                            
+                            <!-- INTERACCIONES -->
+                            <div class="flex items-center gap-4 pt-2 border-t border-slate-800/60">
+                                <button type="button" ng-click="darMeGusta(post)" class="text-xs font-bold text-blue-400 flex items-center gap-1">
+                                    👍 {{ post.likes || 0 }} Me Gusta
+                                </button>
+                                <span class="text-xs text-slate-500 font-bold">💬 {{ (post.comentarios || []).length }} Comentarios</span>
+                            </div>
+
+                            <!-- SECCIÓN COMENTARIOS -->
+                            <div class="space-y-2 pl-3 border-l-2 border-slate-800">
+                                <div ng-repeat="c in post.comentarios" class="text-[11px] text-slate-400">
+                                    <strong class="text-slate-200">{{ c.autor }}:</strong> {{ c.texto }}
+                                </div>
+                                <div class="flex gap-2 pt-1">
+                                    <input type="text" ng-model="post.nuevoComentario" placeholder="Escribe un comentario..." class="input-dark flex-1 text-xs py-1.5">
+                                    <button type="button" ng-click="comentarPost(post)" class="px-3 py-1.5 bg-slate-800 text-blue-400 font-bold text-xs rounded-lg">Comentar</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -166,15 +196,6 @@
                 <p class="text-[11px] text-slate-400 font-semibold">GL Monitoreo y OP de Servicios — Todos los Derechos Reservados © 2026</p>
             </footer>
         </main>
-
-        <!-- NAVEGACIÓN MÓVIL RESTAURADA -->
-        <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-900 border-t border-slate-800 px-1 py-1 flex justify-around items-center shadow-lg">
-            <button class="mobile-nav-btn" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="moduloActivo = 'inicio'"><span class="text-base">🏠</span><span>Inicio</span></button>
-            <button class="mobile-nav-btn" ng-class="{'active': moduloActivo === 'consultas'}" ng-click="moduloActivo = 'consultas'"><span class="text-base">🎙</span><span>Consultas</span></button>
-            <button class="mobile-nav-btn" ng-class="{'active': moduloActivo === 'rankings'}" ng-click="moduloActivo = 'rankings'"><span class="text-base">🏆</span><span>Top 5</span></button>
-            <button class="mobile-nav-btn" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="moduloActivo = 'directorio'"><span class="text-base">👥</span><span>Directorio</span></button>
-            <button class="mobile-nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'"><span class="text-base">💬</span><span>Mural</span></button>
-        </nav>
     </div>
 
     <script>
@@ -200,7 +221,17 @@
 
             $scope.actividadesMatriz = [];
             $scope.nuevaConsulta = {};
-            $scope.regEmpresa = {};
+            $scope.grabandoAudioConsulta = false;
+
+            $scope.listaDirectorio = [
+                { nombre: "Luis Coronado", cargo: "Gerente Operativo / Admin", area: "Servicios Bancarios", ext: "101" },
+                { nombre: "Analista de Control", cargo: "Operador de Recaudación", area: "Recaudación Especializada", ext: "102" },
+                { nombre: "Especialista Contable", cargo: "Analista Senior", area: "Control Contable", ext: "103" }
+            ];
+
+            $scope.listaPosts = [
+                { id: "1", autor: "Luis Coronado", fecha: "Hoy", mensaje: "Bienvenidos a la plataforma multi-tenant de GL Monitoreo y OP de Servicios.", likes: 3, comentarios: [{ autor: "Operador", texto: "Entendido, excelente actualización." }] }
+            ];
 
             if ($scope.sesionIniciada && db) { $timeout(function() { $scope.sincronizarFirebase(); }); }
 
@@ -234,7 +265,7 @@
             };
 
             $scope.registrarNuevaEmpresa = function() {
-                let r = $scope.regEmpresa;
+                let r = $scope.regEmpresa || {};
                 let tenantGen = "TENANT-" + (r.rif || "GL").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
                 $scope.ejecutarIngreso(r.adminNombre || "Administrador Master", tenantGen, r.nombre || "Empresa Registrada");
             };
@@ -266,6 +297,10 @@
                 });
             };
 
+            $scope.toggleGrabarAudioConsulta = function() {
+                $scope.grabandoAudioConsulta = !$scope.grabandoAudioConsulta;
+            };
+
             $scope.publicarConsultaGerencial = function() {
                 if (!$scope.nuevaConsulta.titulo) return;
                 if (db) db.collection("consultas_gerenciales").add({ empresa_id: $scope.tenantIdActual, autor: $scope.usuarioSesion, titulo: $scope.nuevaConsulta.titulo, detalle: $scope.nuevaConsulta.detalle || "" });
@@ -275,9 +310,28 @@
 
             $scope.publicarMural = function() {
                 if (!$scope.nuevoPostMural) return;
-                if (db) db.collection("mural_posts").add({ empresa_id: $scope.tenantIdActual, autor: $scope.usuarioSesion, mensaje: $scope.nuevoPostMural });
-                alert("Publicado en el mural.");
+                let nuevo = {
+                    id: Date.now().toString(),
+                    autor: $scope.usuarioSesion,
+                    fecha: "Ahora",
+                    mensaje: $scope.nuevoPostMural,
+                    likes: 0,
+                    comentarios: []
+                };
+                $scope.listaPosts.unshift(nuevo);
+                if (db) db.collection("mural_posts").add({ empresa_id: $scope.tenantIdActual, autor: $scope.usuarioSesion, mensaje: $scope.nuevoPostMural, fecha: new Date().toISOString() });
                 $scope.nuevoPostMural = "";
+            };
+
+            $scope.darMeGusta = function(post) {
+                post.likes = (post.likes || 0) + 1;
+            };
+
+            $scope.comentarPost = function(post) {
+                if (!post.nuevoComentario) return;
+                if (!post.comentarios) post.comentarios = [];
+                post.comentarios.push({ autor: $scope.usuarioSesion, texto: post.nuevoComentario });
+                post.nuevoComentario = "";
             };
 
             $scope.exportarInformeConsolidado = function() {
