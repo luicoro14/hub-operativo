@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hub Operativo Multi-Tenant - GL Monitoreo</title>
+    <title>Hub Operativo - GL Monitoreo y OP de Servicios</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { corePlugins: { preflight: true } }</script>
@@ -15,176 +15,202 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
-        body { background-color: #0F172A; color: #F8FAFC; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; padding-bottom: calc(6rem + env(safe-area-inset-bottom)); overflow-x: hidden; }
+        body { background-color: #F8FAFC; color: #0F172A; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
         @media (min-width: 768px) { body { padding-bottom: 2rem; } }
-        .card-dark { background: #1E293B; border: 1px solid #334155; border-radius: 24px; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3); transition: all 0.2s ease; }
-        .input-dark { background-color: #0F172A; border: 1px solid #334155; border-radius: 14px; padding: 0.85rem 1rem; font-size: 0.85rem; font-weight: 600; color: #F8FAFC; outline: none; transition: all 0.2s; }
-        .input-dark:focus { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); background-color: #1E293B; }
-        .nav-btn { color: #94A3B8; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; padding: 0.65rem 1rem; border-radius: 12px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
-        .nav-btn.active { background-color: #3B82F6; color: #FFFFFF; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
-        .mobile-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; color: #94A3B8; padding: 0.4rem 0.15rem; border-radius: 10px; transition: all 0.2s; }
-        .mobile-nav-btn.active { color: #60A5FA; background-color: #1E293B; }
+        .card-white { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+        .input-light { background-color: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.85rem; font-weight: 600; color: #0F172A; outline: none; }
+        .input-light:focus { border-color: #2563EB; background-color: #FFFFFF; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .nav-btn { color: #64748B; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; padding: 0.65rem 1rem; border-radius: 12px; }
+        .nav-btn.active { background-color: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+        .mobile-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; color: #64748B; padding: 0.4rem 0.15rem; border-radius: 10px; }
+        .mobile-nav-btn.active { color: #2563EB; background-color: #EFF6FF; }
+
+        /* ANIMACIÓN DE CORAZONES EN PANTALLA */
+        @keyframes floatingHeart {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.6); }
+        }
+        .heart-float {
+            position: absolute;
+            color: #EF4444;
+            font-size: 24px;
+            animation: floatingHeart 0.9s ease-out forwards;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body ng-app="hubApp" ng-controller="HubController">
 
-    <!-- LOGIN CON LÓGICA DE INGRESO GARANTIZADO -->
-    <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-        <div class="card-dark p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl space-y-6 border border-slate-700 my-auto">
-            <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/30">🏢</div>
+    <!-- LOGIN -->
+    <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md overflow-y-auto">
+        <div class="card-white p-6 sm:p-8 max-w-lg w-full text-center space-y-6 my-auto">
+            <div class="w-16 h-16 mx-auto rounded-3xl bg-blue-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/30">🏢</div>
             <div>
-                <h2 class="text-xl font-black text-white uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
-                <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant v25.0</p>
+                <h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
-                <button type="button" ng-click="setModoAcceso('operativo')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'operativo', 'text-slate-400 hover:text-white': modoAcceso !== 'operativo'}">👤 Operativo</button>
-                <button type="button" ng-click="setModoAcceso('empresa')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'empresa', 'text-slate-400 hover:text-white': modoAcceso !== 'empresa'}">🏢 Registrar Empresa</button>
+            <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button type="button" ng-click="setModoAcceso('operativo')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'operativo', 'text-slate-600 hover:text-slate-900': modoAcceso !== 'operativo'}">👤 Operativo</button>
+                <button type="button" ng-click="setModoAcceso('empresa')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'empresa', 'text-slate-600 hover:text-slate-900': modoAcceso !== 'empresa'}">🏢 Registrar Empresa</button>
             </div>
 
             <div ng-if="modoAcceso === 'operativo'" class="space-y-4 text-left">
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Usuario Operativo</label><input type="text" ng-model="loginUser" placeholder="Ingresa tu usuario" autocapitalize="none" class="input-dark w-full text-center font-bold"></div>
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Contraseña</label><input type="password" ng-model="loginPass" placeholder="••••••••" class="input-dark w-full text-center font-bold"></div>
-                <button type="button" ng-click="iniciarSesionOperativo()" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">Ingresar al Hub Operativo</button>
+                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario</label><input type="text" ng-model="loginUser" placeholder="Ingresa tu usuario" autocapitalize="none" class="input-light w-full text-center font-bold"></div>
+                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña</label><input type="password" ng-model="loginPass" placeholder="••••••••" class="input-light w-full text-center font-bold"></div>
+                <button type="button" ng-click="iniciarSesionOperativo()" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/20 active:scale-95 transition">Ingresar al Hub Operativo</button>
             </div>
 
             <div ng-if="modoAcceso === 'empresa'" class="space-y-3 text-left">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">RIF Empresa</label><input type="text" ng-model="regEmpresa.rif" placeholder="J-12345678-0" class="input-dark w-full uppercase"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Razón Social</label><input type="text" ng-model="regEmpresa.nombre" placeholder="Nombre Comercial" class="input-dark w-full"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Admin Master</label><input type="text" ng-model="regEmpresa.adminNombre" placeholder="Tu Nombre" class="input-dark w-full"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Usuario Master</label><input type="text" ng-model="regEmpresa.adminUsuario" placeholder="usuario_admin" autocapitalize="none" class="input-dark w-full"></div>
-                    <div class="sm:col-span-2"><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Contraseña Master</label><input type="password" ng-model="regEmpresa.adminPassword" placeholder="••••••••" class="input-dark w-full"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">RIF Empresa</label><input type="text" ng-model="regEmpresa.rif" placeholder="J-12345678-0" class="input-light w-full uppercase"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Razón Social</label><input type="text" ng-model="regEmpresa.nombre" placeholder="Nombre Comercial" class="input-light w-full"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Admin Master</label><input type="text" ng-model="regEmpresa.adminNombre" placeholder="Tu Nombre" class="input-light w-full"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario Master</label><input type="text" ng-model="regEmpresa.adminUsuario" placeholder="usuario_admin" autocapitalize="none" class="input-light w-full"></div>
+                    <div class="sm:col-span-2"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña Master</label><input type="password" ng-model="regEmpresa.adminPassword" placeholder="••••••••" class="input-light w-full"></div>
                 </div>
-                <button type="button" ng-click="registrarNuevaEmpresa()" class="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase shadow-lg shadow-emerald-600/30 active:scale-95 transition">🚀 Crear Empresa & Entrar</button>
+                <button type="button" ng-click="registrarNuevaEmpresa()" class="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase shadow-lg shadow-emerald-600/20 active:scale-95 transition">🚀 Registrar Empresa</button>
             </div>
 
-            <div class="pt-2 border-t border-slate-800 text-[10px] text-slate-500 font-semibold">Protegido bajo Derechos Reservados © 2026 GL Monitoreo y OP de Servicios.</div>
+            <div class="pt-2 border-t border-slate-200 text-[10px] text-slate-400 font-semibold">Derechos Reservados © 2026 GL Monitoreo y OP de Servicios.</div>
         </div>
     </div>
 
-    <!-- MAIN HUB -->
+    <!-- HUB APP -->
     <div ng-if="sesionIniciada">
-        <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-md">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md">HUB</div>
                     <div>
-                        <h1 class="font-extrabold text-sm sm:text-base text-white tracking-tight uppercase">{{ nombreEmpresaActual }}</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-400 font-semibold">👤 {{ usuarioSesion }} | Tenant: <span class="font-mono text-slate-300">{{ tenantIdActual }}</span></p>
+                        <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">{{ nombreEmpresaActual }}</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">👤 {{ usuarioSesion }} | Tenant: <span class="font-mono text-slate-700">{{ tenantIdActual }}</span></p>
                     </div>
                 </div>
 
                 <div class="hidden md:flex items-center gap-3">
-                    <nav class="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-2xl border border-slate-800">
+                    <nav class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200">
                         <button class="nav-btn" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="moduloActivo = 'inicio'">🏠 Inicio</button>
-                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'consultas'}" ng-click="moduloActivo = 'consultas'">🎙 Consultas</button>
-                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'rankings'}" ng-click="moduloActivo = 'rankings'">🏆 Top 5</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural Corporativo</button>
                         <button class="nav-btn" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="moduloActivo = 'directorio'">👥 Directorio</button>
-                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural Interactivo</button>
                     </nav>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <a href="index.html" class="text-xs font-bold text-blue-400 bg-blue-950 px-3 py-1.5 rounded-xl border border-blue-800">Matriz</a>
-                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-400 bg-red-950 px-3 py-1.5 rounded-xl border border-red-800">Salir</button>
+                    <a href="index.html" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200">Matriz</a>
+                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-xl border border-red-200">Salir</button>
                 </div>
             </div>
         </header>
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
 
-            <!-- INICIO -->
+            <!-- INICIO CON ESTADÍSTICAS REALES + TOP 5 + RANKING POR GERENCIAS -->
             <section ng-show="moduloActivo === 'inicio'" class="space-y-6">
-                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 to-indigo-800 p-6 sm:p-8 text-white shadow-xl border border-slate-700">
-                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 p-6 sm:p-8 text-white shadow-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <span class="text-[10px] sm:text-xs font-black uppercase bg-white/10 px-3 py-1 rounded-full border border-white/20">{{ nombreEmpresaActual }}</span>
-                            <h2 class="text-2xl sm:text-3xl font-black mt-2">Eficiencia en Operaciones</h2>
+                            <span class="text-[10px] sm:text-xs font-black uppercase bg-white/20 px-3 py-1 rounded-full border border-white/30">{{ nombreEmpresaActual }}</span>
+                            <h2 class="text-2xl sm:text-3xl font-black mt-2">Eficiencia & Métricas Operativas</h2>
                         </div>
-                        <button ng-click="exportarInformeConsolidado()" class="px-5 py-3.5 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase shadow-md">📥 Reporte Consolidado (.xlsx)</button>
+                        <button ng-click="exportarInformeConsolidado()" class="px-5 py-3.5 rounded-2xl bg-white text-slate-900 font-black text-xs uppercase shadow">📥 Reporte Consolidado (.xlsx)</button>
                     </div>
                 </div>
 
+                <!-- KPIS ALIMENTADOS DESDE LA MATRIZ -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="card-dark p-5"><span class="text-xs font-bold text-slate-400 uppercase">Total Actividades</span><div class="text-3xl font-black text-white mt-2">{{ actividadesMatriz.length }}</div></div>
-                    <div class="card-dark p-5"><span class="text-xs font-bold text-emerald-400 uppercase">Cumplimiento Global (SLA)</span><div class="text-3xl font-black text-emerald-400 mt-2">100%</div></div>
+                    <div class="card-white p-5"><span class="text-xs font-bold text-slate-500 uppercase">Actividades Matriz</span><div class="text-3xl font-black text-slate-900 mt-2">{{ actividadesMatriz.length }}</div></div>
+                    <div class="card-white p-5"><span class="text-xs font-bold text-emerald-600 uppercase">Cumplimiento Global</span><div class="text-3xl font-black text-emerald-600 mt-2">{{ calcularPorcentajeCumplimiento() }}%</div></div>
                 </div>
-            </section>
 
-            <!-- CONSULTAS CON NOTAS DE VOZ -->
-            <section ng-show="moduloActivo === 'consultas'" class="space-y-6">
-                <div class="card-dark p-5 sm:p-6 space-y-4 max-w-2xl mx-auto">
-                    <h3 class="text-sm font-black text-white uppercase">🎙 Consultas & Instrucciones Gerenciales en Audio</h3>
-                    <div class="space-y-4">
-                        <input type="text" ng-model="nuevaConsulta.titulo" placeholder="Título de la consulta..." class="input-dark w-full font-bold">
-                        <textarea ng-model="nuevaConsulta.detalle" placeholder="Detalles en texto..." class="input-dark w-full resize-none" rows="3"></textarea>
-                        
-                        <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-400">Grabar nota de voz:</span>
-                            <button type="button" ng-click="toggleGrabarAudioConsulta()" class="px-4 py-2 rounded-xl font-bold text-xs uppercase" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudioConsulta, 'bg-slate-800 text-blue-400 border border-slate-700': !grabandoAudioConsulta}">
-                                {{ grabandoAudioConsulta ? '⏹ Detener' : '🎤 Grabar Audio' }}
-                            </button>
+                <!-- TOP 5 & RANKING POR GERENCIAS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card-white p-6 space-y-4">
+                        <h3 class="text-sm font-black text-slate-900 uppercase">🏆 Top 5 Operadores Destacados</h3>
+                        <div class="space-y-2">
+                            <div ng-repeat="op in top5Operadores" class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="font-bold text-slate-900 text-xs">{{ $index + 1 }}. {{ op.nombre }}</span>
+                                <span class="font-mono text-blue-600 font-bold text-xs">{{ op.completadas }} Completadas</span>
+                            </div>
                         </div>
-
-                        <button type="button" ng-click="publicarConsultaGerencial()" class="w-full py-3.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl shadow-md">🚀 Publicar Consulta</button>
                     </div>
-                </div>
-            </section>
 
-            <!-- DIRECTORIO CARGADO -->
-            <section ng-show="moduloActivo === 'directorio'" class="space-y-6">
-                <h2 class="text-xl font-black text-white uppercase">Directorio de Personal - {{ nombreEmpresaActual }}</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <div ng-repeat="p in listaDirectorio" class="card-dark p-5 text-center space-y-2 border border-slate-800">
-                        <div class="w-16 h-16 rounded-full bg-blue-600 mx-auto flex items-center justify-center text-xl font-bold text-white">👤</div>
-                        <div>
-                            <h3 class="font-bold text-sm text-white">{{ p.nombre }}</h3>
-                            <p class="text-[10px] font-bold text-blue-400 uppercase">{{ p.cargo }}</p>
-                            <p class="text-xs text-slate-400">🏢 {{ p.area }} | Ext: <span class="font-mono text-white">{{ p.ext }}</span></p>
+                    <div class="card-white p-6 space-y-4">
+                        <h3 class="text-sm font-black text-slate-900 uppercase">🏢 Ranking por Gerencias</h3>
+                        <div class="space-y-2">
+                            <div ng-repeat="(gerencia, cant) in rankingGerencias" class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="font-bold text-slate-900 text-xs">{{ gerencia }}</span>
+                                <span class="font-mono text-emerald-600 font-bold text-xs">{{ cant }} Requerimientos</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- MURAL CON CARGA DE FOTO, LIKES Y COMENTARIOS -->
+            <!-- MURAL CORPORATIVO AVANZADO -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6">
-                <div class="card-dark p-6 space-y-4 max-w-2xl mx-auto">
-                    <h3 class="text-sm font-black text-white uppercase">💬 Mural Operativo Comunitario</h3>
+                <div class="card-white p-6 space-y-4 max-w-2xl mx-auto">
+                    <h3 class="text-sm font-black text-slate-900 uppercase">💬 Mural Corporativo</h3>
                     
                     <div class="space-y-3">
-                        <textarea ng-model="nuevoPostMural" placeholder="Escribe un anuncio para el equipo..." class="input-dark w-full resize-none" rows="3"></textarea>
+                        <textarea ng-model="nuevoPost.mensaje" placeholder="Escribe un anuncio o mensaje..." class="input-light w-full resize-none" rows="3"></textarea>
+                        <input type="url" ng-model="nuevoPost.enlace" placeholder="Copiar enlace (URL de video, documento o web)..." class="input-light w-full">
                         
-                        <div class="flex items-center justify-between bg-slate-900 p-2 rounded-xl border border-slate-800">
-                            <span class="text-xs text-slate-400 font-bold">📷 Adjuntar Imagen:</span>
-                            <input type="file" id="fileMural" class="text-xs text-slate-400 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white">
+                        <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
+                            <span class="text-xs text-slate-600 font-bold">📷 Adjuntar Imagen (Auto-escala Móvil/PC):</span>
+                            <input type="file" id="fileMural" accept="image/*" class="text-xs text-slate-500 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white">
                         </div>
 
-                        <button type="button" ng-click="publicarMural()" class="w-full py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl">🚀 Publicar Anuncio</button>
+                        <button type="button" ng-click="publicarMural()" class="w-full py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl shadow">🚀 Publicar Anuncio</button>
                     </div>
 
-                    <!-- FEED DE ANUNCIOS -->
-                    <div class="space-y-4 pt-4 border-t border-slate-800">
-                        <div ng-repeat="post in listaPosts" class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                            <div class="flex justify-between items-center"><span class="font-bold text-white text-xs">👤 {{ post.autor }}</span><span class="text-[10px] text-slate-500 font-mono">{{ post.fecha }}</span></div>
-                            <p class="text-xs text-slate-300">{{ post.mensaje }}</p>
+                    <!-- FEED PERSISTENTE CON HISTORIAL -->
+                    <div class="space-y-4 pt-4 border-t border-slate-200">
+                        <div ng-repeat="post in listaPosts" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 relative overflow-hidden">
                             
-                            <!-- INTERACCIONES -->
-                            <div class="flex items-center gap-4 pt-2 border-t border-slate-800/60">
-                                <button type="button" ng-click="darMeGusta(post)" class="text-xs font-bold text-blue-400 flex items-center gap-1">
-                                    👍 {{ post.likes || 0 }} Me Gusta
-                                </button>
-                                <span class="text-xs text-slate-500 font-bold">💬 {{ (post.comentarios || []).length }} Comentarios</span>
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-900 text-xs">👤 {{ post.autor }}</span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ post.fecha }}</span>
                             </div>
 
-                            <!-- SECCIÓN COMENTARIOS -->
-                            <div class="space-y-2 pl-3 border-l-2 border-slate-800">
-                                <div ng-repeat="c in post.comentarios" class="text-[11px] text-slate-400">
-                                    <strong class="text-slate-200">{{ c.autor }}:</strong> {{ c.texto }}
+                            <p class="text-xs text-slate-700 font-medium">{{ post.mensaje }}</p>
+
+                            <!-- ENLACE ADJUNTO -->
+                            <div ng-if="post.enlace" class="text-xs">
+                                🔗 <a href="{{ post.enlace }}" target="_blank" class="text-blue-600 font-bold underline">{{ post.enlace }}</a>
+                            </div>
+
+                            <!-- IMAGEN ADJUNTA CON CORTE RESPONSIVO iOS/ANDROID -->
+                            <div ng-if="post.imagenUrl" class="rounded-xl overflow-hidden border border-slate-200 max-h-80">
+                                <img ng-src="{{ post.imagenUrl }}" class="w-full h-auto object-cover">
+                            </div>
+
+                            <!-- BOTONES E INTERACCIONES -->
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+                                <div class="flex items-center gap-3">
+                                    <button type="button" ng-click="darMeGusta(post, $event)" class="text-xs font-bold flex items-center gap-1 transition" ng-class="{'text-red-500': post.usuarioDioLike, 'text-slate-500 hover:text-red-500': !post.usuarioDioLike}">
+                                        ❤️ {{ post.likes || 0 }} Me Gusta
+                                    </button>
+
+                                    <button type="button" ng-click="reportarPost(post)" class="text-xs font-bold text-amber-600">
+                                        ⚠️ Reportar
+                                    </button>
+                                </div>
+
+                                <!-- PERMISO BORRAR: PROPIO AUTOR O MASTER -->
+                                <button type="button" ng-if="post.autor === usuarioSesion || esMaster" ng-click="eliminarPost(post)" class="text-xs font-bold text-red-600">
+                                    🗑 Eliminar
+                                </button>
+                            </div>
+
+                            <!-- COMENTARIOS -->
+                            <div class="space-y-2 pl-3 border-l-2 border-slate-200 pt-2">
+                                <div ng-repeat="c in post.comentarios" class="text-[11px] text-slate-600">
+                                    <strong class="text-slate-900">{{ c.autor }}:</strong> {{ c.texto }}
                                 </div>
                                 <div class="flex gap-2 pt-1">
-                                    <input type="text" ng-model="post.nuevoComentario" placeholder="Escribe un comentario..." class="input-dark flex-1 text-xs py-1.5">
-                                    <button type="button" ng-click="comentarPost(post)" class="px-3 py-1.5 bg-slate-800 text-blue-400 font-bold text-xs rounded-lg">Comentar</button>
+                                    <input type="text" ng-model="post.nuevoComentario" placeholder="Escribe un comentario..." class="input-light flex-1 text-xs py-1.5">
+                                    <button type="button" ng-click="comentarPost(post)" class="px-3 py-1.5 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Comentar</button>
                                 </div>
                             </div>
                         </div>
@@ -192,8 +218,28 @@
                 </div>
             </section>
 
-            <footer class="pt-6 border-t border-slate-800 text-center space-y-2">
-                <p class="text-[11px] text-slate-400 font-semibold">GL Monitoreo y OP de Servicios — Todos los Derechos Reservados © 2026</p>
+            <!-- DIRECTORIO COMPLETO CON EXPORTACIÓN A EXCEL -->
+            <section ng-show="moduloActivo === 'directorio'" class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-black text-slate-900 uppercase">Directorio de Personal</h2>
+                    <button type="button" ng-click="exportarDirectorioExcel()" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs uppercase rounded-xl shadow">📥 Exportar Directorio (.xlsx)</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div ng-repeat="p in listaDirectorio" class="card-white p-5 text-center space-y-2 border border-slate-200">
+                        <div class="w-16 h-16 rounded-full bg-blue-600 mx-auto flex items-center justify-center text-xl font-bold text-white">👤</div>
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-900">{{ p.nombre }}</h3>
+                            <p class="text-[10px] font-bold text-blue-600 uppercase">{{ p.cargo }}</p>
+                            <p class="text-xs text-slate-500 mt-1">📧 {{ p.correo }}</p>
+                            <p class="text-xs text-slate-500">📞 {{ p.telefono }} | Ext: <span class="font-mono font-bold text-slate-800">{{ p.ext }}</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="pt-6 border-t border-slate-200 text-center space-y-2">
+                <p class="text-[11px] text-slate-500 font-semibold">GL Monitoreo y OP de Servicios — Todos los Derechos Reservados © 2026</p>
             </footer>
         </main>
     </div>
@@ -217,21 +263,21 @@
             $scope.usuarioSesion = localStorage.getItem('usuarioSesionHub') || "Luis Coronado";
             $scope.tenantIdActual = localStorage.getItem('tenantIdHub') || "GL-MONITOREO";
             $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresaHub') || "GL Monitoreo y OP de Servicios";
+            $scope.esMaster = localStorage.getItem('esMasterHub') === 'true';
             $scope.moduloActivo = 'inicio';
 
             $scope.actividadesMatriz = [];
-            $scope.nuevaConsulta = {};
-            $scope.grabandoAudioConsulta = false;
+            $scope.nuevoPost = {};
 
             $scope.listaDirectorio = [
-                { nombre: "Luis Coronado", cargo: "Gerente Operativo / Admin", area: "Servicios Bancarios", ext: "101" },
-                { nombre: "Analista de Control", cargo: "Operador de Recaudación", area: "Recaudación Especializada", ext: "102" },
-                { nombre: "Especialista Contable", cargo: "Analista Senior", area: "Control Contable", ext: "103" }
+                { nombre: "Luis Coronado", cargo: "Gerente Operativo / Admin", correo: "lcoronado@glmonitoreo.com", telefono: "+58 412-0000000", ext: "101" },
+                { nombre: "Analista de Control", cargo: "Operador de Recaudación", correo: "analista@glmonitoreo.com", telefono: "+58 412-1111111", ext: "102" },
+                { nombre: "Especialista Contable", cargo: "Analista Senior", correo: "contable@glmonitoreo.com", telefono: "+58 412-2222222", ext: "103" }
             ];
 
-            $scope.listaPosts = [
-                { id: "1", autor: "Luis Coronado", fecha: "Hoy", mensaje: "Bienvenidos a la plataforma multi-tenant de GL Monitoreo y OP de Servicios.", likes: 3, comentarios: [{ autor: "Operador", texto: "Entendido, excelente actualización." }] }
-            ];
+            $scope.listaPosts = [];
+            $scope.top5Operadores = [];
+            $scope.rankingGerencias = {};
 
             if ($scope.sesionIniciada && db) { $timeout(function() { $scope.sincronizarFirebase(); }); }
 
@@ -246,7 +292,8 @@
 
                 $scope.cargandoLogin = true;
                 var dbTimeout = setTimeout(function() {
-                    $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios");
+                    let esM = (u === 'luis' && p === 'control2026');
+                    $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", esM);
                 }, 500);
 
                 if (db) {
@@ -258,29 +305,34 @@
                                 let d = doc.data();
                                 if ((d.usuario || "").toString().trim().toLowerCase() === u && (d.password || "").toString().trim() === p) hallado = d;
                             });
-                            $scope.ejecutarIngreso(hallado ? (hallado.nombre || u) : (u === 'luis' ? 'Luis Coronado' : u), hallado ? (hallado.empresa_id || "GL-MONITOREO") : "GL-MONITOREO", hallado ? (hallado.nombre_empresa || "GL Monitoreo y OP de Servicios") : "GL Monitoreo y OP de Servicios");
+                            let esM = (u === 'luis' && p === 'control2026');
+                            $scope.ejecutarIngreso(hallado ? (hallado.nombre || u) : (u === 'luis' ? 'Luis Coronado' : u), hallado ? (hallado.empresa_id || "GL-MONITOREO") : "GL-MONITOREO", hallado ? (hallado.nombre_empresa || "GL Monitoreo y OP de Servicios") : "GL Monitoreo y OP de Servicios", esM);
                         });
-                    }).catch(function() { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios"); });
-                } else { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios"); }
+                    }).catch(function() { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true); });
+                } else { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true); }
             };
 
             $scope.registrarNuevaEmpresa = function() {
                 let r = $scope.regEmpresa || {};
                 let tenantGen = "TENANT-" + (r.rif || "GL").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-                $scope.ejecutarIngreso(r.adminNombre || "Administrador Master", tenantGen, r.nombre || "Empresa Registrada");
+                $scope.ejecutarIngreso(r.adminNombre || "Administrador Master", tenantGen, r.nombre || "Empresa Registrada", true);
             };
 
-            $scope.ejecutarIngreso = function(nombre, tenant, nombreEmpresa) {
+            $scope.ejecutarIngreso = function(nombre, tenant, nombreEmpresa, esM) {
                 $scope.$evalAsync(function() {
                     $scope.cargandoLogin = false;
                     $scope.sesionIniciada = true;
                     $scope.usuarioSesion = nombre;
                     $scope.tenantIdActual = tenant;
                     $scope.nombreEmpresaActual = nombreEmpresa;
+                    $scope.esMaster = esM;
+
                     localStorage.setItem('sesionIniciadaHub', 'true');
                     localStorage.setItem('usuarioSesionHub', nombre);
                     localStorage.setItem('tenantIdHub', tenant);
                     localStorage.setItem('nombreEmpresaHub', nombreEmpresa);
+                    localStorage.setItem('esMasterHub', esM ? 'true' : 'false');
+
                     if (db) $scope.sincronizarFirebase();
                 });
             };
@@ -289,49 +341,152 @@
 
             $scope.sincronizarFirebase = function() {
                 if (!db) return;
+
+                // ACTIVIDADES Y MÉTRICAS REALES DE LA MATRIZ
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.actividadesMatriz = [];
-                        snapshot.forEach(doc => { $scope.actividadesMatriz.push(doc.data()); });
+                        let mapaOp = {};
+                        let mapaGer = {};
+
+                        snapshot.forEach(doc => {
+                            let d = doc.data();
+                            if (d.empresa_id === $scope.tenantIdActual || $scope.tenantIdActual === "GL-MONITOREO") {
+                                $scope.actividadesMatriz.push(d);
+
+                                // CONTEO TOP OPERADORES
+                                if (d.responsable) {
+                                    if (!mapaOp[d.responsable]) mapaOp[d.responsable] = 0;
+                                    if (d.estado === 'Completado') mapaOp[d.responsable]++;
+                                }
+
+                                // CONTEO RANKING GERENCIAS
+                                if (d.categoria) {
+                                    if (!mapaGer[d.categoria]) mapaGer[d.categoria] = 0;
+                                    mapaGer[d.categoria]++;
+                                }
+                            }
+                        });
+
+                        $scope.rankingGerencias = mapaGer;
+                        $scope.top5Operadores = Object.keys(mapaOp).map(k => ({ nombre: k, completadas: mapaOp[k] })).sort((a,b) => b.completadas - a.completadas).slice(0, 5);
+                    });
+                });
+
+                // MURAL PERSISTENTE
+                db.collection("mural_posts").onSnapshot(snapshot => {
+                    $scope.$evalAsync(function() {
+                        $scope.listaPosts = [];
+                        snapshot.forEach(doc => {
+                            let d = doc.data();
+                            d.id = doc.id;
+                            if (d.empresa_id === $scope.tenantIdActual || $scope.tenantIdActual === "GL-MONITOREO") {
+                                d.usuarioDioLike = (d.likesUsuarios || []).includes($scope.usuarioSesion);
+                                $scope.listaPosts.push(d);
+                            }
+                        });
                     });
                 });
             };
 
-            $scope.toggleGrabarAudioConsulta = function() {
-                $scope.grabandoAudioConsulta = !$scope.grabandoAudioConsulta;
-            };
-
-            $scope.publicarConsultaGerencial = function() {
-                if (!$scope.nuevaConsulta.titulo) return;
-                if (db) db.collection("consultas_gerenciales").add({ empresa_id: $scope.tenantIdActual, autor: $scope.usuarioSesion, titulo: $scope.nuevaConsulta.titulo, detalle: $scope.nuevaConsulta.detalle || "" });
-                alert("Consulta publicada.");
-                $scope.nuevaConsulta = {};
+            $scope.calcularPorcentajeCumplimiento = function() {
+                if (!$scope.actividadesMatriz.length) return 100;
+                let comp = $scope.actividadesMatriz.filter(a => a.estado === 'Completado').length;
+                return Math.round((comp / $scope.actividadesMatriz.length) * 100);
             };
 
             $scope.publicarMural = function() {
-                if (!$scope.nuevoPostMural) return;
-                let nuevo = {
-                    id: Date.now().toString(),
-                    autor: $scope.usuarioSesion,
-                    fecha: "Ahora",
-                    mensaje: $scope.nuevoPostMural,
-                    likes: 0,
-                    comentarios: []
+                if (!$scope.nuevoPost.mensaje) return;
+
+                let fileInput = document.getElementById('fileMural');
+                let file = fileInput ? fileInput.files[0] : null;
+
+                let crearEInsertar = function(imgDataUrl) {
+                    let payload = {
+                        empresa_id: $scope.tenantIdActual,
+                        autor: $scope.usuarioSesion,
+                        fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                        mensaje: $scope.nuevoPost.mensaje,
+                        enlace: $scope.nuevoPost.enlace || "",
+                        imagenUrl: imgDataUrl || "",
+                        likes: 0,
+                        likesUsuarios: [],
+                        comentarios: []
+                    };
+
+                    if (db) db.collection("mural_posts").add(payload);
+                    $scope.nuevoPost = {};
+                    if (fileInput) fileInput.value = "";
                 };
-                $scope.listaPosts.unshift(nuevo);
-                if (db) db.collection("mural_posts").add({ empresa_id: $scope.tenantIdActual, autor: $scope.usuarioSesion, mensaje: $scope.nuevoPostMural, fecha: new Date().toISOString() });
-                $scope.nuevoPostMural = "";
+
+                if (file) {
+                    let reader = new FileReader();
+                    reader.onload = function(e) { $scope.$apply(function() { crearEInsertar(e.target.result); }); };
+                    reader.readAsDataURL(file);
+                } else {
+                    crearEInsertar("");
+                }
             };
 
-            $scope.darMeGusta = function(post) {
-                post.likes = (post.likes || 0) + 1;
+            $scope.darMeGusta = function(post, $event) {
+                if (!post.likesUsuarios) post.likesUsuarios = [];
+
+                if (!post.likesUsuarios.includes($scope.usuarioSesion)) {
+                    post.likesUsuarios.push($scope.usuarioSesion);
+                    post.likes = (post.likes || 0) + 1;
+                    post.usuarioDioLike = true;
+
+                    if (db && post.id) {
+                        db.collection("mural_posts").doc(post.id).update({
+                            likes: post.likes,
+                            likesUsuarios: post.likesUsuarios
+                        });
+                    }
+
+                    // ANIMACIÓN DE CORAZONES EN PANTALLA
+                    let heart = document.createElement('div');
+                    heart.className = 'heart-float';
+                    heart.innerHTML = '❤️';
+                    heart.style.left = ($event.clientX - 10) + 'px';
+                    heart.style.top = ($event.clientY - 20) + 'px';
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 900);
+                }
             };
 
             $scope.comentarPost = function(post) {
                 if (!post.nuevoComentario) return;
                 if (!post.comentarios) post.comentarios = [];
-                post.comentarios.push({ autor: $scope.usuarioSesion, texto: post.nuevoComentario });
+
+                let c = { autor: $scope.usuarioSesion, texto: post.nuevoComentario };
+                post.comentarios.push(c);
+
+                if (db && post.id) {
+                    db.collection("mural_posts").doc(post.id).update({ comentarios: post.comentarios });
+                }
                 post.nuevoComentario = "";
+            };
+
+            $scope.reportarPost = function(post) {
+                if (confirm("¿Reportar esta publicación al administrador master?")) {
+                    if (db) {
+                        db.collection("reportes_mural").add({
+                            tenantId: $scope.tenantIdActual,
+                            postId: post.id || "",
+                            reportadoPor: $scope.usuarioSesion,
+                            mensaje: post.mensaje,
+                            fecha: new Date().toISOString()
+                        });
+                    }
+                    alert("Publicación reportada. El Administrador Master revisará el caso.");
+                }
+            };
+
+            $scope.eliminarPost = function(post) {
+                if (confirm("¿Eliminar esta publicación del mural?")) {
+                    if (db && post.id) db.collection("mural_posts").doc(post.id).delete();
+                    $scope.listaPosts = $scope.listaPosts.filter(p => p.id !== post.id);
+                }
             };
 
             $scope.exportarInformeConsolidado = function() {
@@ -340,6 +495,14 @@
                 $scope.actividadesMatriz.forEach(a => data.push([a.descripcion, a.categoria, a.responsable, a.estado]));
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Consolidado");
                 XLSX.writeFile(wb, `Reporte_Hub_${$scope.tenantIdActual}.xlsx`);
+            };
+
+            $scope.exportarDirectorioExcel = function() {
+                let wb = XLSX.utils.book_new();
+                let data = [["Nombre", "Cargo", "Correo", "Teléfono", "Extensión"]];
+                $scope.listaDirectorio.forEach(p => data.push([p.nombre, p.cargo, p.correo, p.telefono, p.ext]));
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Directorio");
+                XLSX.writeFile(wb, `Directorio_Personal_${$scope.tenantIdActual}.xlsx`);
             };
         });
     </script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Matriz Operativa Multi-Tenant - GL Monitoreo</title>
+    <title>Matriz Operativa - GL Monitoreo y OP de Servicios</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { corePlugins: { preflight: true } }</script>
@@ -17,156 +17,143 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        body { background-color: #0F172A; color: #F8FAFC; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; padding-bottom: calc(6rem + env(safe-area-inset-bottom)); overflow-x: hidden; }
+        body { background-color: #F8FAFC; color: #0F172A; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
         @media (min-width: 768px) { body { padding-bottom: 2rem; } }
-        .card-dark { background: #1E293B; border: 1px solid #334155; border-radius: 24px; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3); transition: all 0.2s ease; }
-        .input-dark { background-color: #0F172A; border: 1px solid #334155; border-radius: 14px; padding: 0.85rem 1rem; font-size: 0.85rem; font-weight: 600; color: #F8FAFC; outline: none; transition: all 0.2s; }
-        .input-dark:focus { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); background-color: #1E293B; }
+        .card-white { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+        .input-light { background-color: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.85rem; font-weight: 600; color: #0F172A; outline: none; }
+        .input-light:focus { border-color: #2563EB; background-color: #FFFFFF; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
         .badge-estado { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 8px; }
-        .badge-pendiente { background-color: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge-proceso { background-color: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3); }
-        .badge-completado { background-color: rgba(74, 222, 128, 0.15); color: #4ADE80; border: 1px solid rgba(74, 222, 128, 0.3); }
-        .nav-tab { color: #94A3B8; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; padding: 0.6rem 1rem; border-radius: 12px; transition: all 0.2s; }
-        .nav-tab.active { background-color: #3B82F6; color: #FFFFFF; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+        .badge-pendiente { background-color: #FEF3C7; color: #D97706; border: 1px solid #FCD34D; }
+        .badge-proceso { background-color: #E0F2FE; color: #0284C7; border: 1px solid #38BDF8; }
+        .badge-completado { background-color: #DCFCE7; color: #16A34A; border: 1px solid #4ADE80; }
+        .nav-tab { color: #64748B; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; padding: 0.6rem 1rem; border-radius: 12px; }
+        .nav-tab.active { background-color: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
     </style>
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
 
-    <!-- LOGIN CON LÓGICA DE INGRESO GARANTIZADO -->
-    <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-        <div class="card-dark p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl space-y-6 border border-slate-700 my-auto">
-            <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/30">📊</div>
+    <!-- LOGIN CON INGRESOS GARANTIZADOS -->
+    <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md overflow-y-auto">
+        <div class="card-white p-6 sm:p-8 max-w-lg w-full text-center space-y-6 my-auto">
+            <div class="w-16 h-16 mx-auto rounded-3xl bg-blue-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/30">📊</div>
             <div>
-                <h2 class="text-xl font-black text-white uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
-                <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mt-1">Matriz Operativa Multi-Tenant v25.0</p>
+                <h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
+                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Matriz Operativa Multi-Tenant</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
-                <button type="button" ng-click="setModoAcceso('operativo')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'operativo', 'text-slate-400 hover:text-white': modoAcceso !== 'operativo'}">👤 Operativo</button>
-                <button type="button" ng-click="setModoAcceso('empresa')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'empresa', 'text-slate-400 hover:text-white': modoAcceso !== 'empresa'}">🏢 Registrar Empresa</button>
+            <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button type="button" ng-click="setModoAcceso('operativo')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'operativo', 'text-slate-600 hover:text-slate-900': modoAcceso !== 'operativo'}">👤 Operativo</button>
+                <button type="button" ng-click="setModoAcceso('empresa')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'empresa', 'text-slate-600 hover:text-slate-900': modoAcceso !== 'empresa'}">🏢 Registrar Empresa</button>
             </div>
 
             <div ng-if="modoAcceso === 'operativo'" class="space-y-4 text-left">
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Usuario Operativo</label><input type="text" ng-model="loginUser" placeholder="Ingresa tu usuario" autocapitalize="none" class="input-dark w-full text-center font-bold"></div>
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Contraseña</label><input type="password" ng-model="loginPass" placeholder="••••••••" class="input-dark w-full text-center font-bold"></div>
-                <button type="button" ng-click="iniciarSesionOperativo()" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
-                    {{ cargandoLogin ? 'Ingresando...' : 'Ingresar al Sistema Operativo' }}
-                </button>
+                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario</label><input type="text" ng-model="loginUser" placeholder="Ingresa tu usuario" autocapitalize="none" class="input-light w-full text-center font-bold"></div>
+                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña</label><input type="password" ng-model="loginPass" placeholder="••••••••" class="input-light w-full text-center font-bold"></div>
+                <button type="button" ng-click="iniciarSesionOperativo()" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/20 active:scale-95 transition">Ingresar al Sistema</button>
             </div>
 
             <div ng-if="modoAcceso === 'empresa'" class="space-y-3 text-left">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">RIF Empresa</label><input type="text" ng-model="regEmpresa.rif" placeholder="J-12345678-0" class="input-dark w-full uppercase"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Razón Social</label><input type="text" ng-model="regEmpresa.nombre" placeholder="Nombre Comercial" class="input-dark w-full"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Admin Master</label><input type="text" ng-model="regEmpresa.adminNombre" placeholder="Tu Nombre" class="input-dark w-full"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Usuario Master</label><input type="text" ng-model="regEmpresa.adminUsuario" placeholder="usuario_admin" autocapitalize="none" class="input-dark w-full"></div>
-                    <div class="sm:col-span-2"><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Contraseña Master</label><input type="password" ng-model="regEmpresa.adminPassword" placeholder="••••••••" class="input-dark w-full"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">RIF Empresa</label><input type="text" ng-model="regEmpresa.rif" placeholder="J-12345678-0" class="input-light w-full uppercase"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Razón Social</label><input type="text" ng-model="regEmpresa.nombre" placeholder="Nombre Comercial" class="input-light w-full"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Admin Master</label><input type="text" ng-model="regEmpresa.adminNombre" placeholder="Nombre Admin" class="input-light w-full"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario Master</label><input type="text" ng-model="regEmpresa.adminUsuario" placeholder="usuario_admin" autocapitalize="none" class="input-light w-full"></div>
+                    <div class="sm:col-span-2"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña Master</label><input type="password" ng-model="regEmpresa.adminPassword" placeholder="••••••••" class="input-light w-full"></div>
                 </div>
-                <button type="button" ng-click="registrarNuevaEmpresa()" class="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase shadow-lg shadow-emerald-600/30 active:scale-95 transition">🚀 Crear Empresa & Entrar</button>
+                <button type="button" ng-click="registrarNuevaEmpresa()" class="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase shadow-lg shadow-emerald-600/20 active:scale-95 transition">🚀 Registrar Empresa</button>
             </div>
 
-            <div class="pt-2 border-t border-slate-800 text-[10px] text-slate-500 font-semibold">Protegido bajo Derechos Reservados © 2026 GL Monitoreo y OP de Servicios.</div>
+            <div class="pt-2 border-t border-slate-200 text-[10px] text-slate-400 font-semibold">Derechos Reservados © 2026 GL Monitoreo y OP de Servicios.</div>
         </div>
     </div>
 
-    <!-- NAVEGACIÓN -->
+    <!-- MAIN APP -->
     <div ng-if="sesionIniciada">
-        <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-md">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md">🏢</div>
                     <div>
-                        <h1 class="font-extrabold text-sm sm:text-base text-white tracking-tight uppercase">{{ nombreEmpresaActual }}</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-400 font-semibold">👤 {{ usuarioSesion }} | Tenant: <span class="font-mono text-slate-300">{{ tenantIdActual }}</span></p>
+                        <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">{{ nombreEmpresaActual }}</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">👤 {{ usuarioSesion }} <span class="text-blue-600 font-bold">({{ esMaster ? 'Master Admin' : 'Operador' }})</span> | Tenant: <span class="font-mono text-slate-700">{{ tenantIdActual }}</span></p>
                     </div>
                 </div>
 
                 <div class="hidden md:flex items-center gap-3">
-                    <div class="flex gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                    <div class="flex gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
                         <button class="nav-tab" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="seccionActiva = 'matriz'">📋 Matriz</button>
-                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'calendario'}" ng-click="seccionActiva = 'calendario'">📅 Agenda & SLAs</button>
-                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'sugerencias'}" ng-click="seccionActiva = 'sugerencias'">💡 Sugerencias</button>
-                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'admin_master'}" ng-click="seccionActiva = 'admin_master'">⚙ Admin Master</button>
+                        <button class="nav-tab" ng-class="{'active': seccionActiva === 'admin_master'}" ng-show="esMaster" ng-click="seccionActiva = 'admin_master'">⚙ Control Master</button>
                     </div>
-                    <a href="intranet.html" class="text-xs font-bold text-blue-400 bg-blue-950/60 px-3.5 py-2 rounded-xl border border-blue-800">🏢 Hub Operativo</a>
-                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-400 bg-red-950/60 px-3 py-2 rounded-xl border border-red-800">Salir</button>
+                    <a href="intranet.html" class="text-xs font-bold text-blue-600 bg-blue-50 px-3.5 py-2 rounded-xl border border-blue-200">🏢 Hub Operativo</a>
+                    <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-600 bg-red-50 px-3 py-2 rounded-xl border border-red-200">Salir</button>
                 </div>
             </div>
         </header>
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
 
-            <!-- 1. MATRIZ OPERATIVA -->
+            <!-- SECCIÓN MATRIZ -->
             <div ng-show="seccionActiva === 'matriz'" class="space-y-6">
-                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 p-6 sm:p-8 text-white shadow-xl border border-slate-700">
-                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 p-6 sm:p-8 text-white shadow-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <span class="text-[10px] sm:text-xs font-black uppercase bg-white/10 px-3 py-1 rounded-full border border-white/20">{{ nombreEmpresaActual }}</span>
-                            <h2 class="text-2xl sm:text-3xl font-black mt-2">Control de Requerimientos & SLAs</h2>
+                            <span class="text-[10px] sm:text-xs font-black uppercase bg-white/20 px-3 py-1 rounded-full border border-white/30">{{ nombreEmpresaActual }}</span>
+                            <h2 class="text-2xl sm:text-3xl font-black mt-2">Control de Requerimientos Operativos</h2>
                         </div>
                         <div class="flex gap-2">
-                            <button ng-click="exportarPDF()" class="px-4 py-3 rounded-2xl bg-slate-950 text-white font-bold text-xs uppercase border border-slate-800">📄 PDF</button>
-                            <button ng-click="exportarExcel()" class="px-4 py-3 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase shadow-md">📥 Excel</button>
+                            <button ng-click="exportarPDF()" class="px-4 py-3 rounded-2xl bg-white text-slate-900 font-bold text-xs uppercase shadow">📄 PDF</button>
+                            <button ng-click="exportarExcel()" class="px-4 py-3 rounded-2xl bg-emerald-500 text-white font-black text-xs uppercase shadow">📥 Excel</button>
                         </div>
                     </div>
                 </div>
 
+                <!-- KPIS -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                    <div class="card-dark p-4"><span class="text-xs font-bold text-slate-400 uppercase">Total Actividades</span><div class="text-2xl font-black text-white mt-1">{{ actividadesVisibles.length }}</div></div>
-                    <div class="card-dark p-4"><span class="text-xs font-bold text-amber-400 uppercase">Pendientes</span><div class="text-2xl font-black text-amber-400 mt-1">{{ contarPorEstado('Pendiente') }}</div></div>
-                    <div class="card-dark p-4"><span class="text-xs font-bold text-sky-400 uppercase">En Proceso</span><div class="text-2xl font-black text-sky-400 mt-1">{{ contarPorEstado('En Proceso') }}</div></div>
-                    <div class="card-dark p-4"><span class="text-xs font-bold text-emerald-400 uppercase">Completadas</span><div class="text-2xl font-black text-emerald-400 mt-1">{{ contarPorEstado('Completado') }}</div></div>
+                    <div class="card-white p-4"><span class="text-xs font-bold text-slate-500 uppercase">Total Actividades</span><div class="text-2xl font-black text-slate-900 mt-1">{{ actividadesVisibles.length }}</div></div>
+                    <div class="card-white p-4"><span class="text-xs font-bold text-amber-600 uppercase">Pendientes</span><div class="text-2xl font-black text-amber-600 mt-1">{{ contarPorEstado('Pendiente') }}</div></div>
+                    <div class="card-white p-4"><span class="text-xs font-bold text-sky-600 uppercase">En Proceso</span><div class="text-2xl font-black text-sky-600 mt-1">{{ contarPorEstado('En Proceso') }}</div></div>
+                    <div class="card-white p-4"><span class="text-xs font-bold text-emerald-600 uppercase">Completadas</span><div class="text-2xl font-black text-emerald-600 mt-1">{{ contarPorEstado('Completado') }}</div></div>
                 </div>
 
-                <!-- CARGA CON SOPORTE DOCUMENTAL Y NOTA DE VOZ -->
-                <div class="card-dark p-5 sm:p-6 space-y-4">
-                    <h3 class="text-xs sm:text-base font-black text-white uppercase border-b border-slate-800 pb-3">➕ Registrar Requerimiento Operativo</h3>
+                <!-- FORMULARIO REGISTRO -->
+                <div class="card-white p-5 sm:p-6 space-y-4">
+                    <h3 class="text-xs sm:text-base font-black text-slate-900 uppercase border-b border-slate-200 pb-3">➕ Registrar Requerimiento Operativo</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                        <div class="sm:col-span-2"><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Descripción</label><input type="text" ng-model="nuevaAct.descripcion" placeholder="Ej: Conciliación bancaria..." class="input-dark w-full"></div>
+                        <div class="sm:col-span-2"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Descripción</label><input type="text" ng-model="nuevaAct.descripcion" placeholder="Ej: Conciliación bancaria..." class="input-light w-full"></div>
                         <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Gerencia / Área</label>
-                            <select ng-model="nuevaAct.categoria" class="input-dark w-full">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Gerencia / Área</label>
+                            <select ng-model="nuevaAct.categoria" class="input-light w-full">
                                 <option value="Servicios bancarios">Servicios bancarios</option>
                                 <option value="Recaudación especializada">Recaudación especializada</option>
                                 <option value="Control contable">Control contable</option>
                             </select>
                         </div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Responsable</label><input type="text" ng-model="nuevaAct.responsable" class="input-dark w-full"></div>
+                        <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Responsable</label><input type="text" ng-model="nuevaAct.responsable" class="input-light w-full"></div>
                         <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Estado</label>
-                            <select ng-model="nuevaAct.estado" class="input-dark w-full">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Estado</label>
+                            <select ng-model="nuevaAct.estado" class="input-light w-full">
                                 <option value="Pendiente">Pendiente</option>
                                 <option value="En Proceso">En Proceso</option>
                                 <option value="Completado">Completado</option>
                             </select>
                         </div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">SLA (Fecha Compromiso)</label><input type="date" ng-model="nuevaAct.fechaLimiteInput" class="input-dark w-full"></div>
-                        <div class="sm:col-span-2"><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Observaciones</label><input type="text" ng-model="nuevaAct.observaciones" placeholder="Detalles adicionales..." class="input-dark w-full"></div>
-                    </div>
-
-                    <!-- BOTONES DE AUDIO Y ARCHIVO -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-900 rounded-2xl border border-slate-800">
+                        
+                        <!-- RESTRICCIÓN SLA: SOLO MODIFICABLE POR ADMIN -->
                         <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">📄 Soporte Documental (PDF / Excel)</label>
-                            <input type="file" id="fileDoc" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">SLA (Fecha Compromiso) {{ !esMaster ? '[Solo Admin]' : '' }}</label>
+                            <input type="date" ng-model="nuevaAct.fechaLimiteInput" ng-disabled="!esMaster" class="input-light w-full">
                         </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">🎙 Nota de Voz Operativa</label>
-                            <button type="button" ng-click="toggleGrabarAudioMatriz()" class="px-4 py-1.5 rounded-lg font-bold text-xs uppercase" ng-class="{'bg-red-600 text-white animate-pulse': grabandoAudio, 'bg-slate-800 text-blue-400 border border-slate-700': !grabandoAudio}">
-                                {{ grabandoAudio ? '⏹ Detener Grabación' : '🎤 Grabar Audio' }}
-                            </button>
-                        </div>
+                        <div class="sm:col-span-2"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Observaciones</label><input type="text" ng-model="nuevaAct.observaciones" placeholder="Detalles de ejecución..." class="input-light w-full"></div>
                     </div>
-
-                    <button type="button" ng-click="agregarActividad()" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/30 transition">+ Guardar Requerimiento</button>
+                    <button type="button" ng-click="agregarActividad()" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-md transition">+ Guardar Requerimiento</button>
                 </div>
 
-                <!-- TABLA MATRIZ CON BOTÓN DE MODIFICAR -->
-                <div class="card-dark p-4 sm:p-6 space-y-4">
+                <!-- TABLA -->
+                <div class="card-white p-4 sm:p-6 space-y-4">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse min-w-[850px]">
+                        <table class="w-full text-left text-xs border-collapse min-w-[800px]">
                             <thead>
-                                <tr class="bg-slate-900 text-slate-400 uppercase text-[10px]">
+                                <tr class="bg-slate-100 text-slate-600 uppercase text-[10px]">
                                     <th class="p-3 font-black">Requerimiento</th>
                                     <th class="p-3 font-black">Área</th>
                                     <th class="p-3 font-black">Responsable</th>
@@ -176,16 +163,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="act in actividadesVisibles" class="border-b border-slate-800 hover:bg-slate-800/50 transition">
-                                    <td class="p-3 font-bold text-white">{{ act.descripcion }}</td>
-                                    <td class="p-3 text-slate-400">🏢 {{ act.categoria }}</td>
-                                    <td class="p-3 font-bold text-blue-400">👤 {{ act.responsable }}</td>
+                                <tr ng-repeat="act in actividadesVisibles" class="border-b border-slate-100 hover:bg-slate-50 transition">
+                                    <td class="p-3 font-bold text-slate-900">{{ act.descripcion }}</td>
+                                    <td class="p-3 text-slate-600">🏢 {{ act.categoria }}</td>
+                                    <td class="p-3 font-bold text-blue-600">👤 {{ act.responsable }}</td>
                                     <td class="p-3"><span class="badge-estado" ng-class="{'badge-pendiente': act.estado==='Pendiente', 'badge-proceso': act.estado==='En Proceso', 'badge-completado': act.estado==='Completado'}">{{ act.estado }}</span></td>
-                                    <td class="p-3 font-mono text-slate-400 font-bold">{{ act.fechaLimite || '--' }}</td>
+                                    <td class="p-3 font-mono text-slate-600 font-bold">{{ act.fechaLimite || '--' }}</td>
                                     <td class="p-3 text-center space-x-1">
-                                        <button type="button" ng-click="abrirModalEdicion(act)" class="px-2.5 py-1.5 bg-amber-500/20 text-amber-400 font-bold rounded-lg border border-amber-500/30 text-[10px]">✏ Modificar</button>
-                                        <button type="button" ng-click="cambiarEstado(act)" class="px-2.5 py-1.5 bg-blue-950 text-blue-400 font-bold rounded-lg border border-blue-800 text-[10px]">⚡ Estado</button>
-                                        <button type="button" ng-click="eliminarActividad($index)" class="px-2.5 py-1.5 bg-red-950 text-red-400 font-bold rounded-lg border border-red-800 text-[10px]">🗑 Borrar</button>
+                                        <button type="button" ng-click="abrirModalEdicion(act)" class="px-2.5 py-1.5 bg-amber-50 text-amber-600 font-bold rounded-lg border border-amber-200 text-[10px]">✏ Modificar</button>
+                                        <button type="button" ng-click="cambiarEstado(act)" class="px-2.5 py-1.5 bg-blue-50 text-blue-600 font-bold rounded-lg border border-blue-200 text-[10px]">⚡ Estado</button>
+                                        <button type="button" ng-click="eliminarActividad($index)" class="px-2.5 py-1.5 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 text-[10px]">🗑 Borrar</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -194,43 +181,46 @@
                 </div>
             </div>
 
-            <!-- MODAL DE EDICIÓN -->
-            <div ng-show="modalEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-                <div class="card-dark p-6 max-w-lg w-full space-y-4 border border-slate-700">
-                    <h3 class="text-sm font-black text-white uppercase">✏ Editar Requerimiento</h3>
+            <!-- MODAL DE EDICIÓN CON CONTROL DE SLA -->
+            <div ng-show="modalEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+                <div class="card-white p-6 max-w-lg w-full space-y-4">
+                    <h3 class="text-sm font-black text-slate-900 uppercase">✏ Modificar Requerimiento</h3>
                     <div class="space-y-3">
-                        <input type="text" ng-model="actEdit.descripcion" class="input-dark w-full font-bold">
-                        <input type="text" ng-model="actEdit.responsable" class="input-dark w-full">
-                        <select ng-model="actEdit.estado" class="input-dark w-full">
+                        <input type="text" ng-model="actEdit.descripcion" class="input-light w-full font-bold">
+                        <input type="text" ng-model="actEdit.responsable" class="input-light w-full">
+                        <select ng-model="actEdit.estado" class="input-light w-full">
                             <option value="Pendiente">Pendiente</option>
                             <option value="En Proceso">En Proceso</option>
                             <option value="Completado">Completado</option>
                         </select>
-                        <input type="date" ng-model="actEdit.fechaLimiteInput" class="input-dark w-full">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">SLA (Solo Administrador)</label>
+                            <input type="date" ng-model="actEdit.fechaLimiteInput" ng-disabled="!esMaster" class="input-light w-full">
+                        </div>
                     </div>
                     <div class="flex justify-end gap-2 pt-2">
-                        <button type="button" ng-click="modalEditOpen = false" class="px-4 py-2 bg-slate-800 text-slate-400 font-bold text-xs rounded-xl">Cancelar</button>
+                        <button type="button" ng-click="modalEditOpen = false" class="px-4 py-2 bg-slate-200 text-slate-600 font-bold text-xs rounded-xl">Cancelar</button>
                         <button type="button" ng-click="guardarEdicion()" class="px-5 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">Guardar Cambios</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. ADMIN MASTER DE EMPRESAS Y USUARIOS -->
+            <!-- CONTROL MASTER GLOBAL (`luis` / `control2026`) -->
             <div ng-show="seccionActiva === 'admin_master'" class="space-y-6">
-                <div class="card-dark p-6 space-y-4">
-                    <h3 class="text-sm font-black text-white uppercase">🏢 Control Master de Empresas Registradas</h3>
+                <div class="card-white p-6 space-y-4">
+                    <h3 class="text-sm font-black text-slate-900 uppercase">⚙ Panel Master de Empresas & Reportes</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div ng-repeat="emp in listaEmpresas" class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                            <div class="flex justify-between items-center"><span class="font-bold text-white text-sm">{{ emp.nombre }}</span><span class="text-[10px] font-mono text-blue-400">{{ emp.tenantId }}</span></div>
-                            <p class="text-xs text-slate-400">RIF: {{ emp.rif }} | Admin: {{ emp.adminNombre }}</p>
-                            <button type="button" ng-click="eliminarEmpresa(emp.tenantId)" class="px-3 py-1 bg-red-950 text-red-400 font-bold text-[10px] rounded-lg border border-red-800">🗑 Eliminar Empresa</button>
+                        <div ng-repeat="emp in listaEmpresas" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center"><span class="font-bold text-slate-900 text-sm">{{ emp.nombre }}</span><span class="text-[10px] font-mono text-blue-600">{{ emp.tenantId }}</span></div>
+                            <p class="text-xs text-slate-500">RIF: {{ emp.rif }} | Admin: {{ emp.adminNombre }}</p>
+                            <button type="button" ng-click="eliminarEmpresa(emp.tenantId)" class="px-3 py-1 bg-red-100 text-red-600 font-bold text-[10px] rounded-lg border border-red-200">🗑 Eliminar Empresa</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <footer class="pt-6 border-t border-slate-800 text-center space-y-2">
-                <p class="text-[11px] text-slate-400 font-semibold">GL Monitoreo y OP de Servicios — Todos los Derechos Reservados © 2026</p>
+            <footer class="pt-6 border-t border-slate-200 text-center space-y-2">
+                <p class="text-[11px] text-slate-500 font-semibold">GL Monitoreo y OP de Servicios — Todos los Derechos Reservados © 2026</p>
             </footer>
         </main>
     </div>
@@ -254,6 +244,7 @@
             $scope.usuarioSesion = localStorage.getItem('usuarioSesionMatriz') || "Luis Coronado";
             $scope.tenantIdActual = localStorage.getItem('tenantIdMatriz') || "GL-MONITOREO";
             $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresaMatriz') || "GL Monitoreo y OP de Servicios";
+            $scope.esMaster = localStorage.getItem('esMasterMatriz') === 'true';
             $scope.seccionActiva = 'matriz';
 
             $scope.actividadesVisibles = [];
@@ -263,7 +254,6 @@
             $scope.nuevaAct = { categoria: "Servicios bancarios", estado: "Pendiente" };
             $scope.actEdit = {};
             $scope.modalEditOpen = false;
-            $scope.grabandoAudio = false;
 
             if ($scope.sesionIniciada && db) { $timeout(function() { $scope.sincronizarFirebase(); }); }
 
@@ -278,7 +268,8 @@
 
                 $scope.cargandoLogin = true;
                 var dbTimeout = setTimeout(function() {
-                    $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios");
+                    let esM = (u === 'luis' && p === 'control2026');
+                    $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", esM);
                 }, 500);
 
                 if (db) {
@@ -290,30 +281,35 @@
                                 let d = doc.data();
                                 if ((d.usuario || "").toString().trim().toLowerCase() === u && (d.password || "").toString().trim() === p) hallado = d;
                             });
-                            $scope.ejecutarIngreso(hallado ? (hallado.nombre || u) : (u === 'luis' ? 'Luis Coronado' : u), hallado ? (hallado.empresa_id || "GL-MONITOREO") : "GL-MONITOREO", hallado ? (hallado.nombre_empresa || "GL Monitoreo y OP de Servicios") : "GL Monitoreo y OP de Servicios");
+                            let esM = (u === 'luis' && p === 'control2026');
+                            $scope.ejecutarIngreso(hallado ? (hallado.nombre || u) : (u === 'luis' ? 'Luis Coronado' : u), hallado ? (hallado.empresa_id || "GL-MONITOREO") : "GL-MONITOREO", hallado ? (hallado.nombre_empresa || "GL Monitoreo y OP de Servicios") : "GL Monitoreo y OP de Servicios", esM);
                         });
-                    }).catch(function() { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios"); });
-                } else { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios"); }
+                    }).catch(function() { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true); });
+                } else { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true); }
             };
 
             $scope.registrarNuevaEmpresa = function() {
                 let r = $scope.regEmpresa || {};
                 let tenantGen = "TENANT-" + (r.rif || "GL").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
                 $scope.listaEmpresas.push({ nombre: r.nombre || "Nueva Empresa", tenantId: tenantGen, rif: r.rif || "N/A", adminNombre: r.adminNombre || "Admin" });
-                $scope.ejecutarIngreso(r.adminNombre || "Administrador Master", tenantGen, r.nombre || "Empresa Registrada");
+                $scope.ejecutarIngreso(r.adminNombre || "Administrador Master", tenantGen, r.nombre || "Empresa Registrada", true);
             };
 
-            $scope.ejecutarIngreso = function(nombre, tenant, nombreEmpresa) {
+            $scope.ejecutarIngreso = function(nombre, tenant, nombreEmpresa, esM) {
                 $scope.$evalAsync(function() {
                     $scope.cargandoLogin = false;
                     $scope.sesionIniciada = true;
                     $scope.usuarioSesion = nombre;
                     $scope.tenantIdActual = tenant;
                     $scope.nombreEmpresaActual = nombreEmpresa;
+                    $scope.esMaster = esM;
+
                     localStorage.setItem('sesionIniciadaMatriz', 'true');
                     localStorage.setItem('usuarioSesionMatriz', nombre);
                     localStorage.setItem('tenantIdMatriz', tenant);
                     localStorage.setItem('nombreEmpresaMatriz', nombreEmpresa);
+                    localStorage.setItem('esMasterMatriz', esM ? 'true' : 'false');
+
                     if (db) $scope.sincronizarFirebase();
                 });
             };
@@ -325,7 +321,14 @@
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.actividadesVisibles = [];
-                        snapshot.forEach(doc => { let d = doc.data(); d.id = doc.id; $scope.actividadesVisibles.push(d); });
+                        snapshot.forEach(doc => {
+                            let d = doc.data();
+                            d.id = doc.id;
+                            if (d.empresa_id === $scope.tenantIdActual || $scope.tenantIdActual === "GL-MONITOREO") {
+                                $scope.actividadesVisibles.push(d);
+                            }
+                        });
+                        localStorage.setItem('cacheMatriz', JSON.stringify($scope.actividadesVisibles));
                     });
                 });
             };
@@ -356,17 +359,17 @@
 
             $scope.guardarEdicion = function() {
                 if (db && $scope.actEdit.id) {
-                    db.collection("actividades_operativas").doc($scope.actEdit.id).update({
+                    let upd = {
                         descripcion: $scope.actEdit.descripcion,
                         responsable: $scope.actEdit.responsable,
                         estado: $scope.actEdit.estado
-                    });
+                    };
+                    if ($scope.esMaster && $scope.actEdit.fechaLimiteInput) {
+                        upd.fechaLimite = $scope.actEdit.fechaLimiteInput.toISOString().split('T')[0];
+                    }
+                    db.collection("actividades_operativas").doc($scope.actEdit.id).update(upd);
                 }
                 $scope.modalEditOpen = false;
-            };
-
-            $scope.toggleGrabarAudioMatriz = function() {
-                $scope.grabandoAudio = !$scope.grabandoAudio;
             };
 
             $scope.cambiarEstado = function(act) {
@@ -382,7 +385,7 @@
             };
 
             $scope.eliminarEmpresa = function(tenantId) {
-                if (confirm("¿Eliminar la empresa seleccionada?")) {
+                if (confirm("¿Eliminar empresa seleccionada?")) {
                     $scope.listaEmpresas = $scope.listaEmpresas.filter(e => e.tenantId !== tenantId);
                 }
             };
