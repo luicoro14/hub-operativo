@@ -11,7 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -105,20 +104,20 @@
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
 
-    <!-- LOGIN / ONBOARDING DUAL PROFESIONAL -->
+    <!-- LOGIN / ONBOARDING DUAL REPARADO -->
     <div id="loginOverlay" ng-if="!sesionIniciada" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
         <div class="card-dark p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl space-y-6 border border-slate-700 my-auto">
             
             <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/30">
-                🏢
+                📊
             </div>
             
             <div>
                 <h2 class="text-xl font-black text-white uppercase tracking-tight">GL Monitoreo y OP de Servicios</h2>
-                <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mt-1">Plataforma Empresarial v24.0 Multi-Tenant</p>
+                <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mt-1">Matriz Operativa Multi-Tenant v24.1</p>
             </div>
 
-            <!-- BOTONES DE SELECCIÓN DE PERFIL DE INGRESO -->
+            <!-- SELECCIÓN DE PESTAÑAS -->
             <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
                 <button type="button" ng-click="setModoAcceso('operativo')" class="py-2.5 px-3 rounded-xl font-bold text-xs uppercase transition" ng-class="{'bg-blue-600 text-white shadow-md': modoAcceso === 'operativo', 'text-slate-400 hover:text-white': modoAcceso !== 'operativo'}">
                     👤 Operativo
@@ -128,53 +127,53 @@
                 </button>
             </div>
 
-            <!-- FORMULARIO 1: USUARIO OPERATIVO -->
-            <form ng-if="modoAcceso === 'operativo'" ng-submit="iniciarSesionOperativo($event)" class="space-y-4 text-left">
+            <!-- 1. USUARIO OPERATIVO -->
+            <div ng-if="modoAcceso === 'operativo'" class="space-y-4 text-left">
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Usuario Operativo</label>
-                    <input type="text" ng-model="loginUser" placeholder="Ingresa tu usuario" required autocapitalize="none" class="input-dark w-full text-center font-bold">
+                    <input type="text" ng-model="loginUser" placeholder="Ingresa tu usuario" autocapitalize="none" class="input-dark w-full text-center font-bold">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Contraseña</label>
-                    <input type="password" ng-model="loginPass" placeholder="••••••••" required class="input-dark w-full text-center font-bold">
+                    <input type="password" ng-model="loginPass" placeholder="••••••••" class="input-dark w-full text-center font-bold">
                 </div>
 
-                <button type="submit" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
+                <button type="button" ng-click="iniciarSesionOperativo($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/30 active:scale-95 transition">
                     {{ cargandoLogin ? 'Verificando...' : 'Ingresar al Sistema Operativo' }}
                 </button>
-            </form>
+            </div>
 
-            <!-- FORMULARIO 2: REGISTRO MASTER EMPRESA -->
-            <form ng-if="modoAcceso === 'empresa'" ng-submit="registrarNuevaEmpresa($event)" class="space-y-3 text-left">
+            <!-- 2. REGISTRO EMPRESA MASTER -->
+            <div ng-if="modoAcceso === 'empresa'" class="space-y-3 text-left">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">RIF / Cédula Empresa</label>
-                        <input type="text" ng-model="regEmpresa.rif" placeholder="J-12345678-0" required class="input-dark w-full uppercase">
+                        <input type="text" ng-model="regEmpresa.rif" placeholder="J-12345678-0" class="input-dark w-full uppercase">
                     </div>
                     <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Nombre / Razón Social</label>
-                        <input type="text" ng-model="regEmpresa.nombre" placeholder="Nombre Comercial" required class="input-dark w-full">
+                        <input type="text" ng-model="regEmpresa.nombre" placeholder="Nombre Comercial" class="input-dark w-full">
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Nombre Administrador Master</label>
-                        <input type="text" ng-model="regEmpresa.adminNombre" placeholder="Tu Nombre" required class="input-dark w-full">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Administrador Master</label>
+                        <input type="text" ng-model="regEmpresa.adminNombre" placeholder="Tu Nombre" class="input-dark w-full">
                     </div>
                     <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Usuario Master</label>
-                        <input type="text" ng-model="regEmpresa.adminUsuario" placeholder="usuario_admin" required autocapitalize="none" class="input-dark w-full">
+                        <input type="text" ng-model="regEmpresa.adminUsuario" placeholder="usuario_admin" autocapitalize="none" class="input-dark w-full">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Contraseña Master</label>
-                        <input type="password" ng-model="regEmpresa.adminPassword" placeholder="••••••••" required class="input-dark w-full">
+                        <input type="password" ng-model="regEmpresa.adminPassword" placeholder="••••••••" class="input-dark w-full">
                     </div>
                 </div>
 
-                <button type="submit" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase shadow-lg shadow-emerald-600/30 active:scale-95 transition">
+                <button type="button" ng-click="registrarNuevaEmpresa($event)" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase shadow-lg shadow-emerald-600/30 active:scale-95 transition">
                     {{ cargandoLogin ? 'Registrando...' : '🚀 Crear Empresa & Entrar' }}
                 </button>
-            </form>
+            </div>
 
-            <p ng-show="loginError" class="text-xs text-red-400 font-bold">⚠ Error en credenciales o datos de registro. Revisa e intentalo de nuevo.</p>
+            <p ng-show="loginError" class="text-xs text-red-400 font-bold">⚠ Error en credenciales o datos incompletos. Revisa e intentalo de nuevo.</p>
 
             <div class="pt-2 border-t border-slate-800 text-[10px] text-slate-500 font-semibold">
                 Protegido bajo Derechos Reservados © 2026 GL Monitoreo y OP de Servicios.
@@ -201,7 +200,6 @@
                         <button class="nav-tab" ng-class="{'active': seccionActiva === 'matriz'}" ng-click="cambiarSeccion('matriz')">📋 Matriz</button>
                         <button class="nav-tab" ng-class="{'active': seccionActiva === 'calendario'}" ng-click="cambiarSeccion('calendario')">📅 Agenda & SLAs</button>
                         <button class="nav-tab" ng-class="{'active': seccionActiva === 'sugerencias'}" ng-click="cambiarSeccion('sugerencias')">💡 Sugerencias</button>
-                        <button class="nav-tab" ng-show="esSuperAdmin" ng-class="{'active': seccionActiva === 'admin'}" ng-click="cambiarSeccion('admin')">⚙ Admin</button>
                     </div>
 
                     <a href="intranet.html" class="text-xs font-bold text-blue-400 bg-blue-950/60 px-3.5 py-2 rounded-xl border border-blue-800 hover:bg-blue-900 transition">
@@ -258,15 +256,15 @@
                 <!-- FORMULARIO REGISTRO -->
                 <div class="card-dark p-5 sm:p-6 space-y-4">
                     <h3 class="text-xs sm:text-base font-black text-white uppercase border-b border-slate-800 pb-3">➕ Registrar Requerimiento Operativo</h3>
-                    <form ng-submit="agregarActividad()" class="space-y-4">
+                    <div class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                             <div class="sm:col-span-2">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Descripción Requerimiento</label>
-                                <input type="text" ng-model="nuevaAct.descripcion" required placeholder="Ej: Conciliación bancaria..." class="input-dark w-full">
+                                <input type="text" ng-model="nuevaAct.descripcion" placeholder="Ej: Conciliación bancaria..." class="input-dark w-full">
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Gerencia / Área</label>
-                                <select ng-model="nuevaAct.categoria" required class="input-dark w-full">
+                                <select ng-model="nuevaAct.categoria" class="input-dark w-full">
                                     <option value="Servicios bancarios">Servicios bancarios</option>
                                     <option value="Recaudación especializada">Recaudación especializada</option>
                                     <option value="Control contable">Control contable</option>
@@ -274,11 +272,11 @@
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Responsable</label>
-                                <input type="text" ng-model="nuevaAct.responsable" required placeholder="Nombre" class="input-dark w-full">
+                                <input type="text" ng-model="nuevaAct.responsable" placeholder="Nombre" class="input-dark w-full">
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Estado Inicial</label>
-                                <select ng-model="nuevaAct.estado" required class="input-dark w-full">
+                                <select ng-model="nuevaAct.estado" class="input-dark w-full">
                                     <option value="Pendiente">Pendiente</option>
                                     <option value="En Proceso">En Proceso</option>
                                     <option value="Completado">Completado</option>
@@ -286,7 +284,7 @@
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">SLA (Fecha Compromiso)</label>
-                                <input type="date" ng-model="nuevaAct.fechaLimiteInput" required class="input-dark w-full">
+                                <input type="date" ng-model="nuevaAct.fechaLimiteInput" class="input-dark w-full">
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Observaciones</label>
@@ -294,10 +292,10 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/30 transition">
+                        <button type="button" ng-click="agregarActividad()" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/30 transition">
                             + Guardar Requerimiento
                         </button>
-                    </form>
+                    </div>
                 </div>
 
                 <!-- TABLA DE ACTIVIDADES -->
@@ -386,8 +384,17 @@
                 var u = ($scope.loginUser || "").trim().toLowerCase();
                 var p = ($scope.loginPass || "").trim();
 
-                if (!u || !p) return;
+                if (!u || !p) {
+                    $scope.loginError = true;
+                    return;
+                }
                 $scope.cargandoLogin = true;
+
+                // Validación de Respaldo Inmediata para credenciales Maestras
+                if ((u === 'luis' || u === 'admin') && (p === 'control2026' || p === 'luis')) {
+                    $scope.ejecutarIngreso("Luis Coronado", "GL-MONITOREO", "GL Monitoreo y OP de Servicios");
+                    return;
+                }
 
                 if (db) {
                     db.collection("personal_intranet").get().then(function(snapshot) {
@@ -402,10 +409,9 @@
                             });
 
                             if (hallado) {
-                                $scope.ejecutarIngreso(hallado.nombre || u, hallado.empresa_id || "GL-MONITOREO", hallado.nombre_empresa || "GL Monitoreo");
+                                $scope.ejecutarIngreso(hallado.nombre || u, hallado.empresa_id || "GL-MONITOREO", hallado.nombre_empresa || "GL Monitoreo y OP de Servicios");
                             } else {
-                                if (u === 'luis' || u === 'admin') $scope.ejecutarIngreso("Luis Coronado", "GL-MONITOREO", "GL Monitoreo y OP de Servicios");
-                                else $scope.loginError = true;
+                                $scope.loginError = true;
                             }
                         });
                     }).catch(() => {
@@ -423,7 +429,10 @@
             $scope.registrarNuevaEmpresa = function(event) {
                 if (event) event.preventDefault();
                 let r = $scope.regEmpresa;
-                if (!r.rif || !r.nombre || !r.adminUsuario || !r.adminPassword) return;
+                if (!r.rif || !r.nombre || !r.adminUsuario || !r.adminPassword) {
+                    $scope.loginError = true;
+                    return;
+                }
 
                 $scope.cargandoLogin = true;
                 let tenantGen = "TENANT-" + r.rif.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
@@ -432,14 +441,14 @@
                     rif: r.rif,
                     nombre_empresa: r.nombre,
                     empresa_id: tenantGen,
-                    admin_nombre: r.adminNombre,
+                    admin_nombre: r.adminNombre || "Administrador",
                     fecha_registro: new Date().toISOString()
                 };
 
                 let payloadUsuarioMaster = {
                     empresa_id: tenantGen,
                     nombre_empresa: r.nombre,
-                    nombre: r.adminNombre,
+                    nombre: r.adminNombre || "Administrador",
                     usuario: r.adminUsuario.trim().toLowerCase(),
                     password: r.adminPassword.trim(),
                     rol: "admin_master"
@@ -448,10 +457,10 @@
                 if (db) {
                     db.collection("tenants").doc(tenantGen).set(payloadEmpresa);
                     db.collection("personal_intranet").add(payloadUsuarioMaster).then(() => {
-                        $scope.ejecutarIngreso(r.adminNombre, tenantGen, r.nombre);
+                        $scope.ejecutarIngreso(r.adminNombre || "Administrador", tenantGen, r.nombre);
                     });
                 } else {
-                    $scope.ejecutarIngreso(r.adminNombre, tenantGen, r.nombre);
+                    $scope.ejecutarIngreso(r.adminNombre || "Administrador", tenantGen, r.nombre);
                 }
             };
 
@@ -486,6 +495,7 @@
                         snapshot.forEach(doc => {
                             let d = doc.data();
                             d.id = doc.id;
+                            if (!d.empresa_id) { d.empresa_id = "GL-MONITOREO"; }
                             if (d.empresa_id === $scope.tenantIdActual || $scope.tenantIdActual === "GL-MONITOREO") {
                                 $scope.actividadesVisibles.push(d);
                             }
@@ -499,13 +509,14 @@
             };
 
             $scope.agregarActividad = function() {
+                if (!$scope.nuevaAct.descripcion) return;
                 let r = {
                     empresa_id: $scope.tenantIdActual,
                     nombre_empresa: $scope.nombreEmpresaActual,
                     descripcion: $scope.nuevaAct.descripcion,
-                    categoria: $scope.nuevaAct.categoria,
-                    responsable: $scope.nuevaAct.responsable,
-                    estado: $scope.nuevaAct.estado,
+                    categoria: $scope.nuevaAct.categoria || "Servicios bancarios",
+                    responsable: $scope.nuevaAct.responsable || $scope.usuarioSesion,
+                    estado: $scope.nuevaAct.estado || "Pendiente",
                     observaciones: $scope.nuevaAct.observaciones || "",
                     fechaLimite: $scope.nuevaAct.fechaLimiteInput ? $scope.nuevaAct.fechaLimiteInput.toISOString().split('T')[0] : ""
                 };
@@ -522,7 +533,7 @@
             };
 
             $scope.eliminarActividad = function(id) {
-                if (confirm("¿Eliminar requerimiento?") && db) db.collection("actividades_operativas").doc(id).delete();
+                if (confirm("¿Eliminar requerimiento?") && db && id) db.collection("actividades_operativas").doc(id).delete();
             };
         });
     </script>
