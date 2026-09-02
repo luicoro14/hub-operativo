@@ -23,7 +23,7 @@
         .nav-btn.active { background-color: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
         
         .mobile-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background-color: #FFFFFF; border-top: 1px solid #E2E8F0; display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0.5rem 0.2rem; }
-        .mobile-nav-item { flex: 1 0 auto; min-w-[65px]; text-align: center; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: #64748B; padding: 4px; }
+        .mobile-nav-item { flex: 1 0 auto; min-width: 65px; text-align: center; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: #64748B; padding: 4px; }
         .mobile-nav-item.active { color: #2563EB; }
 
         @keyframes floatingHeart { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.6); } }
@@ -41,11 +41,11 @@
                 <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Hub Operativo Multi-Tenant</p>
             </div>
 
-            <div class="space-y-4 text-left">
+            <form ng-submit="iniciarSesionOperativo()" class="space-y-4 text-left">
                 <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Usuario</label><input type="text" ng-model="loginUser" placeholder="Ingresa tu usuario" autocapitalize="none" class="input-light w-full text-center font-bold"></div>
                 <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña</label><input type="password" ng-model="loginPass" placeholder="••••••••" class="input-light w-full text-center font-bold"></div>
-                <button type="button" ng-click="iniciarSesionOperativo()" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/20 active:scale-95 transition">Ingresar al Hub Operativo</button>
-            </div>
+                <button type="submit" ng-disabled="cargandoLogin" class="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase shadow-lg shadow-blue-600/20 active:scale-95 transition">Ingresar al Hub (Enter)</button>
+            </form>
             <div class="pt-2 border-t border-slate-200 text-[10px] text-slate-400 font-semibold">Derechos Reservados © 2026 GL Monitoreo y OP de Servicios.</div>
         </div>
     </div>
@@ -86,7 +86,7 @@
                     <a href="index.html" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200">Matriz</a>
                     <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-xl border border-red-200">Salir</button>
 
-                    <!-- BANDEJA DESPLEGABLE NOTIFICACIONES -->
+                    <!-- BANDEJA NOTIFICACIONES -->
                     <div ng-show="mostrarNotificaciones" class="absolute right-0 top-12 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-4 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                             <h4 class="text-xs font-black text-slate-900 uppercase">🔔 Centro de Notificaciones</h4>
@@ -107,7 +107,7 @@
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
 
-            <!-- 1. INICIO - TOP 5 Y RANKING DE GERENCIAS -->
+            <!-- 1. INICIO -->
             <section ng-show="moduloActivo === 'inicio'" class="space-y-6">
                 <div class="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 p-6 sm:p-8 text-white shadow-lg">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -175,7 +175,7 @@
                 </div>
             </section>
 
-            <!-- 2. MURAL CORPORATIVO RED SOCIAL CON COMPRESIÓN CANVAS -->
+            <!-- 2. MURAL CORPORATIVO -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6 max-w-2xl mx-auto">
                 <div class="card-white p-6 space-y-4">
                     <h3 class="text-sm font-black text-slate-900 uppercase">💬 Mural Corporativo</h3>
@@ -239,7 +239,7 @@
                 </div>
             </section>
 
-            <!-- 3. DIRECTORIO CORPORATIVO VISUAL CON BUSCADOR -->
+            <!-- 3. DIRECTORIO -->
             <section ng-show="moduloActivo === 'directorio'" class="space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <h2 class="text-xl font-black text-slate-900 uppercase">Directorio de Personal</h2>
@@ -265,7 +265,7 @@
                 </div>
             </section>
 
-            <!-- 4. MI PERFIL (MODO LECTURA / EDICIÓN INHIBIDO CON VALIDACIÓN DE CONTRASEÑA) -->
+            <!-- 4. MI PERFIL -->
             <section ng-show="moduloActivo === 'perfil'" class="space-y-6 max-w-xl mx-auto">
                 <div class="card-white p-6 space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-200 pb-3">
@@ -289,7 +289,7 @@
                         <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Teléfono Personal</label><input type="text" ng-model="perfilUsuario.telefono" ng-disabled="!perfilEditando" class="input-light w-full"></div>
                         <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Extensión Corporativa</label><input type="text" ng-model="perfilUsuario.ext" ng-disabled="!perfilEditando" class="input-light w-full"></div>
 
-                        <!-- VALIDACIÓN DE CAMBIO DE CLAVE -->
+                        <!-- VALIDACIÓN DE CONTRASEÑA -->
                         <div ng-if="perfilEditando" class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                             <h4 class="text-xs font-black text-slate-800 uppercase">🔒 Cambiar Contraseña {{ esMaster ? '(Modo Master Directo)' : '' }}</h4>
                             <div ng-if="!esMaster">
@@ -314,7 +314,7 @@
                 </div>
             </section>
 
-            <!-- 5. LOG DE AUDITORÍA -->
+            <!-- 5. AUDITORÍA -->
             <section ng-show="moduloActivo === 'auditoria'" class="space-y-6">
                 <div class="card-white p-6 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -348,7 +348,7 @@
                 </div>
             </section>
 
-            <!-- 6. ADMINISTRADOR MASTER (`luis` / `control2026`) -->
+            <!-- 6. ADMIN MASTER -->
             <section ng-show="moduloActivo === 'admin'" class="space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="card-white p-5"><span class="text-xs font-bold text-slate-500 uppercase">Total Usuarios Creados</span><div class="text-3xl font-black text-blue-600 mt-1">{{ listaUsuariosAdmin.length }}</div></div>
@@ -453,7 +453,7 @@
             </footer>
         </main>
 
-        <!-- BARRA INFERIOR MÓVIL ADAPTATIVA POR ROLES (SCROLL TOUCH) -->
+        <!-- BARRA INFERIOR MÓVIL ADAPTATIVA POR ROLES -->
         <div class="mobile-bottom-nav md:hidden">
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="moduloActivo = 'inicio'">🏠 Inicio</button>
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural</button>
@@ -478,12 +478,13 @@
 
         var app = angular.module('hubApp', []);
         app.controller('HubController', function($scope, $timeout) {
-            $scope.sesionIniciada = localStorage.getItem('sesionIniciadaHub') === 'true';
-            $scope.usuarioSesion = localStorage.getItem('usuarioSesionHub') || "Luis Coronado";
-            $scope.tenantIdActual = localStorage.getItem('tenantIdHub') || "GL-MONITOREO";
-            $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresaHub') || "GL Monitoreo y OP de Servicios";
-            $scope.esMaster = localStorage.getItem('esMasterHub') === 'true';
-            $scope.esAdminEmpresa = localStorage.getItem('esAdminEmpresaHub') === 'true';
+            // UNIFICACIÓN DE LLAVES LOCALSTORAGE CON LA MATRIZ
+            $scope.sesionIniciada = localStorage.getItem('sesionIniciada') === 'true' || localStorage.getItem('sesionIniciadaHub') === 'true';
+            $scope.usuarioSesion = localStorage.getItem('usuarioSesion') || localStorage.getItem('usuarioSesionHub') || "Luis Coronado";
+            $scope.tenantIdActual = localStorage.getItem('tenantId') || localStorage.getItem('tenantIdHub') || "GL-MONITOREO";
+            $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresa') || localStorage.getItem('nombreEmpresaHub') || "GL Monitoreo y OP de Servicios";
+            $scope.esMaster = (localStorage.getItem('esMaster') === 'true' || localStorage.getItem('esMasterHub') === 'true');
+            $scope.esAdminEmpresa = (localStorage.getItem('esAdminEmpresa') === 'true' || localStorage.getItem('esAdminEmpresaHub') === 'true');
             $scope.moduloActivo = 'inicio';
 
             $scope.top5Operadores = [];
@@ -511,7 +512,6 @@
 
             if ($scope.sesionIniciada && db) { $timeout(function() { $scope.sincronizarFirebase(); }); }
 
-            // COMPRESOR DE IMÁGENES CANVAS CLIENTE
             $scope.compressImage = function(file, callback) {
                 let reader = new FileReader();
                 reader.onload = function(e) {
@@ -572,11 +572,18 @@
                     $scope.esMaster = esM;
                     $scope.esAdminEmpresa = esA;
 
+                    // PERSISTENCIA UNIFICADA
+                    localStorage.setItem('sesionIniciada', 'true');
                     localStorage.setItem('sesionIniciadaHub', 'true');
+                    localStorage.setItem('usuarioSesion', nombre);
                     localStorage.setItem('usuarioSesionHub', nombre);
+                    localStorage.setItem('tenantId', tenant);
                     localStorage.setItem('tenantIdHub', tenant);
+                    localStorage.setItem('nombreEmpresa', nombreEmpresa);
                     localStorage.setItem('nombreEmpresaHub', nombreEmpresa);
+                    localStorage.setItem('esMaster', esM ? 'true' : 'false');
                     localStorage.setItem('esMasterHub', esM ? 'true' : 'false');
+                    localStorage.setItem('esAdminEmpresa', esA ? 'true' : 'false');
                     localStorage.setItem('esAdminEmpresaHub', esA ? 'true' : 'false');
 
                     $scope.registrarLog("LOGIN_HUB", "Ingreso al Hub Operativo");
@@ -700,7 +707,6 @@
                 });
             };
 
-            // PERFIL INHIBIDO CON VALIDACIÓN DE CONTRASEÑA
             $scope.activarEdicionPerfil = function() { $scope.perfilEditando = true; $scope.passVal = { actual: "", nueva: "", confirmacion: "" }; };
             $scope.cancelarEdicionPerfil = function() {
                 $scope.perfilUsuario = angular.copy($scope.perfilOriginal);
@@ -727,7 +733,6 @@
                     fotoUrl: $scope.perfilUsuario.fotoUrl || ""
                 };
 
-                // LÓGICA DE VALIDACIÓN DE CONTRASEÑA
                 if (!$scope.esMaster && ($scope.passVal.actual || $scope.passVal.nueva)) {
                     if ($scope.passVal.actual !== $scope.perfilOriginal.password) {
                         alert("❌ La contraseña actual ingresada es incorrecta.");
@@ -756,7 +761,6 @@
                 });
             };
 
-            // MURAL CON COMPRESIÓN DE FOTO
             $scope.publicarMural = function() {
                 if (!$scope.nuevoPost.mensaje) return;
                 let fileInput = document.getElementById('fileMural');
