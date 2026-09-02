@@ -25,8 +25,7 @@
         .badge-pendiente { background-color: #FEF3C7; color: #D97706; border: 1px solid #FCD34D; }
         .badge-proceso { background-color: #E0F2FE; color: #0284C7; border: 1px solid #38BDF8; }
         .badge-completado { background-color: #DCFCE7; color: #16A34A; border: 1px solid #4ADE80; }
-        .nav-tab { color: #64748B; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; padding: 0.6rem 1rem; border-radius: 12px; }
-        .nav-tab.active { background-color: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+        .badge-porvencer { background-color: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; }
     </style>
 </head>
 <body ng-app="matrizApp" ng-controller="MatrizController">
@@ -54,10 +53,13 @@
         <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md">🏢</div>
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md overflow-hidden">
+                        <img ng-if="fotoUsuario" ng-src="{{ fotoUsuario }}" class="w-full h-full object-cover">
+                        <span ng-if="!fotoUsuario">🏢</span>
+                    </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">{{ nombreEmpresaActual }}</h1>
-                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">👤 {{ usuarioSesion }} <span class="text-blue-600 font-bold">({{ esMaster ? 'Master' : (esAdminEmpresa ? 'Admin' : 'Operador') }})</span> | Tenant: <span class="font-mono text-slate-700">{{ tenantIdActual }}</span></p>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">👤 {{ usuarioSesion }} <span class="text-blue-600 font-bold">({{ esMaster ? 'Master' : (esAdminEmpresa ? 'Admin' : 'Operador') }})</span> | Gerencia: <span class="font-bold text-slate-700">{{ gerenciaPermitida || 'Todas' }}</span></p>
                     </div>
                 </div>
 
@@ -85,6 +87,7 @@
                     </div>
                 </div>
 
+                <!-- REGISTRO DE NUEVA TAREA -->
                 <div class="card-white p-5 sm:p-6 space-y-4">
                     <h3 class="text-xs sm:text-base font-black text-slate-900 uppercase border-b border-slate-200 pb-3">➕ Registrar Requerimiento Operativo</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
@@ -111,7 +114,7 @@
                     <button type="button" ng-click="agregarActividad()" class="w-full py-4 px-6 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase shadow">+ Guardar Requerimiento</button>
                 </div>
 
-                <!-- TABLA DE LA MATRIZ CON BOTONES DE MODIFICAR Y AVANCES -->
+                <!-- TABLA DE LA MATRIZ CON SENSOR DE PROXIMIDAD DE VENCIMIENTO -->
                 <div class="card-white p-4 sm:p-6 space-y-4">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs border-collapse min-w-[850px]">
@@ -126,11 +129,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="act in actividadesVisibles" class="border-b border-slate-100 hover:bg-slate-50 transition">
+                                <tr ng-repeat="act in actividadesVisibles" class="border-b border-slate-100 hover:bg-slate-50 transition" ng-class="{'bg-red-50/60': act.esPorVencer}">
                                     <td class="p-3 font-bold text-slate-900">{{ act.descripcion }}</td>
                                     <td class="p-3 text-slate-600">🏢 {{ act.categoria }}</td>
                                     <td class="p-3 font-bold text-blue-600">👤 {{ act.responsable }}</td>
-                                    <td class="p-3"><span class="badge-estado" ng-class="{'badge-pendiente': act.estado==='Pendiente', 'badge-proceso': act.estado==='En Proceso', 'badge-completado': act.estado==='Completado'}">{{ act.estado }}</span></td>
+                                    <td class="p-3">
+                                        <span class="badge-estado" ng-class="{'badge-pendiente': act.estado==='Pendiente', 'badge-proceso': act.estado==='En Proceso', 'badge-completado': act.estado==='Completado'}">{{ act.estado }}</span>
+                                        <span ng-if="act.esPorVencer" class="badge-estado badge-porvencer ml-1">⚠️ Próximo a Vencer</span>
+                                    </td>
                                     <td class="p-3 font-mono text-slate-600 font-bold">{{ act.fechaLimite || '--' }}</td>
                                     <td class="p-3 text-center space-x-1">
                                         <button type="button" ng-click="abrirModalAvances(act)" class="px-2.5 py-1.5 bg-indigo-50 text-indigo-600 font-bold rounded-lg border border-indigo-200 text-[10px]">📌 Avances ({{ (act.avances||[]).length }})</button>
@@ -144,7 +150,7 @@
                 </div>
             </div>
 
-            <!-- MODAL DE EDICIÓN (RESTRICCIÓN DE SLA PARA ADMIN) -->
+            <!-- MODAL DE EDICIÓN -->
             <div ng-show="modalEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
                 <div class="card-white p-6 max-w-lg w-full space-y-4">
                     <h3 class="text-sm font-black text-slate-900 uppercase">✏ Modificar Requerimiento</h3>
@@ -168,7 +174,7 @@
                 </div>
             </div>
 
-            <!-- MODAL DE AVANCES ILIMITADOS MULTIMEDIAL -->
+            <!-- MODAL DE AVANCES -->
             <div ng-show="modalAvancesOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-md">
                 <div class="card-white p-6 max-w-lg w-full space-y-4 max-h-[90vh] overflow-y-auto">
                     <div class="flex justify-between items-center border-b border-slate-200 pb-2">
@@ -178,7 +184,6 @@
                     
                     <div class="space-y-3">
                         <textarea ng-model="nuevoAvance.texto" placeholder="Escribe el avance..." class="input-light w-full resize-none" rows="2"></textarea>
-                        <input type="file" id="fileAvanceDoc" class="text-xs text-slate-500 w-full">
                         <button type="button" ng-click="guardarAvanceMultimedial()" class="w-full py-3 bg-indigo-600 text-white font-bold text-xs uppercase rounded-xl shadow">Registrar Avance</button>
                     </div>
 
@@ -221,6 +226,8 @@
             $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresaMatriz') || "GL Monitoreo y OP de Servicios";
             $scope.esMaster = localStorage.getItem('esMasterMatriz') === 'true';
             $scope.esAdminEmpresa = localStorage.getItem('esAdminEmpresaMatriz') === 'true';
+            $scope.gerenciaPermitida = localStorage.getItem('gerenciaMatriz') || "";
+            $scope.fotoUsuario = localStorage.getItem('fotoUsuarioMatriz') || "";
 
             $scope.actividadesVisibles = [];
             $scope.nuevaAct = { categoria: "Servicios bancarios", estado: "Pendiente" };
@@ -242,7 +249,7 @@
                 $scope.cargandoLogin = true;
                 var dbTimeout = setTimeout(function() {
                     let esM = (u === 'luis' && p === 'control2026');
-                    $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", esM, true);
+                    $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", esM, true, "", "");
                 }, 500);
 
                 if (db) {
@@ -256,13 +263,13 @@
                             });
                             let esM = (u === 'luis' && p === 'control2026');
                             let esA = hallado ? (hallado.rol === 'admin_empresa' || esM) : true;
-                            $scope.ejecutarIngreso(hallado ? (hallado.nombre || u) : (u === 'luis' ? 'Luis Coronado' : u), hallado ? (hallado.empresa_id || "GL-MONITOREO") : "GL-MONITOREO", hallado ? (hallado.nombre_empresa || "GL Monitoreo y OP de Servicios") : "GL Monitoreo y OP de Servicios", esM, esA);
+                            $scope.ejecutarIngreso(hallado ? (hallado.nombre || u) : (u === 'luis' ? 'Luis Coronado' : u), hallado ? (hallado.empresa_id || "GL-MONITOREO") : "GL-MONITOREO", hallado ? (hallado.nombre_empresa || "GL Monitoreo y OP de Servicios") : "GL Monitoreo y OP de Servicios", esM, esA, hallado ? (hallado.gerencia || "") : "", hallado ? (hallado.fotoUrl || "") : "");
                         });
-                    }).catch(function() { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true, true); });
-                } else { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true, true); }
+                    }).catch(function() { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true, true, "", ""); });
+                } else { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true, true, "", ""); }
             };
 
-            $scope.ejecutarIngreso = function(nombre, tenant, nombreEmpresa, esM, esA) {
+            $scope.ejecutarIngreso = function(nombre, tenant, nombreEmpresa, esM, esA, gerencia, foto) {
                 $scope.$evalAsync(function() {
                     $scope.cargandoLogin = false;
                     $scope.sesionIniciada = true;
@@ -271,6 +278,8 @@
                     $scope.nombreEmpresaActual = nombreEmpresa;
                     $scope.esMaster = esM;
                     $scope.esAdminEmpresa = esA;
+                    $scope.gerenciaPermitida = gerencia;
+                    $scope.fotoUsuario = foto;
 
                     localStorage.setItem('sesionIniciadaMatriz', 'true');
                     localStorage.setItem('usuarioSesionMatriz', nombre);
@@ -278,6 +287,8 @@
                     localStorage.setItem('nombreEmpresaMatriz', nombreEmpresa);
                     localStorage.setItem('esMasterMatriz', esM ? 'true' : 'false');
                     localStorage.setItem('esAdminEmpresaMatriz', esA ? 'true' : 'false');
+                    localStorage.setItem('gerenciaMatriz', gerencia || "");
+                    localStorage.setItem('fotoUsuarioMatriz', foto || "");
 
                     $scope.registrarLog("LOGIN", "Ingreso a la Matriz Operativa");
                     if (db) $scope.sincronizarFirebase();
@@ -289,10 +300,26 @@
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.actividadesVisibles = [];
+                        let hoy = new Date();
+
                         snapshot.forEach(doc => {
                             let d = doc.data();
                             d.id = doc.id;
-                            if (d.empresa_id === $scope.tenantIdActual || $scope.esMaster) { $scope.actividadesVisibles.push(d); }
+
+                            // EVALUAR PROXIMIDAD DE VENCIMIENTO (3 DÍAS)
+                            if (d.fechaLimite) {
+                                let fLim = new Date(d.fechaLimite);
+                                let difDias = Math.ceil((fLim - hoy) / (1000 * 3600 * 24));
+                                d.esPorVencer = (difDias >= 0 && difDias <= 3 && d.estado !== 'Completado');
+                            }
+
+                            // FILTRADO DINÁMICO POR GERENCIA ASIGNADA
+                            let coincideEmpresa = (d.empresa_id === $scope.tenantIdActual || $scope.esMaster);
+                            let coincideGerencia = (!$scope.gerenciaPermitida || $scope.gerenciaPermitida === 'Todas' || d.categoria === $scope.gerenciaPermitida);
+
+                            if (coincideEmpresa && coincideGerencia) {
+                                $scope.actividadesVisibles.push(d);
+                            }
                         });
                     });
                 });
@@ -300,6 +327,10 @@
 
             $scope.registrarLog = function(accion, detalle) {
                 if (db) db.collection("auditoria_logs").add({ fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(), usuario: $scope.usuarioSesion, empresa_id: $scope.tenantIdActual, accion: accion, detalle: detalle });
+            };
+
+            $scope.crearNotificacion = function(destinoUsuario, titulo, detalle) {
+                if (db) db.collection("notificaciones").add({ usuarioDestino: destinoUsuario, titulo: titulo, detalle: detalle, fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(), leido: false });
             };
 
             $scope.abrirModalEdicion = function(act) {
@@ -318,6 +349,11 @@
                         upd.fechaLimite = $scope.actEdit.fechaLimiteInput.toISOString().split('T')[0];
                     }
                     db.collection("actividades_operativas").doc($scope.actEdit.id).update(upd);
+                    
+                    if ($scope.actEdit.estado === 'Completado') {
+                        $scope.crearNotificacion($scope.actEdit.responsable, "✅ Requerimiento Completado", "La tarea '" + $scope.actEdit.descripcion + "' ha sido marcada como Completada.");
+                    }
+
                     $scope.registrarLog("MODIFICAR_REQUERIMIENTO", "Edición de tarea: " + $scope.actEdit.descripcion);
                 }
                 $scope.modalEditOpen = false;
