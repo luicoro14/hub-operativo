@@ -21,8 +21,9 @@
         .input-light:focus { border-color: #2563EB; background-color: #FFFFFF; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
         .nav-btn { color: #64748B; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; padding: 0.65rem 0.9rem; border-radius: 12px; }
         .nav-btn.active { background-color: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
-        .mobile-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background-color: #FFFFFF; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-around; padding: 0.5rem 0.2rem; }
-        .mobile-nav-item { flex: 1; text-align: center; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; color: #64748B; }
+        
+        .mobile-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background-color: #FFFFFF; border-top: 1px solid #E2E8F0; display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0.5rem 0.2rem; }
+        .mobile-nav-item { flex: 1 0 auto; min-w-[65px]; text-align: center; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: #64748B; padding: 4px; }
         .mobile-nav-item.active { color: #2563EB; }
 
         @keyframes floatingHeart { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.6); } }
@@ -77,7 +78,6 @@
                 </div>
 
                 <div class="flex items-center gap-2 relative">
-                    <!-- BOTÓN NOTIFICACIONES (CAMPANITA) -->
                     <button type="button" ng-click="toggleNotificaciones()" class="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-base">
                         🔔
                         <span ng-if="notificacionesNoLeidas > 0" class="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center animate-pulse">{{ notificacionesNoLeidas }}</span>
@@ -86,7 +86,7 @@
                     <a href="index.html" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200">Matriz</a>
                     <button ng-click="cerrarSesion()" class="text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-xl border border-red-200">Salir</button>
 
-                    <!-- BANDEJA DESPLEGABLE DE NOTIFICACIONES -->
+                    <!-- BANDEJA DESPLEGABLE NOTIFICACIONES -->
                     <div ng-show="mostrarNotificaciones" class="absolute right-0 top-12 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-4 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                             <h4 class="text-xs font-black text-slate-900 uppercase">🔔 Centro de Notificaciones</h4>
@@ -120,7 +120,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- TABLA TOP 5 CON MEDALLAS -->
                     <div class="card-white p-6 space-y-4">
                         <h3 class="text-sm font-black text-slate-900 uppercase">🏆 Top 5 Operadores de Eficiencia (SLA)</h3>
                         <div class="overflow-x-auto">
@@ -150,7 +149,6 @@
                         </div>
                     </div>
 
-                    <!-- RANKING GERENCIAS -->
                     <div class="card-white p-6 space-y-4">
                         <h3 class="text-sm font-black text-slate-900 uppercase">🏢 Ranking por Gerencias</h3>
                         <div class="overflow-x-auto">
@@ -177,7 +175,7 @@
                 </div>
             </section>
 
-            <!-- 2. MURAL CORPORATIVO RED SOCIAL CON MINIATURAS DE AVATAR -->
+            <!-- 2. MURAL CORPORATIVO RED SOCIAL CON COMPRESIÓN CANVAS -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6 max-w-2xl mx-auto">
                 <div class="card-white p-6 space-y-4">
                     <h3 class="text-sm font-black text-slate-900 uppercase">💬 Mural Corporativo</h3>
@@ -195,7 +193,6 @@
 
                     <div class="space-y-4 pt-4 border-t border-slate-200">
                         <div ng-repeat="post in listaPosts" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 relative">
-                            <!-- ENCABEZADO CON MINIATURA DE FOTO DE PERFIL DEL AUTOR -->
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center gap-2">
                                     <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs overflow-hidden shadow">
@@ -210,7 +207,6 @@
                             <p class="text-xs text-slate-700 font-medium">{{ post.mensaje }}</p>
                             <div ng-if="post.enlace" class="text-xs">🔗 <a href="{{ post.enlace }}" target="_blank" class="text-blue-600 font-bold underline">{{ post.enlace }}</a></div>
 
-                            <!-- FOTO ADJUNTA EN LA PUBLICACIÓN -->
                             <div ng-if="post.imagenUrl" class="rounded-xl overflow-hidden border border-slate-200 max-h-80">
                                 <img ng-src="{{ post.imagenUrl }}" class="w-full h-auto object-cover">
                             </div>
@@ -225,7 +221,6 @@
                                 </div>
                             </div>
 
-                            <!-- COMENTARIOS CON AVATAR EN MINIATURA -->
                             <div class="space-y-1.5 pl-3 border-l-2 border-slate-200 pt-2">
                                 <div ng-repeat="c in post.comentarios" class="text-[11px] text-slate-600 flex items-center gap-1.5">
                                     <div class="w-5 h-5 rounded-full bg-slate-300 flex items-center justify-center text-slate-700 font-bold text-[9px] overflow-hidden">
@@ -244,7 +239,7 @@
                 </div>
             </section>
 
-            <!-- 3. DIRECTORIO CORPORATIVO CON BUSCADOR Y EXPORTACIÓN -->
+            <!-- 3. DIRECTORIO CORPORATIVO VISUAL CON BUSCADOR -->
             <section ng-show="moduloActivo === 'directorio'" class="space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <h2 class="text-xl font-black text-slate-900 uppercase">Directorio de Personal</h2>
@@ -270,7 +265,7 @@
                 </div>
             </section>
 
-            <!-- 4. MI PERFIL (MODO LECTURA / EDICIÓN INHIBIDO) -->
+            <!-- 4. MI PERFIL (MODO LECTURA / EDICIÓN INHIBIDO CON VALIDACIÓN DE CONTRASEÑA) -->
             <section ng-show="moduloActivo === 'perfil'" class="space-y-6 max-w-xl mx-auto">
                 <div class="card-white p-6 space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-200 pb-3">
@@ -293,7 +288,23 @@
                         <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Correo Electrónico</label><input type="email" ng-model="perfilUsuario.correo" ng-disabled="!perfilEditando" class="input-light w-full"></div>
                         <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Teléfono Personal</label><input type="text" ng-model="perfilUsuario.telefono" ng-disabled="!perfilEditando" class="input-light w-full"></div>
                         <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Extensión Corporativa</label><input type="text" ng-model="perfilUsuario.ext" ng-disabled="!perfilEditando" class="input-light w-full"></div>
-                        <div ng-if="perfilEditando"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Nueva Contraseña</label><input type="password" ng-model="perfilUsuario.nuevaPassword" placeholder="Dejar en blanco para mantener actual" class="input-light w-full"></div>
+
+                        <!-- VALIDACIÓN DE CAMBIO DE CLAVE -->
+                        <div ng-if="perfilEditando" class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                            <h4 class="text-xs font-black text-slate-800 uppercase">🔒 Cambiar Contraseña {{ esMaster ? '(Modo Master Directo)' : '' }}</h4>
+                            <div ng-if="!esMaster">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contraseña Actual</label>
+                                <input type="password" ng-model="passVal.actual" placeholder="••••••••" class="input-light w-full">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Nueva Contraseña</label>
+                                <input type="password" ng-model="passVal.nueva" placeholder="••••••••" class="input-light w-full">
+                            </div>
+                            <div ng-if="!esMaster">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Confirmar Nueva Contraseña</label>
+                                <input type="password" ng-model="passVal.confirmacion" placeholder="••••••••" class="input-light w-full">
+                            </div>
+                        </div>
 
                         <div ng-if="perfilEditando" class="flex gap-2 pt-2">
                             <button type="button" ng-click="cancelarEdicionPerfil()" class="w-1/2 py-3 bg-slate-200 text-slate-700 font-bold text-xs uppercase rounded-xl">Cancelar</button>
@@ -303,7 +314,7 @@
                 </div>
             </section>
 
-            <!-- 5. LOG DE AUDITORÍA CON EXPORTACIÓN A EXCEL -->
+            <!-- 5. LOG DE AUDITORÍA -->
             <section ng-show="moduloActivo === 'auditoria'" class="space-y-6">
                 <div class="card-white p-6 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -337,7 +348,7 @@
                 </div>
             </section>
 
-            <!-- 6. ADMINISTRADOR MASTER (`luis` / `control2026`) - GESTIÓN Y ROLES -->
+            <!-- 6. ADMINISTRADOR MASTER (`luis` / `control2026`) -->
             <section ng-show="moduloActivo === 'admin'" class="space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="card-white p-5"><span class="text-xs font-bold text-slate-500 uppercase">Total Usuarios Creados</span><div class="text-3xl font-black text-blue-600 mt-1">{{ listaUsuariosAdmin.length }}</div></div>
@@ -345,7 +356,6 @@
                     <div class="card-white p-5"><span class="text-xs font-bold text-amber-600 uppercase">Reportes del Mural</span><div class="text-3xl font-black text-amber-600 mt-1">{{ listaReportesMural.length }}</div></div>
                 </div>
 
-                <!-- ALERTAS / REPORTES DEL MURAL -->
                 <div ng-if="listaReportesMural.length > 0" class="card-white p-6 space-y-3 border-l-8 border-l-amber-500">
                     <h3 class="text-xs font-black text-amber-700 uppercase">🚩 Reportes de Publicaciones Señaladas</h3>
                     <div ng-repeat="rep in listaReportesMural" class="p-3 bg-amber-50 rounded-xl text-xs space-y-1 border border-amber-200">
@@ -354,7 +364,6 @@
                     </div>
                 </div>
 
-                <!-- PANEL CRUD DE USUARIOS MASTER -->
                 <div class="card-white p-6 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <h3 class="text-sm font-black text-slate-900 uppercase">⚙ Control Master de Usuarios, Roles & Gerencias</h3>
@@ -444,12 +453,13 @@
             </footer>
         </main>
 
-        <!-- BARRA INFERIOR MÓVIL (IOS Y ANDROID) -->
+        <!-- BARRA INFERIOR MÓVIL ADAPTATIVA POR ROLES (SCROLL TOUCH) -->
         <div class="mobile-bottom-nav md:hidden">
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="moduloActivo = 'inicio'">🏠 Inicio</button>
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural</button>
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="moduloActivo = 'directorio'">👥 Personal</button>
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'perfil'}" ng-click="moduloActivo = 'perfil'">⚙ Perfil</button>
+            <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'auditoria'}" ng-show="esMaster || esAdminEmpresa" ng-click="moduloActivo = 'auditoria'">📜 Traza</button>
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'admin'}" ng-show="esMaster" ng-click="moduloActivo = 'admin'">👑 Admin</button>
         </div>
     </div>
@@ -492,12 +502,35 @@
             $scope.userEdit = {};
             $scope.modalUserEditOpen = false;
 
-            $scope.perfilUsuario = { correo: "", telefono: "", ext: "", fotoUrl: "", nuevaPassword: "" };
+            $scope.perfilUsuario = { correo: "", telefono: "", ext: "", fotoUrl: "", password: "" };
             $scope.perfilOriginal = {};
             $scope.perfilEditando = false;
+            $scope.passVal = { actual: "", nueva: "", confirmacion: "" };
+            $scope.userDocId = null;
             $scope.listaDirectorio = [];
 
             if ($scope.sesionIniciada && db) { $timeout(function() { $scope.sincronizarFirebase(); }); }
+
+            // COMPRESOR DE IMÁGENES CANVAS CLIENTE
+            $scope.compressImage = function(file, callback) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = new Image();
+                    img.onload = function() {
+                        let canvas = document.createElement('canvas');
+                        let ctx = canvas.getContext('2d');
+                        let maxW = 1024, maxH = 1024;
+                        let w = img.width, h = img.height;
+                        if (w > h) { if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; } }
+                        else { if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; } }
+                        canvas.width = w; canvas.height = h;
+                        ctx.drawImage(img, 0, 0, w, h);
+                        callback(canvas.toDataURL('image/jpeg', 0.7));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
 
             $scope.iniciarSesionOperativo = function() {
                 var userEl = document.querySelector('input[ng-model="loginUser"]');
@@ -554,7 +587,6 @@
             $scope.sincronizarFirebase = function() {
                 if (!db) return;
 
-                // MÉTRICAS DE LA MATRIZ
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         let mapaOpTot = {}, mapaOpComp = {};
@@ -589,7 +621,6 @@
                     });
                 });
 
-                // MURAL
                 db.collection("mural_posts").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.listaPosts = [];
@@ -604,7 +635,6 @@
                     });
                 });
 
-                // DIRECTORIO Y USUARIOS
                 db.collection("personal_intranet").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.listaUsuariosAdmin = [];
@@ -616,7 +646,8 @@
                             if (d.empresa_id === $scope.tenantIdActual || $scope.esMaster) {
                                 $scope.listaDirectorio.push(d);
                             }
-                            if (d.nombre === $scope.usuarioSesion || d.usuario === $scope.usuarioSesion.toLowerCase()) {
+                            if (d.nombre === $scope.usuarioSesion || d.usuario === $scope.usuarioSesion.toLowerCase() || ($scope.esMaster && d.usuario === 'luis')) {
+                                $scope.userDocId = d.id;
                                 $scope.perfilUsuario = angular.copy(d);
                                 $scope.perfilOriginal = angular.copy(d);
                             }
@@ -624,7 +655,6 @@
                     });
                 });
 
-                // NOTIFICACIONES
                 db.collection("notificaciones").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.listaNotificaciones = [];
@@ -640,7 +670,6 @@
                     });
                 });
 
-                // REPORTES Y AUDITORÍA
                 db.collection("reportes_mural").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.listaReportesMural = [];
@@ -671,48 +700,69 @@
                 });
             };
 
-            // PERFIL INHIBIDO
-            $scope.activarEdicionPerfil = function() { $scope.perfilEditando = true; };
+            // PERFIL INHIBIDO CON VALIDACIÓN DE CONTRASEÑA
+            $scope.activarEdicionPerfil = function() { $scope.perfilEditando = true; $scope.passVal = { actual: "", nueva: "", confirmacion: "" }; };
             $scope.cancelarEdicionPerfil = function() {
                 $scope.perfilUsuario = angular.copy($scope.perfilOriginal);
                 $scope.perfilEditando = false;
+                $scope.passVal = { actual: "", nueva: "", confirmacion: "" };
             };
 
             $scope.subirFotoPerfil = function(element) {
                 let file = element.files[0];
                 if (file) {
-                    let r = new FileReader();
-                    r.onload = function(e) { $scope.$apply(function() { $scope.perfilUsuario.fotoUrl = e.target.result; }); };
-                    r.readAsDataURL(file);
-                }
-            };
-
-            $scope.guardarPerfil = function() {
-                if (db) {
-                    let upd = {
-                        correo: $scope.perfilUsuario.correo || "",
-                        telefono: $scope.perfilUsuario.telefono || "",
-                        ext: $scope.perfilUsuario.ext || "",
-                        fotoUrl: $scope.perfilUsuario.fotoUrl || ""
-                    };
-                    if ($scope.perfilUsuario.nuevaPassword) upd.password = $scope.perfilUsuario.nuevaPassword;
-
-                    db.collection("personal_intranet").where("usuario", "==", $scope.usuarioSesion.toLowerCase()).get().then(snapshot => {
-                        snapshot.forEach(doc => { db.collection("personal_intranet").doc(doc.id).update(upd); });
-                        alert("Perfil actualizado correctamente.");
-                        $scope.perfilEditando = false;
-                        $scope.registrarLog("PERFIL_ACTUALIZADO", "Datos personales modificados");
+                    $scope.compressImage(file, function(imgCompressed) {
+                        $scope.$apply(function() { $scope.perfilUsuario.fotoUrl = imgCompressed; });
                     });
                 }
             };
 
-            // MURAL CON FOTO Y NOTIFICACIONES DE LIKE/COMENTARIO
+            $scope.guardarPerfil = function() {
+                if (!db || !$scope.userDocId) return;
+
+                let upd = {
+                    correo: $scope.perfilUsuario.correo || "",
+                    telefono: $scope.perfilUsuario.telefono || "",
+                    ext: $scope.perfilUsuario.ext || "",
+                    fotoUrl: $scope.perfilUsuario.fotoUrl || ""
+                };
+
+                // LÓGICA DE VALIDACIÓN DE CONTRASEÑA
+                if (!$scope.esMaster && ($scope.passVal.actual || $scope.passVal.nueva)) {
+                    if ($scope.passVal.actual !== $scope.perfilOriginal.password) {
+                        alert("❌ La contraseña actual ingresada es incorrecta.");
+                        return;
+                    }
+                    if (!$scope.passVal.nueva) {
+                        alert("⚠️ Debes ingresar una nueva contraseña.");
+                        return;
+                    }
+                    if ($scope.passVal.nueva !== $scope.passVal.confirmacion) {
+                        alert("❌ La nueva contraseña y su confirmación no coinciden.");
+                        return;
+                    }
+                    upd.password = $scope.passVal.nueva;
+                } else if ($scope.esMaster && $scope.passVal.nueva) {
+                    upd.password = $scope.passVal.nueva;
+                }
+
+                db.collection("personal_intranet").doc($scope.userDocId).update(upd).then(function() {
+                    $scope.$evalAsync(function() {
+                        alert("✅ Perfil actualizado correctamente.");
+                        $scope.perfilEditando = false;
+                        $scope.passVal = { actual: "", nueva: "", confirmacion: "" };
+                        $scope.registrarLog("PERFIL_ACTUALIZADO", "Perfil guardado con éxito");
+                    });
+                });
+            };
+
+            // MURAL CON COMPRESIÓN DE FOTO
             $scope.publicarMural = function() {
                 if (!$scope.nuevoPost.mensaje) return;
                 let fileInput = document.getElementById('fileMural');
                 let file = fileInput ? fileInput.files[0] : null;
 
-                let crear = function(imgUrl) {
+                let enviar = function(imgUrl) {
                     let p = {
                         empresa_id: $scope.tenantIdActual,
                         autor: $scope.usuarioSesion,
@@ -732,10 +782,10 @@
                 };
 
                 if (file) {
-                    let r = new FileReader();
-                    r.onload = function(e) { $scope.$apply(function() { crear(e.target.result); }); };
-                    r.readAsDataURL(file);
-                } else { crear(""); }
+                    $scope.compressImage(file, function(imgCompressed) {
+                        $scope.$apply(function() { enviar(imgCompressed); });
+                    });
+                } else { enviar(""); }
             };
 
             $scope.darMeGusta = function(post, $event) {
@@ -781,7 +831,6 @@
                 }
             };
 
-            // MODIFICAR USUARIOS Y ROLES (MASTER)
             $scope.abrirModalModificarUser = function(u) {
                 $scope.userEdit = angular.copy(u);
                 $scope.modalUserEditOpen = true;

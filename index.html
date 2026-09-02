@@ -114,7 +114,7 @@
                     <button type="button" ng-click="agregarActividad()" class="w-full py-4 px-6 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase shadow">+ Guardar Requerimiento</button>
                 </div>
 
-                <!-- TABLA DE LA MATRIZ CON SENSOR DE PROXIMIDAD DE VENCIMIENTO -->
+                <!-- TABLA DE LA MATRIZ -->
                 <div class="card-white p-4 sm:p-6 space-y-4">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs border-collapse min-w-[850px]">
@@ -306,14 +306,12 @@
                             let d = doc.data();
                             d.id = doc.id;
 
-                            // EVALUAR PROXIMIDAD DE VENCIMIENTO (3 DÍAS)
                             if (d.fechaLimite) {
                                 let fLim = new Date(d.fechaLimite);
                                 let difDias = Math.ceil((fLim - hoy) / (1000 * 3600 * 24));
                                 d.esPorVencer = (difDias >= 0 && difDias <= 3 && d.estado !== 'Completado');
                             }
 
-                            // FILTRADO DINÁMICO POR GERENCIA ASIGNADA
                             let coincideEmpresa = (d.empresa_id === $scope.tenantIdActual || $scope.esMaster);
                             let coincideGerencia = (!$scope.gerenciaPermitida || $scope.gerenciaPermitida === 'Todas' || d.categoria === $scope.gerenciaPermitida);
 
