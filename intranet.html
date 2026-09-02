@@ -54,7 +54,10 @@
         <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3.5 shadow-sm">
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md">HUB</div>
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md overflow-hidden">
+                        <img ng-if="perfilUsuario.fotoUrl" ng-src="{{ perfilUsuario.fotoUrl }}" class="w-full h-full object-cover">
+                        <span ng-if="!perfilUsuario.fotoUrl">👤</span>
+                    </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight uppercase">{{ nombreEmpresaActual }}</h1>
                         <p class="text-[10px] sm:text-xs text-slate-500 font-semibold">👤 {{ usuarioSesion }} | Tenant: <span class="font-mono text-slate-700">{{ tenantIdActual }}</span></p>
@@ -62,12 +65,14 @@
                 </div>
 
                 <!-- DESKTOP NAV -->
-                <div class="hidden md:flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-2">
                     <nav class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200">
                         <button class="nav-btn" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="moduloActivo = 'inicio'">🏠 Inicio</button>
-                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural Corporativo</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural</button>
                         <button class="nav-btn" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="moduloActivo = 'directorio'">👥 Directorio</button>
-                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'admin'}" ng-show="esMaster" ng-click="moduloActivo = 'admin'">⚙ Administrador Master</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'perfil'}" ng-click="moduloActivo = 'perfil'">⚙ Mi Perfil</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'auditoria'}" ng-show="esMaster || esAdminEmpresa" ng-click="moduloActivo = 'auditoria'">📜 Auditoría</button>
+                        <button class="nav-btn" ng-class="{'active': moduloActivo === 'admin'}" ng-show="esMaster" ng-click="moduloActivo = 'admin'">👑 Admin Master</button>
                     </nav>
                 </div>
 
@@ -80,7 +85,7 @@
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
 
-            <!-- INICIO CON DATOS REALES DE LA MATRIZ + TOP 5 Y RANKING -->
+            <!-- 1. INICIO - TOP 5 Y GERENCIAS CONECTADOS A LA MATRIZ DE GL-MONITOREO -->
             <section ng-show="moduloActivo === 'inicio'" class="space-y-6">
                 <div class="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 p-6 sm:p-8 text-white shadow-lg">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -92,17 +97,15 @@
                     </div>
                 </div>
 
-                <!-- TOP 5 & RANKING DE GERENCIAS (CONECTADO A LA MATRIZ DE GL-MONITOREO) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    <!-- TABLA TOP 5 -->
+                    <!-- TABLA TOP 5 CON MEDALLAS -->
                     <div class="card-white p-6 space-y-4">
                         <h3 class="text-sm font-black text-slate-900 uppercase">🏆 Top 5 Operadores de Eficiencia (SLA)</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-600 uppercase text-[10px]">
-                                        <th class="p-2.5 font-black">Medalla</th>
+                                        <th class="p-2.5 font-black">Lugar</th>
                                         <th class="p-2.5 font-black">Operador</th>
                                         <th class="p-2.5 font-black text-center">Completadas</th>
                                         <th class="p-2.5 font-black text-right">% Eficiencia</th>
@@ -125,7 +128,7 @@
                         </div>
                     </div>
 
-                    <!-- TABLA RANKING GERENCIAS -->
+                    <!-- RANKING GERENCIAS -->
                     <div class="card-white p-6 space-y-4">
                         <h3 class="text-sm font-black text-slate-900 uppercase">🏢 Ranking por Gerencias</h3>
                         <div class="overflow-x-auto">
@@ -149,27 +152,25 @@
                             </table>
                         </div>
                     </div>
-
                 </div>
             </section>
 
-            <!-- MURAL CORPORATIVO INTERACTIVO -->
+            <!-- 2. MURAL CORPORATIVO - ESTILO RED SOCIAL CON NOTIFICACIÓN DE REPORTES AL MASTER -->
             <section ng-show="moduloActivo === 'mural'" class="space-y-6 max-w-2xl mx-auto">
                 <div class="card-white p-6 space-y-4">
                     <h3 class="text-sm font-black text-slate-900 uppercase">💬 Mural Corporativo</h3>
                     <div class="space-y-3">
-                        <textarea ng-model="nuevoPost.mensaje" placeholder="Escribe un anuncio para el equipo..." class="input-light w-full resize-none" rows="3"></textarea>
+                        <textarea ng-model="nuevoPost.mensaje" placeholder="Escribe un anuncio para la organización..." class="input-light w-full resize-none" rows="3"></textarea>
                         <input type="url" ng-model="nuevoPost.enlace" placeholder="Copiar enlace (Video/Web)..." class="input-light w-full">
                         
                         <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                            <span class="text-xs text-slate-600 font-bold">📷 Adjuntar Foto desde Móvil/PC:</span>
+                            <span class="text-xs text-slate-600 font-bold">📷 Adjuntar Foto (Galería/Cámara):</span>
                             <input type="file" id="fileMural" accept="image/*" class="text-xs text-slate-500">
                         </div>
 
                         <button type="button" ng-click="publicarMural()" class="w-full py-3.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl shadow">🚀 Publicar Anuncio</button>
                     </div>
 
-                    <!-- FEED CON RECUENTO DE LIKES, CORAZONES Y COMENTARIOS -->
                     <div class="space-y-4 pt-4 border-t border-slate-200">
                         <div ng-repeat="post in listaPosts" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 relative">
                             <div class="flex justify-between items-center">
@@ -178,7 +179,6 @@
                             </div>
 
                             <p class="text-xs text-slate-700 font-medium">{{ post.mensaje }}</p>
-
                             <div ng-if="post.enlace" class="text-xs">🔗 <a href="{{ post.enlace }}" target="_blank" class="text-blue-600 font-bold underline">{{ post.enlace }}</a></div>
 
                             <div ng-if="post.imagenUrl" class="rounded-xl overflow-hidden border border-slate-200 max-h-80">
@@ -189,7 +189,10 @@
                                 <button type="button" ng-click="darMeGusta(post, $event)" class="text-xs font-bold flex items-center gap-1" ng-class="{'text-red-500': post.usuarioDioLike, 'text-slate-500': !post.usuarioDioLike}">
                                     ❤️ {{ post.likes || 0 }} Me Gusta
                                 </button>
-                                <button type="button" ng-if="post.autor === usuarioSesion || esMaster" ng-click="eliminarPost(post)" class="text-xs font-bold text-red-600">🗑 Eliminar</button>
+                                <div class="flex gap-3">
+                                    <button type="button" ng-click="reportarPost(post)" class="text-xs font-bold text-amber-600">🚩 Reportar</button>
+                                    <button type="button" ng-if="post.autor === usuarioSesion || esMaster" ng-click="eliminarPost(post)" class="text-xs font-bold text-red-600">🗑 Borrar</button>
+                                </div>
                             </div>
 
                             <!-- COMENTARIOS -->
@@ -207,55 +210,142 @@
                 </div>
             </section>
 
-            <!-- DIRECTORIO DE PERSONAL -->
+            <!-- 3. DIRECTORIO CORPORATIVO VISUAL CON BUSCADOR Y EXPORTACIÓN -->
             <section ng-show="moduloActivo === 'directorio'" class="space-y-6">
-                <h2 class="text-xl font-black text-slate-900 uppercase">Directorio de Personal</h2>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <h2 class="text-xl font-black text-slate-900 uppercase">Directorio de Personal</h2>
+                    <div class="flex w-full sm:w-auto gap-2">
+                        <input type="text" ng-model="filtroDirectorio" placeholder="🔍 Buscar personal..." class="input-light text-xs flex-1 sm:w-64">
+                        <button type="button" ng-click="exportarDirectorioExcel()" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs uppercase rounded-xl shadow">📥 Excel</button>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <div ng-repeat="p in listaDirectorio" class="card-white p-5 text-center space-y-2 border border-slate-200">
-                        <div class="w-16 h-16 rounded-full bg-blue-600 mx-auto flex items-center justify-center text-xl font-bold text-white">👤</div>
+                    <div ng-repeat="p in listaDirectorio | filter:filtroDirectorio" class="card-white p-5 text-center space-y-2 border border-slate-200">
+                        <div class="w-16 h-16 rounded-full bg-blue-600 mx-auto flex items-center justify-center text-xl font-bold text-white overflow-hidden shadow-md">
+                            <img ng-if="p.fotoUrl" ng-src="{{ p.fotoUrl }}" class="w-full h-full object-cover">
+                            <span ng-if="!p.fotoUrl">👤</span>
+                        </div>
                         <div>
                             <h3 class="font-bold text-sm text-slate-900">{{ p.nombre }}</h3>
-                            <p class="text-[10px] font-bold text-blue-600 uppercase">{{ p.cargo }}</p>
-                            <p class="text-xs text-slate-500 mt-1">📧 {{ p.correo }}</p>
-                            <p class="text-xs text-slate-500">📞 {{ p.telefono }} | Ext: <span class="font-mono font-bold text-slate-800">{{ p.ext }}</span></p>
+                            <p class="text-[10px] font-bold text-blue-600 uppercase">{{ p.cargo || 'Operador' }}</p>
+                            <p class="text-xs text-slate-500 mt-1">📧 {{ p.correo || 'N/A' }}</p>
+                            <p class="text-xs text-slate-500">📞 {{ p.telefono || 'N/A' }} | Ext: <span class="font-mono font-bold text-slate-800">{{ p.ext || 'N/A' }}</span></p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- CONTROL MASTER ADMIN (`luis` / `control2026`) -->
+            <!-- 4. PERFIL DE USUARIO -->
+            <section ng-show="moduloActivo === 'perfil'" class="space-y-6 max-w-xl mx-auto">
+                <div class="card-white p-6 space-y-4">
+                    <h3 class="text-sm font-black text-slate-900 uppercase">⚙ Configuración de Perfil Personal</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="text-center">
+                            <div class="w-20 h-20 rounded-full bg-blue-600 mx-auto flex items-center justify-center text-white text-2xl font-bold overflow-hidden shadow-lg mb-2">
+                                <img ng-if="perfilUsuario.fotoUrl" ng-src="{{ perfilUsuario.fotoUrl }}" class="w-full h-full object-cover">
+                                <span ng-if="!perfilUsuario.fotoUrl">👤</span>
+                            </div>
+                            <label class="text-xs font-bold text-blue-600 cursor-pointer">
+                                📷 Cambiar Foto de Perfil
+                                <input type="file" id="fileFotoPerfil" accept="image/*" class="hidden" onchange="angular.element(this).scope().subirFotoPerfil(this)">
+                            </label>
+                        </div>
+
+                        <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Correo Electrónico</label><input type="email" ng-model="perfilUsuario.correo" class="input-light w-full"></div>
+                        <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Teléfono Personal</label><input type="text" ng-model="perfilUsuario.telefono" class="input-light w-full"></div>
+                        <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Extensión Corporativa</label><input type="text" ng-model="perfilUsuario.ext" class="input-light w-full"></div>
+                        <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Nueva Contraseña</label><input type="password" ng-model="perfilUsuario.nuevaPassword" placeholder="Dejar en blanco si no deseas cambiarla" class="input-light w-full"></div>
+
+                        <button type="button" ng-click="guardarPerfil()" class="w-full py-3.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-2xl shadow">💾 Guardar Cambios de Perfil</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. LOG DE AUDITORÍA CON FILTROS Y EXPORTACIÓN EXCEL -->
+            <section ng-show="moduloActivo === 'auditoria'" class="space-y-6">
+                <div class="card-white p-6 space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <h3 class="text-sm font-black text-slate-900 uppercase">📜 Traza de Auditoría & Accesos</h3>
+                        <div class="flex w-full sm:w-auto gap-2">
+                            <input type="text" ng-model="filtroAuditoria" placeholder="🔍 Filtrar traza..." class="input-light text-xs flex-1 sm:w-64">
+                            <button type="button" ng-click="exportarAuditoriaExcel()" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs uppercase rounded-xl shadow">📥 Excel</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 uppercase text-[10px]">
+                                    <th class="p-3 font-black">Fecha / Hora</th>
+                                    <th class="p-3 font-black">Usuario</th>
+                                    <th class="p-3 font-black">Acción</th>
+                                    <th class="p-3 font-black">Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="log in logsAuditoria | filter:filtroAuditoria" class="border-b border-slate-100">
+                                    <td class="p-3 font-mono text-[10px] text-slate-500">{{ log.fecha }}</td>
+                                    <td class="p-3 font-bold text-slate-900">{{ log.usuario }}</td>
+                                    <td class="p-3 font-bold text-blue-600 uppercase">{{ log.accion }}</td>
+                                    <td class="p-3 text-slate-600">{{ log.detalle }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. ADMINISTRADOR MASTER (`luis` / `control2026`) -->
             <section ng-show="moduloActivo === 'admin'" class="space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="card-white p-5"><span class="text-xs font-bold text-slate-500 uppercase">Total Usuarios Creados</span><div class="text-3xl font-black text-blue-600 mt-1">{{ listaUsuariosAdmin.length }}</div></div>
                     <div class="card-white p-5"><span class="text-xs font-bold text-slate-500 uppercase">Total Empresas Registradas</span><div class="text-3xl font-black text-indigo-600 mt-1">{{ listaEmpresasAdmin.length }}</div></div>
+                    <div class="card-white p-5"><span class="text-xs font-bold text-amber-600 uppercase">Reportes del Mural</span><div class="text-3xl font-black text-amber-600 mt-1">{{ listaReportesMural.length }}</div></div>
                 </div>
 
+                <!-- ALERTAS / REPORTES PENDIENTES DEL MURAL -->
+                <div ng-if="listaReportesMural.length > 0" class="card-white p-6 space-y-3 border-l-8 border-l-amber-500">
+                    <h3 class="text-xs font-black text-amber-700 uppercase">🚩 Reportes de Publicaciones Señaladas</h3>
+                    <div ng-repeat="rep in listaReportesMural" class="p-3 bg-amber-50 rounded-xl text-xs space-y-1 border border-amber-200">
+                        <div class="flex justify-between font-bold text-amber-900"><span>Reportado por: {{ rep.reportadoPor }}</span><span class="text-[10px] font-mono">{{ rep.fecha }}</span></div>
+                        <p class="text-slate-700">Contenido: "{{ rep.mensaje }}"</p>
+                    </div>
+                </div>
+
+                <!-- PANEL CRUD DE USUARIOS MASTER -->
                 <div class="card-white p-6 space-y-4">
-                    <h3 class="text-sm font-black text-slate-900 uppercase">⚙ Administración de Usuarios & Accesos Globales</h3>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <h3 class="text-sm font-black text-slate-900 uppercase">⚙ Control Master de Usuarios & Claves</h3>
+                        <input type="text" ng-model="filtroUsuariosMaster" placeholder="🔍 Buscar usuario/empresa..." class="input-light text-xs w-full sm:w-64">
+                    </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                         <input type="text" ng-model="nuevoUser.nombre" placeholder="Nombre completo" class="input-light">
                         <input type="text" ng-model="nuevoUser.usuario" placeholder="Usuario" class="input-light">
                         <input type="password" ng-model="nuevoUser.password" placeholder="Contraseña" class="input-light">
-                        <button type="button" ng-click="crearUsuarioMaster()" class="py-2.5 bg-emerald-600 text-white font-bold text-xs uppercase rounded-xl">+ Crear Usuario</button>
+                        <button type="button" ng-click="crearUsuarioMaster()" class="py-2.5 bg-emerald-600 text-white font-bold text-xs uppercase rounded-xl shadow">+ Crear Usuario</button>
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
+                        <table class="w-full text-left text-xs border-collapse min-w-[700px]">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-600 uppercase text-[10px]">
                                     <th class="p-3 font-black">Nombre</th>
                                     <th class="p-3 font-black">Usuario</th>
+                                    <th class="p-3 font-black">Contraseña</th>
                                     <th class="p-3 font-black">Empresa</th>
                                     <th class="p-3 font-black text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="u in listaUsuariosAdmin" class="border-b border-slate-100">
+                                <tr ng-repeat="u in listaUsuariosAdmin | filter:filtroUsuariosMaster" class="border-b border-slate-100">
                                     <td class="p-3 font-bold text-slate-900">{{ u.nombre }}</td>
                                     <td class="p-3 font-mono text-blue-600">{{ u.usuario }}</td>
+                                    <td class="p-3 font-mono text-slate-700 bg-slate-100 px-2 rounded font-bold">{{ u.password }}</td>
                                     <td class="p-3 text-slate-600">{{ u.nombre_empresa }}</td>
-                                    <td class="p-3 text-center">
+                                    <td class="p-3 text-center space-x-1">
                                         <button type="button" ng-click="eliminarUsuarioMaster(u)" class="px-2.5 py-1.5 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 text-[10px]">🗑 Eliminar</button>
                                     </td>
                                 </tr>
@@ -275,7 +365,8 @@
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'inicio'}" ng-click="moduloActivo = 'inicio'">🏠 Inicio</button>
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'mural'}" ng-click="moduloActivo = 'mural'">💬 Mural</button>
             <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'directorio'}" ng-click="moduloActivo = 'directorio'">👥 Personal</button>
-            <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'admin'}" ng-show="esMaster" ng-click="moduloActivo = 'admin'">⚙ Admin</button>
+            <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'perfil'}" ng-click="moduloActivo = 'perfil'">⚙ Perfil</button>
+            <button class="mobile-nav-item" ng-class="{'active': moduloActivo === 'admin'}" ng-show="esMaster" ng-click="moduloActivo = 'admin'">👑 Admin</button>
         </div>
     </div>
 
@@ -298,20 +389,21 @@
             $scope.tenantIdActual = localStorage.getItem('tenantIdHub') || "GL-MONITOREO";
             $scope.nombreEmpresaActual = localStorage.getItem('nombreEmpresaHub') || "GL Monitoreo y OP de Servicios";
             $scope.esMaster = localStorage.getItem('esMasterHub') === 'true';
+            $scope.esAdminEmpresa = localStorage.getItem('esAdminEmpresaHub') === 'true';
             $scope.moduloActivo = 'inicio';
 
             $scope.top5Operadores = [];
             $scope.rankingGerencias = [];
             $scope.listaPosts = [];
             $scope.listaUsuariosAdmin = [];
+            $scope.listaReportesMural = [];
+            $scope.logsAuditoria = [];
             $scope.listaEmpresasAdmin = [{ nombre: "GL Monitoreo y OP de Servicios", tenantId: "GL-MONITOREO" }];
             $scope.nuevoPost = {};
             $scope.nuevoUser = {};
+            $scope.perfilUsuario = { correo: "", telefono: "", ext: "", fotoUrl: "", nuevaPassword: "" };
 
-            $scope.listaDirectorio = [
-                { nombre: "Luis Coronado", cargo: "Gerente Operativo / Admin", correo: "lcoronado@glmonitoreo.com", telefono: "+58 412-0000000", ext: "101" },
-                { nombre: "Analista de Control", cargo: "Operador de Recaudación", correo: "analista@glmonitoreo.com", telefono: "+58 412-1111111", ext: "102" }
-            ];
+            $scope.listaDirectorio = [];
 
             if ($scope.sesionIniciada && db) { $timeout(function() { $scope.sincronizarFirebase(); }); }
 
@@ -325,7 +417,7 @@
                 $scope.cargandoLogin = true;
                 var dbTimeout = setTimeout(function() {
                     let esM = (u === 'luis' && p === 'control2026');
-                    $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", esM);
+                    $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", esM, true);
                 }, 500);
 
                 if (db) {
@@ -338,13 +430,14 @@
                                 if ((d.usuario || "").toString().trim().toLowerCase() === u && (d.password || "").toString().trim() === p) hallado = d;
                             });
                             let esM = (u === 'luis' && p === 'control2026');
-                            $scope.ejecutarIngreso(hallado ? (hallado.nombre || u) : (u === 'luis' ? 'Luis Coronado' : u), hallado ? (hallado.empresa_id || "GL-MONITOREO") : "GL-MONITOREO", hallado ? (hallado.nombre_empresa || "GL Monitoreo y OP de Servicios") : "GL Monitoreo y OP de Servicios", esM);
+                            let esA = hallado ? (hallado.rol === 'admin_empresa' || esM) : true;
+                            $scope.ejecutarIngreso(hallado ? (hallado.nombre || u) : (u === 'luis' ? 'Luis Coronado' : u), hallado ? (hallado.empresa_id || "GL-MONITOREO") : "GL-MONITOREO", hallado ? (hallado.nombre_empresa || "GL Monitoreo y OP de Servicios") : "GL Monitoreo y OP de Servicios", esM, esA);
                         });
-                    }).catch(function() { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true); });
-                } else { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true); }
+                    }).catch(function() { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true, true); });
+                } else { clearTimeout(dbTimeout); $scope.ejecutarIngreso(u === 'luis' ? 'Luis Coronado' : u, "GL-MONITOREO", "GL Monitoreo y OP de Servicios", true, true); }
             };
 
-            $scope.ejecutarIngreso = function(nombre, tenant, nombreEmpresa, esM) {
+            $scope.ejecutarIngreso = function(nombre, tenant, nombreEmpresa, esM, esA) {
                 $scope.$evalAsync(function() {
                     $scope.cargandoLogin = false;
                     $scope.sesionIniciada = true;
@@ -352,13 +445,16 @@
                     $scope.tenantIdActual = tenant;
                     $scope.nombreEmpresaActual = nombreEmpresa;
                     $scope.esMaster = esM;
+                    $scope.esAdminEmpresa = esA;
 
                     localStorage.setItem('sesionIniciadaHub', 'true');
                     localStorage.setItem('usuarioSesionHub', nombre);
                     localStorage.setItem('tenantIdHub', tenant);
                     localStorage.setItem('nombreEmpresaHub', nombreEmpresa);
                     localStorage.setItem('esMasterHub', esM ? 'true' : 'false');
+                    localStorage.setItem('esAdminEmpresaHub', esA ? 'true' : 'false');
 
+                    $scope.registrarLog("LOGIN_HUB", "Ingreso al Hub Operativo");
                     if (db) $scope.sincronizarFirebase();
                 });
             };
@@ -366,7 +462,6 @@
             $scope.sincronizarFirebase = function() {
                 if (!db) return;
 
-                // ALIMENTACIÓN DE ESTADÍSTICAS DESDE LA MATRIZ OPERATIVA
                 db.collection("actividades_operativas").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         let mapaOpTot = {}, mapaOpComp = {};
@@ -387,7 +482,6 @@
                             }
                         });
 
-                        // ARRAYS PARA EL TOP 5 Y GERENCIAS
                         $scope.top5Operadores = Object.keys(mapaOpTot).map(k => ({
                             nombre: k,
                             completadas: mapaOpComp[k],
@@ -402,7 +496,6 @@
                     });
                 });
 
-                // MURAL
                 db.collection("mural_posts").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.listaPosts = [];
@@ -417,17 +510,68 @@
                     });
                 });
 
-                // ADMIN USUARIOS
                 db.collection("personal_intranet").onSnapshot(snapshot => {
                     $scope.$evalAsync(function() {
                         $scope.listaUsuariosAdmin = [];
+                        $scope.listaDirectorio = [];
                         snapshot.forEach(doc => {
                             let d = doc.data();
                             d.id = doc.id;
                             $scope.listaUsuariosAdmin.push(d);
+                            if (d.empresa_id === $scope.tenantIdActual || $scope.esMaster) {
+                                $scope.listaDirectorio.push(d);
+                            }
                         });
                     });
                 });
+
+                db.collection("reportes_mural").onSnapshot(snapshot => {
+                    $scope.$evalAsync(function() {
+                        $scope.listaReportesMural = [];
+                        snapshot.forEach(doc => { $scope.listaReportesMural.push(doc.data()); });
+                    });
+                });
+
+                db.collection("auditoria_logs").onSnapshot(snapshot => {
+                    $scope.$evalAsync(function() {
+                        $scope.logsAuditoria = [];
+                        snapshot.forEach(doc => { $scope.logsAuditoria.unshift(doc.data()); });
+                    });
+                });
+            };
+
+            $scope.registrarLog = function(accion, detalle) {
+                if (db) db.collection("auditoria_logs").add({ fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(), usuario: $scope.usuarioSesion, empresa_id: $scope.tenantIdActual, accion: accion, detalle: detalle });
+            };
+
+            $scope.subirFotoPerfil = function(element) {
+                let file = element.files[0];
+                if (file) {
+                    let r = new FileReader();
+                    r.onload = function(e) {
+                        $scope.$apply(function() { $scope.perfilUsuario.fotoUrl = e.target.result; });
+                    };
+                    r.readAsDataURL(file);
+                }
+            };
+
+            $scope.guardarPerfil = function() {
+                if (db) {
+                    db.collection("personal_intranet").where("usuario", "==", $scope.usuarioSesion.toLowerCase()).get().then(snapshot => {
+                        snapshot.forEach(doc => {
+                            let upd = {
+                                correo: $scope.perfilUsuario.correo,
+                                telefono: $scope.perfilUsuario.telefono,
+                                ext: $scope.perfilUsuario.ext,
+                                fotoUrl: $scope.perfilUsuario.fotoUrl
+                            };
+                            if ($scope.perfilUsuario.nuevaPassword) upd.password = $scope.perfilUsuario.nuevaPassword;
+                            db.collection("personal_intranet").doc(doc.id).update(upd);
+                        });
+                        alert("Perfil actualizado correctamente.");
+                        $scope.registrarLog("PERFIL_ACTUALIZADO", "Datos personales modificados");
+                    });
+                }
             };
 
             $scope.publicarMural = function() {
@@ -448,6 +592,7 @@
                         comentarios: []
                     };
                     if (db) db.collection("mural_posts").add(p);
+                    $scope.registrarLog("NUEVO_MURAL", "Anuncio publicado en el mural");
                     $scope.nuevoPost = {};
                     if (fileInput) fileInput.value = "";
                 };
@@ -477,6 +622,13 @@
                 }
             };
 
+            $scope.reportarPost = function(post) {
+                if (confirm("¿Reportar esta publicación al usuario Master?")) {
+                    if (db) db.collection("reportes_mural").add({ reportadoPor: $scope.usuarioSesion, mensaje: post.mensaje, fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString() });
+                    alert("Publicación reportada al usuario Master.");
+                }
+            };
+
             $scope.comentarPost = function(post) {
                 if (!post.nuevoComentario) return;
                 if (!post.comentarios) post.comentarios = [];
@@ -496,12 +648,14 @@
                     rol: "operador"
                 };
                 if (db) db.collection("personal_intranet").add(payload);
+                $scope.registrarLog("CREAR_USUARIO", "Nuevo usuario creado: " + payload.usuario);
                 $scope.nuevoUser = {};
             };
 
             $scope.eliminarUsuarioMaster = function(u) {
                 if (confirm("¿Eliminar usuario " + u.usuario + "?")) {
                     if (db && u.id) db.collection("personal_intranet").doc(u.id).delete();
+                    $scope.registrarLog("ELIMINAR_USUARIO", "Usuario eliminado: " + u.usuario);
                 }
             };
 
@@ -517,6 +671,22 @@
                 $scope.top5Operadores.forEach(op => data.push([op.nombre, op.completadas, op.eficiencia + '%']));
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Métricas");
                 XLSX.writeFile(wb, `Reporte_Eficiencia_${$scope.tenantIdActual}.xlsx`);
+            };
+
+            $scope.exportarDirectorioExcel = function() {
+                let wb = XLSX.utils.book_new();
+                let data = [["Nombre", "Cargo", "Correo", "Teléfono", "Extensión"]];
+                $scope.listaDirectorio.forEach(p => data.push([p.nombre, p.cargo, p.correo, p.telefono, p.ext]));
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Directorio");
+                XLSX.writeFile(wb, `Directorio_${$scope.tenantIdActual}.xlsx`);
+            };
+
+            $scope.exportarAuditoriaExcel = function() {
+                let wb = XLSX.utils.book_new();
+                let data = [["Fecha/Hora", "Usuario", "Acción", "Detalle"]];
+                $scope.logsAuditoria.forEach(l => data.push([l.fecha, l.usuario, l.accion, l.detalle]));
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Auditoria");
+                XLSX.writeFile(wb, `Auditoria_${$scope.tenantIdActual}.xlsx`);
             };
 
             $scope.cerrarSesion = function() { localStorage.clear(); $scope.sesionIniciada = false; window.location.reload(); };
